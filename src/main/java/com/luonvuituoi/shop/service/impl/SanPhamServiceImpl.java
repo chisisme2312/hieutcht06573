@@ -21,6 +21,11 @@ public class SanPhamServiceImpl implements SanPhamService {
     }
 
     @Override
+    public List<SanPham> getActiveWithDetails() {
+        return sanPhamRepository.findAllActiveWithDetails();
+    }
+
+    @Override
     public Optional<SanPham> getById(Integer id) {
         return sanPhamRepository.findById(id);
     }

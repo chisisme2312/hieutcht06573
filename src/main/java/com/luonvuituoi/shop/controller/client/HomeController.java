@@ -15,7 +15,7 @@ public class HomeController {
     // TODO: Thành viên làm Giao diện khách hàng (Client) code ở đây
     @GetMapping("/")
     public String trangChu(Model model) {
-        model.addAttribute("danhSachSanPham", sanPhamService.getAll());
+        model.addAttribute("danhSachSanPham", sanPhamService.getActiveWithDetails());
         return "client/index";
     }
 }

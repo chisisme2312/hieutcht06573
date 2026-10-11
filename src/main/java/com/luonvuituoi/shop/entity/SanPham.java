@@ -49,8 +49,8 @@ public class SanPham {
     private LocalDateTime ngayTao;
 
     @OneToMany(mappedBy = "sanPham", cascade = CascadeType.ALL)
-    private List<Anh> danhSachAnh;
+    private java.util.Set<Anh> danhSachAnh;
 
     @OneToMany(mappedBy = "sanPham", cascade = CascadeType.ALL)
-    private List<SanPhamChiTiet> danhSachChiTiet;
+    private java.util.Set<SanPhamChiTiet> danhSachChiTiet;
 }
