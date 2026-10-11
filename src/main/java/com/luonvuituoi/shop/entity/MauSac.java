@@ -1,0 +1,30 @@
+package com.luonvuituoi.shop.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "mau_sac")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class MauSac {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @Column(name = "ten_mau_sac", nullable = false, unique = true)
+    private String tenMauSac;
+
+    @Column(name = "trang_thai")
+    private Boolean trangThai;
+
+    @Column(name = "mo_ta")
+    private String moTa;
+
+    @Column(name = "ngay_tao")
+    private LocalDateTime ngayTao;
+}
