@@ -6,6 +6,7 @@ import com.luonvuituoi.shop.entity.SanPhamChiTiet;
 import com.luonvuituoi.shop.service.SanPhamChiTietService;
 import com.luonvuituoi.shop.service.SanPhamService;
 import com.luonvuituoi.shop.service.ThuocTinhService;
+import com.luonvuituoi.shop.util.DatabaseFontFixer;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
@@ -29,6 +30,15 @@ public class SanPhamAdminController {
     private final SanPhamService sanPhamService;
     private final SanPhamChiTietService sanPhamChiTietService;
     private final ThuocTinhService thuocTinhService;
+    private final DatabaseFontFixer databaseFontFixer;
+
+    // 1.0 Endpoint Sửa Font tiếng Việt Unicode cho toàn bộ sản phẩm
+    @GetMapping("/sua-font")
+    public String suaFont(RedirectAttributes ra) {
+        databaseFontFixer.fixProductNames();
+        ra.addFlashAttribute("thongBao", "Đã cập nhật lại toàn bộ font chữ tiếng Việt chuẩn Unicode cho sản phẩm!");
+        return "redirect:/admin/san-pham";
+    }
 
     // 1. Danh sách sản phẩm (Phân trang & Lọc đa tiêu chí)
     @GetMapping
