@@ -384,6 +384,47 @@ public class SanPhamAdminController {
         return "redirect:/admin/san-pham/bien-the/" + sanPhamId;
     }
 
+    // 7.1 Cập nhật thông tin 1 biến thể chi tiết (Màu, Size, Giá, Tồn kho, Trạng thái)
+    @PostMapping("/bien-the/cap-nhat")
+    public String capNhatBienThe(@RequestParam("id") Integer id,
+                                 @RequestParam("sanPhamId") Integer sanPhamId,
+                                 @RequestParam("mauSacId") Integer mauSacId,
+                                 @RequestParam("kichThuocId") Integer kichThuocId,
+                                 @RequestParam("giaBan") BigDecimal giaBan,
+                                 @RequestParam(value = "giaBanBanDau", required = false) BigDecimal giaBanBanDau,
+                                 @RequestParam("soLuongTon") Integer soLuongTon,
+                                 @RequestParam("trangThai") Boolean trangThai,
+                                 RedirectAttributes ra) {
+        try {
+            var ctOpt = sanPhamChiTietService.getById(id);
+            if (ctOpt.isPresent()) {
+                SanPhamChiTiet ct = ctOpt.get();
+                thuocTinhService.getMauSacById(mauSacId).ifPresent(ct::setMauSac);
+                thuocTinhService.getKichThuocById(kichThuocId).ifPresent(ct::setKichThuoc);
+                ct.setGiaBan(giaBan != null ? giaBan : BigDecimal.ZERO);
+                ct.setGiaBanBanDau(giaBanBanDau != null ? giaBanBanDau : ct.getGiaBan());
+                ct.setSoLuongTon(soLuongTon != null ? soLuongTon : 0);
+                ct.setTrangThai(trangThai != null ? trangThai : true);
+
+                // Cập nhật lại mã biến thể nếu đổi Màu hoặc Size
+                if (ct.getSanPham() != null) {
+                    ct.setMaSanPhamChiTiet(ct.getSanPham().getMaSanPham() + "-" + mauSacId + "-" + kichThuocId);
+                }
+
+                sanPhamChiTietService.save(ct);
+                ra.addFlashAttribute("thongBao", "Cập nhật biến thể thành công!");
+            }
+        } catch (Exception e) {
+            String msg = e.getMessage();
+            if (msg != null && (msg.contains("duplicate") || msg.contains("UNIQUE") || msg.contains("ma_san_pham_chi_tiet"))) {
+                ra.addFlashAttribute("loi", "Biến thể với Màu sắc và Size này đã tồn tại trong mẫu áo!");
+            } else {
+                ra.addFlashAttribute("loi", "Lỗi cập nhật biến thể: " + e.getMessage());
+            }
+        }
+        return "redirect:/admin/san-pham/bien-the/" + sanPhamId;
+    }
+
     // 8. Xóa Biến Thể Chi Tiết
     @GetMapping("/bien-the/xoa/{id}")
     public String xoaBienThe(@PathVariable("id") Integer id,
