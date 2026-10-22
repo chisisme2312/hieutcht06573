@@ -78,7 +78,7 @@ public class SanPhamAdminController {
             sp.setTrangThai(trangThaiMoi);
             sanPhamService.save(sp);
             ra.addFlashAttribute("thongBao", "Đã chuyển trạng thái mẫu áo [" + sp.getTenSanPham() + "] thành: " 
-                    + (trangThaiMoi ? "Đang kinh doanh" : "Ngừng bán"));
+                    + (trangThaiMoi ? "🟢 Đang kinh doanh (Hiển thị ở trang bán hàng)" : "⚪ Ngừng kinh doanh (Tạm ẩn khỏi trang khách)"));
         }
         return "redirect:/admin/san-pham";
     }

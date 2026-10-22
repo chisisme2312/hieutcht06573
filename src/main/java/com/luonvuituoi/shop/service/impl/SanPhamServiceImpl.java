@@ -101,7 +101,7 @@ public class SanPhamServiceImpl implements SanPhamService {
                             .giaBan(giaBan != null ? giaBan : BigDecimal.ZERO)
                             .giaBanBanDau(giaBanBanDau != null ? giaBanBanDau : giaBan)
                             .soLuongTon(soLuongTon != null ? soLuongTon : 10)
-                            .trangThai(true)
+                            .trangThai(savedSp.getTrangThai() != null ? savedSp.getTrangThai() : true)
                             .build();
 
                     sanPhamChiTietRepository.save(ct);

@@ -177,9 +177,9 @@
                                     <a th:href="@{'/admin/san-pham/doi-trang-thai/' + ${sp.id}}" 
                                        class="badge text-decoration-none py-2 px-2"
                                        th:classappend="${sp.trangThai == true ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-secondary-subtle text-secondary border border-secondary-subtle'}"
-                                       th:title="${sp.trangThai == true ? 'Bấm để chuyển sang Ngừng bán' : 'Bấm để chuyển sang Đang bán'}">
+                                       th:title="${sp.trangThai == true ? 'Bấm để chuyển sang Ngừng kinh doanh (Tạm ẩn khỏi trang khách)' : 'Bấm để chuyển sang Đang kinh doanh (Hiện ở trang khách)'}">
                                         <i class="bi me-1" th:classappend="${sp.trangThai == true ? 'bi-check-circle-fill' : 'bi-slash-circle'}"></i>
-                                        <span th:text="${sp.trangThai == true ? 'Đang bán' : 'Ngừng bán'}"></span>
+                                        <span th:text="${sp.trangThai == true ? 'Đang kinh doanh' : 'Ngừng kinh doanh'}"></span>
                                     </a>
                                 </td>
                                 <td class="text-center">

@@ -70,10 +70,14 @@
 
                                 <div class="col-12">
                                     <label class="form-label fw-semibold text-secondary">Trạng thái kinh doanh</label>
-                                    <select th:field="*{trangThai}" class="form-select" style="max-width: 250px;">
-                                        <option th:value="true">Đang bán</option>
-                                        <option th:value="false">Ngừng bán</option>
+                                    <select th:field="*{trangThai}" class="form-select" style="max-width: 380px;">
+                                        <option th:value="true">🟢 Đang kinh doanh (Hiển thị ở trang bán hàng)</option>
+                                        <option th:value="false">⚪ Ngừng kinh doanh (Tạm ẩn khỏi trang khách)</option>
                                     </select>
+                                    <div class="form-text text-muted mt-1">
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        Mẫu áo <strong>"Ngừng kinh doanh"</strong> vẫn được lưu và quản lý trong trang <strong>Admin</strong>, nhưng hệ thống sẽ tự động ẩn khỏi <strong>Trang bán hàng của khách</strong>.
+                                    </div>
                                 </div>
 
                                 <div class="col-12">
