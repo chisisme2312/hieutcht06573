@@ -4,6 +4,10 @@ import com.luonvuituoi.shop.entity.*;
 import com.luonvuituoi.shop.repository.*;
 import com.luonvuituoi.shop.service.SanPhamService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,6 +54,13 @@ public class SanPhamServiceImpl implements SanPhamService {
     @Override
     public List<SanPham> searchByName(String keyword) {
         return sanPhamRepository.findByTenSanPhamContainingIgnoreCase(keyword);
+    }
+
+    @Override
+    public Page<SanPham> filterSanPham(String keyword, Integer loaiSanPhamId, Boolean trangThai, int page, int size) {
+        String cleanKeyword = (keyword != null && !keyword.trim().isEmpty()) ? keyword.trim() : null;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+        return sanPhamRepository.filterSanPham(cleanKeyword, loaiSanPhamId, trangThai, pageable);
     }
 
     @Override

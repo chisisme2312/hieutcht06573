@@ -71,18 +71,49 @@
                 </div>
             </div>
 
-            <!-- Bộ lọc và tìm kiếm sản phẩm -->
+            <!-- Bộ lọc và tìm kiếm sản phẩm nâng cao -->
             <div class="card card-custom p-3 mb-4">
                 <form th:action="@{/admin/san-pham}" method="get" class="row g-2 align-items-center">
-                    <div class="col-md-9">
+                    <!-- Ô tìm kiếm từ khóa -->
+                    <div class="col-md-4">
                         <div class="input-group">
                             <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
-                            <input type="text" name="keyword" th:value="${keyword}" class="form-control border-start-0" placeholder="Tìm kiếm theo tên mẫu áo (ví dụ: Áo thun, Polo, Sơ mi...)...">
+                            <input type="text" name="keyword" th:value="${keyword}" class="form-control border-start-0" placeholder="Tên hoặc mã áo (AT01, Polo...)...">
                         </div>
                     </div>
+
+                    <!-- Lọc theo Loại sản phẩm -->
+                    <div class="col-md-3">
+                        <select name="loaiSanPhamId" class="form-select">
+                            <option value="">-- Tất cả loại áo --</option>
+                            <option th:each="loai : ${listLoaiSanPham}" 
+                                    th:value="${loai.id}" 
+                                    th:text="${loai.tenLoaiSanPham}" 
+                                    th:selected="${loaiSanPhamId == loai.id}"></option>
+                        </select>
+                    </div>
+
+                    <!-- Lọc theo Trạng thái -->
+                    <div class="col-md-2">
+                        <select name="trangThai" class="form-select">
+                            <option value="">-- Trạng thái --</option>
+                            <option value="true" th:selected="${trangThai == true}">Đang kinh doanh</option>
+                            <option value="false" th:selected="${trangThai == false}">Ngừng kinh doanh</option>
+                        </select>
+                    </div>
+
+                    <!-- Nút thao tác -->
                     <div class="col-md-3 d-flex gap-2">
-                        <button type="submit" class="btn btn-danger flex-grow-1 fw-bold"><i class="bi bi-search me-1"></i> Tìm Kiếm</button>
-                        <a th:if="${keyword != null && !keyword.empty}" href="/admin/san-pham" class="btn btn-light border fw-semibold">Xóa lọc</a>
+                        <button type="submit" class="btn btn-danger fw-bold flex-grow-1">
+                            <i class="bi bi-funnel-fill me-1"></i> Lọc
+                        </button>
+                        <a href="/admin/san-pham" class="btn btn-light border fw-semibold" title="Xóa bộ lọc">
+                            <i class="bi bi-arrow-counterclockwise"></i>
+                        </a>
+                        <!-- Nút Xuất Excel -->
+                        <a href="/admin/san-pham/xuat-excel" class="btn btn-success fw-bold" title="Xuất toàn bộ danh sách ra file Excel">
+                            <i class="bi bi-file-earmark-excel-fill me-1"></i> Excel
+                        </a>
                     </div>
                 </form>
             </div>
@@ -90,11 +121,18 @@
             <!-- Bảng danh sách sản phẩm -->
             <div class="card card-custom p-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="fw-bold text-dark mb-0">📦 Danh Sách Mẫu Áo</h5>
+                    <div>
+                        <h5 class="fw-bold text-dark mb-0">📦 Danh Sách Mẫu Áo</h5>
+                        <small class="text-muted" th:if="${totalItems != null}">
+                            Tìm thấy <strong class="text-danger" th:text="${totalItems}">0</strong> mẫu áo phù hợp
+                        </small>
+                    </div>
                     <div class="d-flex align-items-center gap-2">
-                        <span class="badge bg-light text-dark border fw-bold" th:text="'Tổng: ' + ${danhSach.size()} + ' mẫu áo'"></span>
+                        <a href="/admin/san-pham/xuat-excel" class="btn btn-sm btn-outline-success fw-semibold">
+                            <i class="bi bi-download me-1"></i> Xuất Excel
+                        </a>
                         <a href="/admin/san-pham/them-moi" class="btn btn-sm btn-danger fw-semibold">
-                            <i class="bi bi-plus-lg me-1"></i> Thêm Áo
+                            <i class="bi bi-plus-lg me-1"></i> Thêm Áo Mới
                         </a>
                     </div>
                 </div>
@@ -109,11 +147,18 @@
                                 <th>Loại Áo</th>
                                 <th>Thương Hiệu</th>
                                 <th>Chất Liệu</th>
-                                <th>Trạng Thái</th>
+                                <th>Biến Thể</th>
+                                <th class="text-center">Trạng Thái</th>
                                 <th class="text-center" style="width: 180px;">Hành Động</th>
                             </tr>
                         </thead>
                         <tbody>
+                            <tr th:if="${danhSach == null || danhSach.empty}">
+                                <td colspan="9" class="text-center py-4 text-muted">
+                                    <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                                    Không tìm thấy mẫu áo nào phù hợp với điều kiện lọc!
+                                </td>
+                            </tr>
                             <tr th:each="sp : ${danhSach}">
                                 <td class="fw-bold text-secondary" th:text="${sp.id}">1</td>
                                 <td><span class="badge bg-secondary-subtle text-secondary fw-bold" th:text="${sp.maSanPham}">AT01</span></td>
@@ -122,8 +167,20 @@
                                 <td th:text="${sp.nhaCungCap != null ? sp.nhaCungCap.tenNhaCungCap : '-'}">Coolmate</td>
                                 <td th:text="${sp.chatLieu != null ? sp.chatLieu.tenChatLieu : '-'}">Cotton</td>
                                 <td>
-                                    <span th:if="${sp.trangThai}" class="badge bg-success-subtle text-success border border-success-subtle badge-status">Đang bán</span>
-                                    <span th:unless="${sp.trangThai}" class="badge bg-secondary-subtle text-secondary border border-secondary-subtle badge-status">Ngừng bán</span>
+                                    <a th:href="@{'/admin/san-pham/bien-the/' + ${sp.id}}" class="text-decoration-none">
+                                        <span class="badge bg-info-subtle text-info border border-info-subtle" 
+                                              th:text="${sp.danhSachChiTiet != null ? sp.danhSachChiTiet.size() : 0} + ' phân loại'"></span>
+                                    </a>
+                                </td>
+                                <td class="text-center">
+                                    <!-- Nút đổi trạng thái nhanh 1-click -->
+                                    <a th:href="@{'/admin/san-pham/doi-trang-thai/' + ${sp.id}}" 
+                                       class="badge text-decoration-none py-2 px-2"
+                                       th:classappend="${sp.trangThai == true ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-secondary-subtle text-secondary border border-secondary-subtle'}"
+                                       th:title="${sp.trangThai == true ? 'Bấm để chuyển sang Ngừng bán' : 'Bấm để chuyển sang Đang bán'}">
+                                        <i class="bi me-1" th:classappend="${sp.trangThai == true ? 'bi-check-circle-fill' : 'bi-slash-circle'}"></i>
+                                        <span th:text="${sp.trangThai == true ? 'Đang bán' : 'Ngừng bán'}"></span>
+                                    </a>
                                 </td>
                                 <td class="text-center">
                                     <!-- Nút quản lý Biến thể chi tiết & Thư viện ảnh -->
@@ -144,6 +201,55 @@
                             </tr>
                         </tbody>
                     </table>
+                </div>
+
+                <!-- Phân Trang (Pagination) -->
+                <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top" th:if="${totalPages > 0}">
+                    <div class="small text-muted">
+                        Hiển thị <strong th:text="${currentPage * pageSize + 1}">1</strong> - 
+                        <strong th:text="${currentPage * pageSize + danhSach.size()}">8</strong> 
+                        trên tổng số <strong class="text-danger" th:text="${totalItems}">20</strong> mẫu áo
+                    </div>
+
+                    <nav aria-label="Page navigation" th:if="${totalPages > 1}">
+                        <ul class="pagination pagination-sm mb-0">
+                            <!-- Nút Đầu -->
+                            <li class="page-item" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
+                                <a class="page-link" th:href="@{/admin/san-pham(page=0, size=${pageSize}, keyword=${keyword}, loaiSanPhamId=${loaiSanPhamId}, trangThai=${trangThai})}">
+                                    <i class="bi bi-chevron-double-left"></i>
+                                </a>
+                            </li>
+
+                            <!-- Nút Trước -->
+                            <li class="page-item" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
+                                <a class="page-link" th:href="@{/admin/san-pham(page=${currentPage - 1}, size=${pageSize}, keyword=${keyword}, loaiSanPhamId=${loaiSanPhamId}, trangThai=${trangThai})}">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+
+                            <!-- Các số trang -->
+                            <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}" 
+                                th:classappend="${currentPage == i ? 'active' : ''}">
+                                <a class="page-link" 
+                                   th:href="@{/admin/san-pham(page=${i}, size=${pageSize}, keyword=${keyword}, loaiSanPhamId=${loaiSanPhamId}, trangThai=${trangThai})}" 
+                                   th:text="${i + 1}">1</a>
+                            </li>
+
+                            <!-- Nút Sau -->
+                            <li class="page-item" th:classappend="${currentPage + 1 >= totalPages ? 'disabled' : ''}">
+                                <a class="page-link" th:href="@{/admin/san-pham(page=${currentPage + 1}, size=${pageSize}, keyword=${keyword}, loaiSanPhamId=${loaiSanPhamId}, trangThai=${trangThai})}">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+
+                            <!-- Nút Cuối -->
+                            <li class="page-item" th:classappend="${currentPage + 1 >= totalPages ? 'disabled' : ''}">
+                                <a class="page-link" th:href="@{/admin/san-pham(page=${totalPages - 1}, size=${pageSize}, keyword=${keyword}, loaiSanPhamId=${loaiSanPhamId}, trangThai=${trangThai})}">
+                                    <i class="bi bi-chevron-double-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
                 </div>
             </div>
 
