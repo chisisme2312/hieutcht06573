@@ -11,87 +11,526 @@
         <!-- Main content đồng bộ giao diện -->
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
             
-            <div class="d-flex justify-content-between align-items-center pb-3 mb-4 border-bottom">
+            <!-- Header Dashboard & Quick Actions -->
+            <div class="d-flex flex-wrap justify-content-between align-items-center pb-3 mb-4 border-bottom">
                 <div>
-                    <h3 class="fw-bold text-dark mb-1">📊 Tổng Quan Hoạt Động (Dashboard)</h3>
-                    <p class="text-muted mb-0 small">Báo cáo kinh doanh và thống kê cửa hàng Luôn Vui Tươi Shop</p>
+                    <h3 class="fw-bold text-dark mb-1">📊 Tổng Quan Kinh Doanh (Dashboard)</h3>
+                    <p class="text-secondary mb-0 small">Báo cáo trực quan tình hình bán hàng, doanh thu và tồn kho Luôn Vui Tươi Shop</p>
+                </div>
+                <div class="d-flex gap-2 mt-2 mt-md-0">
+                    <a href="/admin/san-pham/them-moi" class="btn btn-danger fw-semibold btn-sm px-3 shadow-sm">
+                        <i class="bi bi-plus-circle me-1"></i> Thêm Mẫu Áo
+                    </a>
+                    <a href="/admin/san-pham" class="btn btn-outline-secondary fw-semibold btn-sm px-3 bg-white">
+                        <i class="bi bi-box-seam me-1"></i> Quản Lý Kho
+                    </a>
                 </div>
             </div>
 
-            <!-- 4 thẻ thống kê phong cách hiện đại phẳng đồng bộ -->
-            <div class="row g-4 mb-4">
-                <div class="col-md-3">
-                    <div class="card card-custom p-4 border-start border-4 border-primary">
-                        <div class="d-flex justify-content-between align-items-center">
+            <!-- 1. 4 Thẻ KPI Chỉ Số Chính -->
+            <div class="row g-3 mb-4">
+                <!-- KPI 1: Doanh thu tháng -->
+                <div class="col-xl-3 col-md-6">
+                    <div class="card card-custom p-3 h-100 border-start border-4 border-danger">
+                        <div class="d-flex justify-content-between align-items-start">
                             <div>
-                                <span class="text-muted small text-uppercase fw-bold">Tổng Đơn Hàng</span>
-                                <h3 class="fw-bold text-dark mt-2 mb-0">120 đơn</h3>
+                                <span class="text-secondary text-uppercase fw-bold" style="font-size: 11px; letter-spacing: 0.5px;">Doanh Thu Tháng Này</span>
+                                <h3 class="fw-bold text-danger mt-1 mb-1" th:text="${doanhThuThangNayStr}">45.200.000 đ</h3>
+                                <div class="small text-muted">
+                                    <span class="text-success fw-bold"><i class="bi bi-arrow-up-right"></i> +14.2%</span> so với tháng trước
+                                </div>
                             </div>
-                            <div class="bg-primary-subtle text-primary p-3 rounded-circle">
-                                <i class="bi bi-bag-check fs-4"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-3">
-                    <div class="card card-custom p-4 border-start border-4 border-success">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <span class="text-muted small text-uppercase fw-bold">Doanh Thu Tháng</span>
-                                <h3 class="fw-bold text-success mt-2 mb-0">45.200.000 đ</h3>
-                            </div>
-                            <div class="bg-success-subtle text-success p-3 rounded-circle">
+                            <div class="p-3 rounded-3 text-white" style="background: linear-gradient(135deg, #dc2626, #ef4444); box-shadow: 0 4px 10px rgba(220,38,38,0.25);">
                                 <i class="bi bi-cash-stack fs-4"></i>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-md-3">
-                    <div class="card card-custom p-4 border-start border-4 border-warning">
-                        <div class="d-flex justify-content-between align-items-center">
+                <!-- KPI 2: Đơn hàng -->
+                <div class="col-xl-3 col-md-6">
+                    <div class="card card-custom p-3 h-100 border-start border-4 border-primary">
+                        <div class="d-flex justify-content-between align-items-start">
                             <div>
-                                <span class="text-muted small text-uppercase fw-bold">Số Mẫu Áo</span>
-                                <h3 class="fw-bold text-dark mt-2 mb-0">24 mẫu</h3>
+                                <span class="text-secondary text-uppercase fw-bold" style="font-size: 11px; letter-spacing: 0.5px;">Tổng Đơn Hàng</span>
+                                <h3 class="fw-bold text-dark mt-1 mb-1" th:text="${tongSoDon + ' đơn'}">120 đơn</h3>
+                                <div class="small text-muted">
+                                    <span class="badge bg-primary-subtle text-primary fw-bold" th:text="${soDonChoXuLy + ' chờ xử lý'}">3 chờ xử lý</span>
+                                    <span class="ms-1" th:text="'(' + ${tyLeThanhCong} + '% hoàn thành)'"></span>
+                                </div>
                             </div>
-                            <div class="bg-warning-subtle text-warning p-3 rounded-circle">
+                            <div class="p-3 rounded-3 text-white" style="background: linear-gradient(135deg, #2563eb, #3b82f6); box-shadow: 0 4px 10px rgba(37,99,235,0.25);">
+                                <i class="bi bi-bag-check fs-4"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KPI 3: Mẫu áo & Tồn kho -->
+                <div class="col-xl-3 col-md-6">
+                    <div class="card card-custom p-3 h-100 border-start border-4 border-success">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <span class="text-secondary text-uppercase fw-bold" style="font-size: 11px; letter-spacing: 0.5px;">Mẫu Áo Kinh Doanh</span>
+                                <h3 class="fw-bold text-dark mt-1 mb-1">
+                                    <span th:text="${soMauAoDangBan}">24</span>/<span class="text-secondary fs-5" th:text="${tongSoMauAo}">24</span>
+                                </h3>
+                                <div class="small text-muted">
+                                    Tổng kho: <b class="text-success" th:text="${#numbers.formatInteger(tongTonKho, 0, 'POINT') + ' áo'}">1.250 áo</b>
+                                </div>
+                            </div>
+                            <div class="p-3 rounded-3 text-white" style="background: linear-gradient(135deg, #059669, #10b981); box-shadow: 0 4px 10px rgba(5,150,105,0.25);">
                                 <i class="bi bi-box-seam fs-4"></i>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-md-3">
-                    <div class="card card-custom p-4 border-start border-4 border-danger">
-                        <div class="d-flex justify-content-between align-items-center">
+                <!-- KPI 4: Cảnh báo tồn kho -->
+                <div class="col-xl-3 col-md-6">
+                    <div class="card card-custom p-3 h-100 border-start border-4 border-warning">
+                        <div class="d-flex justify-content-between align-items-start">
                             <div>
-                                <span class="text-muted small text-uppercase fw-bold">Áo Sắp Hết Hàng</span>
-                                <h3 class="fw-bold text-danger mt-2 mb-0">3 biến thể</h3>
+                                <span class="text-secondary text-uppercase fw-bold" style="font-size: 11px; letter-spacing: 0.5px;">Cảnh Báo Tồn Kho</span>
+                                <h3 class="fw-bold text-warning mt-1 mb-1" th:text="${soBienTheSapHet + ' biến thể'}">3 biến thể</h3>
+                                <div class="small text-danger fw-semibold">
+                                    <i class="bi bi-exclamation-triangle-fill me-1"></i> Số lượng tồn kho &le; 10 chiếc
+                                </div>
                             </div>
-                            <div class="bg-danger-subtle text-danger p-3 rounded-circle">
-                                <i class="bi bi-exclamation-triangle fs-4"></i>
+                            <div class="p-3 rounded-3 text-white" style="background: linear-gradient(135deg, #d97706, #f59e0b); box-shadow: 0 4px 10px rgba(217,119,6,0.25);">
+                                <i class="bi bi-bell-fill fs-4"></i>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Bảng thông báo nhiệm vụ chuẩn chỉ -->
-            <div class="card card-custom p-4 mb-4">
-                <div class="d-flex align-items-center mb-2">
-                    <i class="bi bi-info-circle-fill text-primary fs-5 me-2"></i>
-                    <h5 class="fw-bold text-dark mb-0">Hệ Thống Quản Trị Đã Đồng Bộ Giao Diện</h5>
+            <!-- 2. Hàng Biểu Đồ Doanh Thu & Cơ Cấu Đơn Hàng -->
+            <div class="row g-4 mb-4">
+                <!-- Cột Trái: Biểu đồ Doanh Thu & Số Đơn Hàng -->
+                <div class="col-lg-8">
+                    <div class="card card-custom p-4 h-100">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+                            <div>
+                                <h5 class="fw-bold text-dark mb-0">📈 Biểu Đồ Tăng Trưởng Doanh Thu</h5>
+                                <small class="text-secondary">Theo dõi doanh số bán hàng và số lượng đơn theo thời gian thực</small>
+                            </div>
+                            <div class="btn-group btn-group-sm mt-2 mt-sm-0" role="group">
+                                <button type="button" class="btn btn-outline-danger active fw-semibold" id="btn7Days" onclick="switchChartMode('7days')">
+                                    7 Ngày Qua
+                                </button>
+                                <button type="button" class="btn btn-outline-danger fw-semibold" id="btn12Months" onclick="switchChartMode('12months')">
+                                    Năm 2026 (Theo Tháng)
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Canvas biểu đồ Chart.js -->
+                        <div style="position: relative; height: 320px; width: 100%;">
+                            <canvas id="revenueChart"></canvas>
+                        </div>
+
+                        <div class="row text-center mt-3 pt-3 border-top g-2">
+                            <div class="col-4">
+                                <small class="text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Tổng Thu Tích Lũy</small>
+                                <div class="fw-bold text-danger fs-6" th:text="${tongDoanhThuStr}">48.350.000 đ</div>
+                            </div>
+                            <div class="col-4 border-start border-end">
+                                <small class="text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Tỉ Lệ Giao Thành Công</small>
+                                <div class="fw-bold text-success fs-6" th:text="${tyLeThanhCong + '%'}">88.5%</div>
+                            </div>
+                            <div class="col-4">
+                                <small class="text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Khách Hàng Đã Mua</small>
+                                <div class="fw-bold text-primary fs-6" th:text="${totalCustomers + ' khách'}">15 khách</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <p class="text-secondary small mb-0">
-                    Toàn bộ các trang từ <b>Dashboard</b>, <b>Quản Lý Sản Phẩm</b> đến 6 danh mục <b>Màu Sắc, Kích Thước, Chất Liệu, Cổ Áo, Loại Áo, Nhà Cung Cấp</b> đều đã dùng chung một mẫu giao diện chuẩn phong cách <b>Luôn Vui Tươi Shop</b>.
-                </p>
+
+                <!-- Cột Phải: Biểu đồ Doughnut Trạng Thái Đơn Hàng -->
+                <div class="col-lg-4">
+                    <div class="card card-custom p-4 h-100">
+                        <div class="mb-3">
+                            <h5 class="fw-bold text-dark mb-0">🎯 Cơ Cấu Đơn Hàng</h5>
+                            <small class="text-secondary">Phân loại theo tiến trình xử lý đơn hàng</small>
+                        </div>
+
+                        <div style="position: relative; height: 230px; width: 100%;" class="d-flex justify-content-center align-items-center">
+                            <canvas id="orderStatusChart"></canvas>
+                        </div>
+
+                        <!-- Danh sách chú thích chi tiết số lượng -->
+                        <div class="mt-3 pt-2 border-top">
+                            <div class="d-flex justify-content-between align-items-center py-1 small">
+                                <span><i class="bi bi-circle-fill text-success me-2"></i> Đã hoàn thành</span>
+                                <b class="text-dark" th:text="${soDonHoanThanh + ' đơn'}">12 đơn</b>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center py-1 small">
+                                <span><i class="bi bi-circle-fill text-warning me-2"></i> Đang giao hàng</span>
+                                <b class="text-dark" th:text="${soDonDangGiao + ' đơn'}">2 đơn</b>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center py-1 small">
+                                <span><i class="bi bi-circle-fill text-primary me-2"></i> Chờ xác nhận</span>
+                                <b class="text-dark" th:text="${soDonChoXuLy + ' đơn'}">3 đơn</b>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center py-1 small">
+                                <span><i class="bi bi-circle-fill text-danger me-2"></i> Đã hủy</span>
+                                <b class="text-dark" th:text="${soDonHuy + ' đơn'}">1 đơn</b>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Hàng Dữ Liệu: Đơn Hàng Mới Nhất & Top Sản Phẩm Bán Chạy -->
+            <div class="row g-4">
+                <!-- Cột 1: Danh sách Đơn Hàng Mới Nhất -->
+                <div class="col-lg-7">
+                    <div class="card card-custom p-4 h-100">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <h5 class="fw-bold text-dark mb-0">🛒 Đơn Hàng Mới Cần Xử Lý</h5>
+                                <small class="text-secondary">Các đơn vừa được đặt qua hệ thống</small>
+                            </div>
+                            <span class="badge bg-danger-subtle text-danger fw-bold px-3 py-2">
+                                <i class="bi bi-clock-history me-1"></i> Cập nhật liên tục
+                            </span>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Mã Đơn</th>
+                                        <th>Khách Hàng</th>
+                                        <th>Ngày Đặt</th>
+                                        <th>Tổng Tiền</th>
+                                        <th>Thanh Toán</th>
+                                        <th>Trạng Thái</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="hd : ${danhSachDonMoi}">
+                                        <td>
+                                            <span class="badge bg-dark-subtle text-dark fw-bold" th:text="${hd.maHoaDon}">HD01</span>
+                                        </td>
+                                        <td>
+                                            <div class="fw-semibold text-dark" th:text="${hd.khachHang != null ? hd.khachHang.hoTen : 'Khách vãng lai'}">Nguyễn Văn A</div>
+                                            <small class="text-muted" th:text="${hd.khachHang != null ? hd.khachHang.soDienThoai : ''}">0912345678</small>
+                                        </td>
+                                        <td>
+                                            <small class="text-secondary fw-semibold" th:text="${hd.ngayTao != null ? #temporals.format(hd.ngayTao, 'dd/MM/yyyy HH:mm') : '-'}">22/10/2026</small>
+                                        </td>
+                                        <td>
+                                            <span class="fw-bold text-danger" th:text="${hd.tongTien != null ? #numbers.formatDecimal(hd.tongTien, 0, 'POINT', 0, 'POINT') + ' đ' : '0 đ'}">350.000 đ</span>
+                                        </td>
+                                        <td>
+                                            <span th:if="${hd.phuongThucThanhToan}" class="badge bg-info-subtle text-info fw-semibold">
+                                                <i class="bi bi-credit-card me-1"></i> Chuyển khoản
+                                            </span>
+                                            <span th:unless="${hd.phuongThucThanhToan}" class="badge bg-secondary-subtle text-secondary fw-semibold">
+                                                <i class="bi bi-cash me-1"></i> Tiền mặt / COD
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span th:if="${hd.trangThai != null and hd.trangThai.contains('hoàn thành')}" class="badge bg-success-subtle text-success fw-bold">
+                                                <i class="bi bi-check-circle-fill me-1"></i> Hoàn thành
+                                            </span>
+                                            <span th:if="${hd.trangThai != null and hd.trangThai.contains('Đang giao')}" class="badge bg-warning-subtle text-warning fw-bold">
+                                                <i class="bi bi-truck me-1"></i> Đang giao
+                                            </span>
+                                            <span th:if="${hd.trangThai != null and (hd.trangThai.contains('Chờ') or hd.trangThai.contains('chờ'))}" class="badge bg-primary-subtle text-primary fw-bold">
+                                                <i class="bi bi-hourglass-split me-1"></i> Chờ duyệt
+                                            </span>
+                                            <span th:if="${hd.trangThai != null and hd.trangThai.contains('hủy')}" class="badge bg-danger-subtle text-danger fw-bold">
+                                                <i class="bi bi-x-circle-fill me-1"></i> Đã hủy
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${#lists.isEmpty(danhSachDonMoi)}">
+                                        <td colspan="6" class="text-center py-4 text-muted">Chưa có đơn hàng nào trong hệ thống!</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cột 2: Tabs Top Sản Phẩm Bán Chạy & Cảnh Báo Tồn Kho -->
+                <div class="col-lg-5">
+                    <div class="card card-custom p-4 h-100">
+                        <!-- Navigation Tabs -->
+                        <ul class="nav nav-pills mb-3 border-bottom pb-2" id="dashboardTab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active fw-bold text-dark btn-sm py-1 px-3 me-2" id="top-sold-tab" data-bs-toggle="pill" data-bs-target="#top-sold" type="button" role="tab">
+                                    🔥 Top Bán Chạy
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link fw-bold text-dark btn-sm py-1 px-3" id="low-stock-tab" data-bs-toggle="pill" data-bs-target="#low-stock" type="button" role="tab">
+                                    ⚠️ Sắp Hết Hàng <span class="badge bg-danger ms-1" th:text="${soBienTheSapHet}">3</span>
+                                </button>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content" id="dashboardTabContent">
+                            <!-- Tab 1: Top Sản Phẩm Bán Chạy -->
+                            <div class="tab-pane fade show active" id="top-sold" role="tabpanel">
+                                <div class="list-group list-group-flush">
+                                    <div th:each="sp, iter : ${topSanPhamList}" class="list-group-item px-0 py-2 border-0 d-flex align-items-center justify-content-between">
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-3 position-relative">
+                                                <img th:src="${sp.anhDaiDien}" class="rounded-3 shadow-sm" style="width: 48px; height: 48px; object-fit: cover;" onerror="this.src='https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=100&auto=format&fit=crop&q=60'" alt="Ảnh áo">
+                                                <span class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-danger" style="font-size: 10px;" th:text="${'#' + iter.count}">#1</span>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold text-dark text-truncate" style="max-width: 170px;" th:text="${sp.tenSanPham}">Áo Thun Cotton Basic</div>
+                                                <small class="text-secondary" th:text="${sp.loaiSanPham}">Áo Thun</small>
+                                            </div>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge bg-success-subtle text-success fw-bold mb-1" th:text="${sp.daBan + ' đã bán'}">15 đã bán</span>
+                                            <div class="small fw-bold text-danger" th:text="${#numbers.formatDecimal(sp.giaBan, 0, 'POINT', 0, 'POINT') + ' đ'}">199.000 đ</div>
+                                        </div>
+                                    </div>
+                                    <div th:if="${#lists.isEmpty(topSanPhamList)}" class="text-center py-4 text-muted">
+                                        Chưa có số liệu sản phẩm bán ra.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tab 2: Danh sách biến thể sắp hết hàng -->
+                            <div class="tab-pane fade" id="low-stock" role="tabpanel">
+                                <div class="alert alert-warning py-2 px-3 small mb-3">
+                                    <i class="bi bi-exclamation-circle-fill me-1"></i> Các mẫu áo dưới đây còn <b>&le; 10 chiếc</b> trong kho. Vui lòng liên hệ nhà cung cấp nhập hàng.
+                                </div>
+                                <div class="list-group list-group-flush">
+                                    <div th:each="ct : ${danhSachSapHet}" class="list-group-item px-0 py-2 border-0 d-flex align-items-center justify-content-between">
+                                        <div>
+                                            <div class="fw-bold text-dark" th:text="${ct.sanPham != null ? ct.sanPham.tenSanPham : ct.maSanPhamChiTiet}">Áo Thun Regular</div>
+                                            <small class="text-secondary">
+                                                Màu: <span class="fw-semibold text-dark" th:text="${ct.mauSac != null ? ct.mauSac.tenMau : '-'}">Trắng</span> | 
+                                                Size: <span class="badge bg-light text-dark border fw-bold" th:text="${ct.kichThuoc != null ? ct.kichThuoc.tenKichThuoc : '-'}">L</span>
+                                            </small>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge bg-danger text-white fw-bold px-2 py-1 fs-6" th:text="${'Còn ' + ct.soLuongTon + ' cái'}">Còn 2 cái</span>
+                                            <div class="mt-1">
+                                                <a th:if="${ct.sanPham != null}" th:href="@{'/admin/san-pham/bien-the/' + ${ct.sanPham.id}}" class="btn btn-outline-dark btn-sm py-0 px-2" style="font-size: 11px;">
+                                                    <i class="bi bi-pencil-square"></i> Sửa kho
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div th:if="${#lists.isEmpty(danhSachSapHet)}" class="text-center py-4 text-success fw-semibold">
+                                        <i class="bi bi-shield-check fs-3 d-block mb-1"></i> Kho hàng dồi dào, không có áo nào sắp hết hàng!
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
             </div>
 
         </main>
     </div>
 </div>
 
+<!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Chart.js Thư Viện Biểu Đồ Chuẩn Hiện Đại -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    // Nhận dữ liệu thực tế từ Controller
+    const labels7Days = /*[[${chart7DaysLabelsJson}]]*/ '["16/10","17/10","18/10","19/10","20/10","21/10","22/10"]';
+    const revenue7Days = /*[[${chart7DaysRevenueJson}]]*/ '[1200000, 2400000, 1800000, 3100000, 2700000, 4200000, 3800000]';
+    const orders7Days = /*[[${chart7DaysOrdersJson}]]*/ '[3, 5, 4, 7, 6, 9, 8]';
+
+    const labels12Months = /*[[${chartMonthLabelsJson}]]*/ '["T1","T2","T3","T4","T5","T6","T7","T8","T9","T10","T11","T12"]';
+    const revenue12Months = /*[[${chartMonthRevenueJson}]]*/ '[15000000, 18000000, 22000000, 25000000, 28000000, 32000000, 35000000, 39000000, 42000000, 48000000, 0, 0]';
+
+    const orderStatusData = /*[[${orderStatusCountsJson}]]*/ '[12, 2, 3, 1]';
+
+    const parsedLabels7Days = JSON.parse(labels7Days);
+    const parsedRevenue7Days = JSON.parse(revenue7Days);
+    const parsedOrders7Days = JSON.parse(orders7Days);
+
+    const parsedLabels12Months = JSON.parse(labels12Months);
+    const parsedRevenue12Months = JSON.parse(revenue12Months);
+
+    const parsedOrderStatus = JSON.parse(orderStatusData);
+
+    // 1. Khởi tạo Biểu đồ Doanh Thu (Line & Bar Chart kết hợp)
+    const ctxRevenue = document.getElementById('revenueChart').getContext('2d');
+
+    // Gradient màu đỏ thương hiệu Luôn Vui Tươi
+    const gradientRevenue = ctxRevenue.createLinearGradient(0, 0, 0, 300);
+    gradientRevenue.addColorStop(0, 'rgba(220, 38, 38, 0.45)');
+    gradientRevenue.addColorStop(1, 'rgba(220, 38, 38, 0.0)');
+
+    let revenueChart = new Chart(ctxRevenue, {
+        type: 'line',
+        data: {
+            labels: parsedLabels7Days,
+            datasets: [
+                {
+                    label: 'Doanh Thu (VNĐ)',
+                    data: parsedRevenue7Days,
+                    borderColor: '#dc2626',
+                    backgroundColor: gradientRevenue,
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.35,
+                    pointBackgroundColor: '#dc2626',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    yAxisID: 'y'
+                },
+                {
+                    label: 'Số Lượng Đơn',
+                    data: parsedOrders7Days,
+                    type: 'bar',
+                    backgroundColor: 'rgba(30, 58, 138, 0.25)',
+                    hoverBackgroundColor: '#1e3a8a',
+                    borderColor: '#1e3a8a',
+                    borderWidth: 1,
+                    borderRadius: 6,
+                    barThickness: 16,
+                    yAxisID: 'y1'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        usePointStyle: true,
+                        font: { family: 'Plus Jakarta Sans', weight: '600', size: 12 }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(17, 24, 39, 0.95)',
+                    titleFont: { family: 'Plus Jakarta Sans', weight: '700' },
+                    bodyFont: { family: 'Plus Jakarta Sans' },
+                    padding: 12,
+                    cornerRadius: 8,
+                    callbacks: {
+                        label: function(context) {
+                            if (context.dataset.yAxisID === 'y') {
+                                return 'Doanh thu: ' + new Intl.NumberFormat('vi-VN').format(context.raw) + ' đ';
+                            }
+                            return 'Số đơn hàng: ' + context.raw + ' đơn';
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { font: { family: 'Plus Jakarta Sans', weight: '600' } }
+                },
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    grid: { color: 'rgba(226, 232, 240, 0.8)' },
+                    ticks: {
+                        callback: function(value) {
+                            if (value >= 1000000) return (value / 1000000).toFixed(1) + 'M';
+                            if (value >= 1000) return (value / 1000).toFixed(0) + 'k';
+                            return value;
+                        },
+                        font: { family: 'Plus Jakarta Sans' }
+                    }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    grid: { drawOnChartArea: false },
+                    ticks: {
+                        precision: 0,
+                        font: { family: 'Plus Jakarta Sans' }
+                    }
+                }
+            }
+        }
+    });
+
+    // Chuyển đổi giữa 7 ngày qua và 12 tháng
+    function switchChartMode(mode) {
+        const btn7 = document.getElementById('btn7Days');
+        const btn12 = document.getElementById('btn12Months');
+
+        if (mode === '7days') {
+            btn7.classList.add('active');
+            btn12.classList.remove('active');
+            revenueChart.data.labels = parsedLabels7Days;
+            revenueChart.data.datasets[0].data = parsedRevenue7Days;
+            revenueChart.data.datasets[1].data = parsedOrders7Days;
+            revenueChart.data.datasets[1].hidden = false;
+        } else {
+            btn12.classList.add('active');
+            btn7.classList.remove('active');
+            revenueChart.data.labels = parsedLabels12Months;
+            revenueChart.data.datasets[0].data = parsedRevenue12Months;
+            revenueChart.data.datasets[1].data = [];
+            revenueChart.data.datasets[1].hidden = true; // Ẩn cột đơn khi xem năm
+        }
+        revenueChart.update();
+    }
+
+    // 2. Khởi tạo Biểu đồ Doughnut Trạng Thái Đơn Hàng
+    const ctxStatus = document.getElementById('orderStatusChart').getContext('2d');
+    new Chart(ctxStatus, {
+        type: 'doughnut',
+        data: {
+            labels: ['Hoàn thành', 'Đang giao', 'Chờ xác nhận', 'Đã hủy'],
+            datasets: [{
+                data: parsedOrderStatus,
+                backgroundColor: [
+                    '#10b981', // Hoàn thành - Xanh lá
+                    '#f59e0b', // Đang giao - Vàng hổ phách
+                    '#3b82f6', // Chờ duyệt - Xanh dương
+                    '#ef4444'  // Đã hủy - Đỏ
+                ],
+                borderWidth: 2,
+                borderColor: '#ffffff',
+                hoverOffset: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '72%',
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(17, 24, 39, 0.95)',
+                    padding: 10,
+                    cornerRadius: 8,
+                    callbacks: {
+                        label: function(context) {
+                            return context.label + ': ' + context.raw + ' đơn';
+                        }
+                    }
+                }
+            }
+        }
+    });
+    /*]]>*/
+</script>
 </body>
 </html>
