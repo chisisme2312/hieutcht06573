@@ -162,8 +162,8 @@
                                                     th:data-ma="${bt.maSanPhamChiTiet}"
                                                     th:data-mausac="${bt.mauSac.id}"
                                                     th:data-kichthuoc="${bt.kichThuoc.id}"
-                                                    th:data-giaban="${#numbers.formatDecimal(bt.giaBan, 0, 'POINT', 0, 'POINT')}"
-                                                    th:data-giagoc="${bt.giaBanBanDau != null ? #numbers.formatDecimal(bt.giaBanBanDau, 0, 'POINT', 0, 'POINT') : ''}"
+                                                    th:data-giaban="${bt.giaBan != null ? #numbers.formatInteger(bt.giaBan, 0, 'NONE') : ''}"
+                                                    th:data-giagoc="${bt.giaBanBanDau != null ? #numbers.formatInteger(bt.giaBanBanDau, 0, 'NONE') : ''}"
                                                     th:data-soluong="${bt.soLuongTon}"
                                                     th:data-trangthai="${bt.trangThai}"
                                                     onclick="moModalSuaBienThe(this)">
@@ -271,8 +271,13 @@
         document.getElementById('edit_ma').value = btn.getAttribute('data-ma');
         document.getElementById('edit_mauSac').value = btn.getAttribute('data-mausac');
         document.getElementById('edit_kichThuoc').value = btn.getAttribute('data-kichthuoc');
-        document.getElementById('edit_giaBan').value = btn.getAttribute('data-giaban');
-        document.getElementById('edit_giaBanBanDau').value = btn.getAttribute('data-giagoc');
+
+        // Tự động loại bỏ mọi dấu phẩy, chấm phân cách hàng nghìn để input số hiển thị chuẩn và lưu ngay không bị lỗi
+        let giaBan = (btn.getAttribute('data-giaban') || '').replace(/[,.\s]/g, '');
+        let giaGoc = (btn.getAttribute('data-giagoc') || '').replace(/[,.\s]/g, '');
+
+        document.getElementById('edit_giaBan').value = giaBan;
+        document.getElementById('edit_giaBanBanDau').value = giaGoc;
         document.getElementById('edit_soLuongTon').value = btn.getAttribute('data-soluong');
         document.getElementById('edit_trangThai').value = btn.getAttribute('data-trangthai');
 

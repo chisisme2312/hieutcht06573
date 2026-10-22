@@ -390,19 +390,31 @@ public class SanPhamAdminController {
                                  @RequestParam("sanPhamId") Integer sanPhamId,
                                  @RequestParam("mauSacId") Integer mauSacId,
                                  @RequestParam("kichThuocId") Integer kichThuocId,
-                                 @RequestParam("giaBan") BigDecimal giaBan,
-                                 @RequestParam(value = "giaBanBanDau", required = false) BigDecimal giaBanBanDau,
+                                 @RequestParam("giaBan") String giaBanStr,
+                                 @RequestParam(value = "giaBanBanDau", required = false) String giaBanBanDauStr,
                                  @RequestParam("soLuongTon") Integer soLuongTon,
                                  @RequestParam("trangThai") Boolean trangThai,
                                  RedirectAttributes ra) {
         try {
+            BigDecimal giaBan = BigDecimal.ZERO;
+            if (giaBanStr != null && !giaBanStr.trim().isEmpty()) {
+                String clean = giaBanStr.replaceAll("[,.\\s]", "");
+                giaBan = new BigDecimal(clean);
+            }
+
+            BigDecimal giaBanBanDau = giaBan;
+            if (giaBanBanDauStr != null && !giaBanBanDauStr.trim().isEmpty()) {
+                String clean = giaBanBanDauStr.replaceAll("[,.\\s]", "");
+                giaBanBanDau = new BigDecimal(clean);
+            }
+
             var ctOpt = sanPhamChiTietService.getById(id);
             if (ctOpt.isPresent()) {
                 SanPhamChiTiet ct = ctOpt.get();
                 thuocTinhService.getMauSacById(mauSacId).ifPresent(ct::setMauSac);
                 thuocTinhService.getKichThuocById(kichThuocId).ifPresent(ct::setKichThuoc);
-                ct.setGiaBan(giaBan != null ? giaBan : BigDecimal.ZERO);
-                ct.setGiaBanBanDau(giaBanBanDau != null ? giaBanBanDau : ct.getGiaBan());
+                ct.setGiaBan(giaBan);
+                ct.setGiaBanBanDau(giaBanBanDau);
                 ct.setSoLuongTon(soLuongTon != null ? soLuongTon : 0);
                 ct.setTrangThai(trangThai != null ? trangThai : true);
 
