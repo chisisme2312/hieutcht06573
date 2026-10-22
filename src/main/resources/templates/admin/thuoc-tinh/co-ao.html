@@ -38,7 +38,7 @@
                 <!-- Cột trái: Form Thêm / Cập nhật -->
                 <div class="col-lg-4">
                     <div class="card card-custom p-4">
-                        <h5 class="fw-bold text-dark mb-3" th:text="${isEdit ? '✏️ Cập Nhật Cổ Áo' : '➕ Thêm Cổ Áo Mới'}">Thêm Cổ Áo Mới</h5>
+                        <h5 class="fw-bold text-dark mb-3" th:text="${isEdit == true ? '✏️ Cập Nhật Cổ Áo' : '➕ Thêm Cổ Áo Mới'}">Thêm Cổ Áo Mới</h5>
                         
                         <form th:action="@{/admin/thuoc-tinh/co-ao/save}" th:object="${item}" method="post">
                             <input type="hidden" th:field="*{id}" />
@@ -65,7 +65,7 @@
                                 <button type="submit" class="btn btn-danger flex-grow-1 fw-bold">
                                     <i class="bi bi-save me-1"></i> Lưu Cổ Áo
                                 </button>
-                                <a th:if="${isEdit}" href="/admin/thuoc-tinh/co-ao" class="btn btn-light fw-semibold">Hủy</a>
+                                <a th:if="${isEdit == true}" href="/admin/thuoc-tinh/co-ao" class="btn btn-light fw-semibold">Hủy</a>
                             </div>
                         </form>
                     </div>

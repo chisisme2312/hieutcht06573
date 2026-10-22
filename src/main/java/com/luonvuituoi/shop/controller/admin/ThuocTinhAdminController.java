@@ -28,8 +28,12 @@ public class ThuocTinhAdminController {
 
     @PostMapping("/mau-sac/save")
     public String saveMauSac(@ModelAttribute("item") MauSac mauSac, RedirectAttributes ra) {
-        thuocTinhService.saveMauSac(mauSac);
-        ra.addFlashAttribute("thongBao", "Lưu màu sắc thành công!");
+        try {
+            thuocTinhService.saveMauSac(mauSac);
+            ra.addFlashAttribute("thongBao", "Lưu màu sắc thành công!");
+        } catch (Exception e) {
+            ra.addFlashAttribute("loi", "Không thể lưu: Tên màu sắc có thể đã tồn tại!");
+        }
         return "redirect:/admin/thuoc-tinh/mau-sac";
     }
 
@@ -67,8 +71,12 @@ public class ThuocTinhAdminController {
 
     @PostMapping("/kich-thuoc/save")
     public String saveKichThuoc(@ModelAttribute("item") KichThuoc kichThuoc, RedirectAttributes ra) {
-        thuocTinhService.saveKichThuoc(kichThuoc);
-        ra.addFlashAttribute("thongBao", "Lưu kích thước thành công!");
+        try {
+            thuocTinhService.saveKichThuoc(kichThuoc);
+            ra.addFlashAttribute("thongBao", "Lưu kích thước thành công!");
+        } catch (Exception e) {
+            ra.addFlashAttribute("loi", "Không thể lưu: Tên kích thước có thể đã tồn tại!");
+        }
         return "redirect:/admin/thuoc-tinh/kich-thuoc";
     }
 
@@ -106,8 +114,12 @@ public class ThuocTinhAdminController {
 
     @PostMapping("/chat-lieu/save")
     public String saveChatLieu(@ModelAttribute("item") ChatLieu chatLieu, RedirectAttributes ra) {
-        thuocTinhService.saveChatLieu(chatLieu);
-        ra.addFlashAttribute("thongBao", "Lưu chất liệu thành công!");
+        try {
+            thuocTinhService.saveChatLieu(chatLieu);
+            ra.addFlashAttribute("thongBao", "Lưu chất liệu thành công!");
+        } catch (Exception e) {
+            ra.addFlashAttribute("loi", "Không thể lưu: Tên chất liệu có thể đã tồn tại!");
+        }
         return "redirect:/admin/thuoc-tinh/chat-lieu";
     }
 
@@ -145,8 +157,12 @@ public class ThuocTinhAdminController {
 
     @PostMapping("/loai-san-pham/save")
     public String saveLoaiSanPham(@ModelAttribute("item") LoaiSanPham loaiSanPham, RedirectAttributes ra) {
-        thuocTinhService.saveLoaiSanPham(loaiSanPham);
-        ra.addFlashAttribute("thongBao", "Lưu loại sản phẩm thành công!");
+        try {
+            thuocTinhService.saveLoaiSanPham(loaiSanPham);
+            ra.addFlashAttribute("thongBao", "Lưu loại sản phẩm thành công!");
+        } catch (Exception e) {
+            ra.addFlashAttribute("loi", "Không thể lưu: Tên loại sản phẩm có thể đã tồn tại!");
+        }
         return "redirect:/admin/thuoc-tinh/loai-san-pham";
     }
 
@@ -184,8 +200,12 @@ public class ThuocTinhAdminController {
 
     @PostMapping("/nha-cung-cap/save")
     public String saveNhaCungCap(@ModelAttribute("item") NhaCungCap nhaCungCap, RedirectAttributes ra) {
-        thuocTinhService.saveNhaCungCap(nhaCungCap);
-        ra.addFlashAttribute("thongBao", "Lưu nhà cung cấp thành công!");
+        try {
+            thuocTinhService.saveNhaCungCap(nhaCungCap);
+            ra.addFlashAttribute("thongBao", "Lưu nhà cung cấp thành công!");
+        } catch (Exception e) {
+            ra.addFlashAttribute("loi", "Không thể lưu: Tên nhà cung cấp có thể đã tồn tại!");
+        }
         return "redirect:/admin/thuoc-tinh/nha-cung-cap";
     }
 

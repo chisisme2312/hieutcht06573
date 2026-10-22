@@ -290,7 +290,12 @@ public class SanPhamAdminController {
                 ra.addFlashAttribute("thongBao", "Thêm mẫu áo và tạo biến thể thành công!");
             }
         } catch (Exception e) {
-            ra.addFlashAttribute("loi", "Có lỗi xảy ra: " + e.getMessage());
+            String msg = e.getMessage();
+            if (msg != null && (msg.contains("duplicate") || msg.contains("UNIQUE") || msg.contains("ma_san_pham"))) {
+                ra.addFlashAttribute("loi", "Mã sản phẩm [" + sanPham.getMaSanPham() + "] đã tồn tại, vui lòng nhập mã khác!");
+            } else {
+                ra.addFlashAttribute("loi", "Có lỗi xảy ra: " + e.getMessage());
+            }
         }
         return "redirect:/admin/san-pham";
     }
@@ -339,6 +344,18 @@ public class SanPhamAdminController {
             if (spOpt.isPresent()) {
                 chiTiet.setSanPham(spOpt.get());
                 
+                // Nạp thực thể MauSac và KichThuoc đầy đủ
+                if (chiTiet.getMauSac() != null && chiTiet.getMauSac().getId() != null) {
+                    thuocTinhService.getMauSacById(chiTiet.getMauSac().getId()).ifPresent(chiTiet::setMauSac);
+                }
+                if (chiTiet.getKichThuoc() != null && chiTiet.getKichThuoc().getId() != null) {
+                    thuocTinhService.getKichThuocById(chiTiet.getKichThuoc().getId()).ifPresent(chiTiet::setKichThuoc);
+                }
+
+                if (chiTiet.getTrangThai() == null) {
+                    chiTiet.setTrangThai(true);
+                }
+                
                 // Tránh lỗi null cột gia_ban_ban_dau
                 if (chiTiet.getGiaBanBanDau() == null) {
                     chiTiet.setGiaBanBanDau(chiTiet.getGiaBan() != null ? chiTiet.getGiaBan() : BigDecimal.ZERO);
@@ -357,7 +374,12 @@ public class SanPhamAdminController {
                 ra.addFlashAttribute("thongBao", "Lưu biến thể áo thành công!");
             }
         } catch (Exception e) {
-            ra.addFlashAttribute("loi", "Lỗi lưu biến thể: " + e.getMessage());
+            String msg = e.getMessage();
+            if (msg != null && (msg.contains("duplicate") || msg.contains("UNIQUE") || msg.contains("ma_san_pham_chi_tiet"))) {
+                ra.addFlashAttribute("loi", "Biến thể với Màu sắc và Size này đã tồn tại!");
+            } else {
+                ra.addFlashAttribute("loi", "Lỗi lưu biến thể: " + e.getMessage());
+            }
         }
         return "redirect:/admin/san-pham/bien-the/" + sanPhamId;
     }
