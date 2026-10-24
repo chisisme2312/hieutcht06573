@@ -293,11 +293,15 @@
         modal.show();
     }
 
-    // Tự động chuyển sang Ngừng bán khi số lượng tồn kho = 0
+    // Tự động chuyển trạng thái 2 chiều thông minh theo số lượng tồn kho:
+    // - Khi hết hàng (số lượng = 0) -> Auto chuyển sang Ngừng bán
+    // - Khi nhập có hàng lại (số lượng > 0) -> Auto chuyển sang Đang bán
     document.getElementById('edit_soLuongTon').addEventListener('input', function() {
         let sl = parseInt(this.value, 10);
         if (isNaN(sl) || sl <= 0) {
             document.getElementById('edit_trangThai').value = 'false';
+        } else {
+            document.getElementById('edit_trangThai').value = 'true';
         }
     });
 

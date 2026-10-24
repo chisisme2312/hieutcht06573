@@ -458,17 +458,29 @@ public class SanPhamAdminController {
                 ct.setGiaBan(giaBan);
                 ct.setGiaBanBanDau(giaBanBanDau);
                 
-                int tonKho = soLuongTon != null ? soLuongTon : 0;
-                ct.setSoLuongTon(tonKho);
+                int tonKhoCu = ct.getSoLuongTon() != null ? ct.getSoLuongTon() : 0;
+                int tonKhoMoi = soLuongTon != null ? soLuongTon : 0;
+                ct.setSoLuongTon(tonKhoMoi);
 
-                // Logic: Hết hàng (số lượng = 0) auto chuyển sang ngừng hoạt động
-                boolean statusMoi = Boolean.TRUE.equals(trangThai);
-                if (tonKho <= 0) {
+                // Logic 2 chiều thông minh theo tồn kho:
+                // 1. Hết hàng (tồn kho = 0) -> Auto chuyển sang Ngừng bán
+                // 2. Nhập có hàng lại (tồn kho > 0):
+                //    - Nếu mẫu áo cha đang kinh doanh -> Auto chuyển sang Đang kinh doanh
+                //    - Nếu mẫu áo cha đang ngừng kinh doanh -> Biến thể vẫn phải ngừng theo cha
+                boolean statusMoi;
+                if (tonKhoMoi <= 0) {
                     statusMoi = false;
-                }
-                // Nếu mẫu áo cha đang ngừng kinh doanh thì biến thể con không thể kinh doanh
-                if (ct.getSanPham() != null && !Boolean.TRUE.equals(ct.getSanPham().getTrangThai())) {
-                    statusMoi = false;
+                } else {
+                    if (ct.getSanPham() != null && !Boolean.TRUE.equals(ct.getSanPham().getTrangThai())) {
+                        statusMoi = false; // Cha ngừng bán thì con ngừng bán
+                    } else {
+                        // Nếu trước đó hết hàng (tonKhoCu <= 0) nay nhập hàng lại (tonKhoMoi > 0) -> Auto chuyển sang Đang bán!
+                        if (tonKhoCu <= 0 || Boolean.TRUE.equals(trangThai)) {
+                            statusMoi = true;
+                        } else {
+                            statusMoi = Boolean.TRUE.equals(trangThai);
+                        }
+                    }
                 }
                 ct.setTrangThai(statusMoi);
 
@@ -478,8 +490,10 @@ public class SanPhamAdminController {
                 }
 
                 sanPhamChiTietService.save(ct);
-                if (tonKho <= 0) {
+                if (tonKhoMoi <= 0) {
                     ra.addFlashAttribute("thongBao", "Cập nhật biến thể thành công (Tồn kho = 0 nên tự động chuyển sang Ngừng bán)!");
+                } else if (tonKhoCu <= 0 && statusMoi) {
+                    ra.addFlashAttribute("thongBao", "Cập nhật biến thể thành công (Đã có hàng tồn kho nên tự động chuyển sang Đang bán)!");
                 } else {
                     ra.addFlashAttribute("thongBao", "Cập nhật biến thể thành công!");
                 }
