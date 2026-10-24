@@ -19,6 +19,9 @@ public interface SanPhamService {
     // Phân trang và lọc đa tiêu chí
     Page<SanPham> filterSanPham(String keyword, Integer loaiSanPhamId, Boolean trangThai, int page, int size);
 
+    // Đồng bộ trạng thái từ mẫu áo cha sang các biến thể con
+    void dongBoTrangThaiBienThe(Integer sanPhamId, boolean trangThaiSanPham);
+
     // Lưu sản phẩm kèm biến thể (màu sắc, kích thước, giá, số lượng)
     SanPham saveWithVariants(SanPham sanPham, 
                              List<Integer> listMauSacId, 

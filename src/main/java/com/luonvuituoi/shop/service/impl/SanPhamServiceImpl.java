@@ -65,6 +65,28 @@ public class SanPhamServiceImpl implements SanPhamService {
 
     @Override
     @Transactional
+    public void dongBoTrangThaiBienThe(Integer sanPhamId, boolean trangThaiSanPham) {
+        List<SanPhamChiTiet> variants = sanPhamChiTietRepository.findBySanPhamId(sanPhamId);
+        if (variants != null && !variants.isEmpty()) {
+            for (SanPhamChiTiet ct : variants) {
+                if (!trangThaiSanPham) {
+                    // Mẫu áo cha ngừng kinh doanh -> tất cả biến thể đều ngừng kinh doanh
+                    ct.setTrangThai(false);
+                } else {
+                    // Mẫu áo cha đang kinh doanh: chỉ kích hoạt biến thể còn hàng (> 0)
+                    if (ct.getSoLuongTon() != null && ct.getSoLuongTon() > 0) {
+                        ct.setTrangThai(true);
+                    } else {
+                        ct.setTrangThai(false); // Hết hàng (tồn <= 0) tự động chuyển sang ngừng hoạt động
+                    }
+                }
+                sanPhamChiTietRepository.save(ct);
+            }
+        }
+    }
+
+    @Override
+    @Transactional
     public SanPham saveWithVariants(SanPham sanPham, 
                                     List<Integer> listMauSacId, 
                                     List<Integer> listKichThuocId, 
@@ -83,6 +105,9 @@ public class SanPhamServiceImpl implements SanPhamService {
 
         // Sinh các biến thể chi tiết kết hợp giữa Màu Sắc và Kích Thước
         if (listMauSacId != null && !listMauSacId.isEmpty() && listKichThuocId != null && !listKichThuocId.isEmpty()) {
+            int slTon = soLuongTon != null ? soLuongTon : 10;
+            boolean variantStatus = Boolean.TRUE.equals(savedSp.getTrangThai()) && (slTon > 0);
+
             for (Integer idMau : listMauSacId) {
                 MauSac ms = mauSacRepository.findById(idMau).orElse(null);
                 if (ms == null) continue;
@@ -100,8 +125,8 @@ public class SanPhamServiceImpl implements SanPhamService {
                             .kichThuoc(kt)
                             .giaBan(giaBan != null ? giaBan : BigDecimal.ZERO)
                             .giaBanBanDau(giaBanBanDau != null ? giaBanBanDau : giaBan)
-                            .soLuongTon(soLuongTon != null ? soLuongTon : 10)
-                            .trangThai(savedSp.getTrangThai() != null ? savedSp.getTrangThai() : true)
+                            .soLuongTon(slTon)
+                            .trangThai(variantStatus)
                             .build();
 
                     sanPhamChiTietRepository.save(ct);

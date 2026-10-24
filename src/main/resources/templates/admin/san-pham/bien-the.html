@@ -101,7 +101,7 @@
                                 </div>
                                 <div class="col-md-2">
                                     <label class="form-label small fw-semibold text-secondary">Giá bán (đ)</label>
-                                    <input type="number" th:field="*{giaBan}" class="form-control form-control-sm" placeholder="199000" required />
+                                    <input type="text" inputmode="numeric" th:field="*{giaBan}" class="form-control form-control-sm" placeholder="199000 hoặc 1,990,000" required />
                                 </div>
                                 <div class="col-md-2">
                                     <label class="form-label small fw-semibold text-secondary">Số lượng tồn</label>
@@ -162,8 +162,8 @@
                                                     th:data-ma="${bt.maSanPhamChiTiet}"
                                                     th:data-mausac="${bt.mauSac.id}"
                                                     th:data-kichthuoc="${bt.kichThuoc.id}"
-                                                    th:data-giaban="${#numbers.formatDecimal(bt.giaBan, 0, 'POINT', 0, 'POINT')}"
-                                                    th:data-giagoc="${bt.giaBanBanDau != null ? #numbers.formatDecimal(bt.giaBanBanDau, 0, 'POINT', 0, 'POINT') : ''}"
+                                                    th:data-giaban="${bt.giaBan != null ? bt.giaBan.toBigInteger().toString() : '0'}"
+                                                    th:data-giagoc="${bt.giaBanBanDau != null ? bt.giaBanBanDau.toBigInteger().toString() : ''}"
                                                     th:data-soluong="${bt.soLuongTon}"
                                                     th:data-trangthai="${bt.trangThai}"
                                                     onclick="moModalSuaBienThe(this)">
@@ -231,11 +231,11 @@
                     <div class="row g-3 mb-3">
                         <div class="col-6">
                             <label class="form-label small fw-semibold text-secondary">Giá bán thực tế (VNĐ) <span class="text-danger">*</span></label>
-                            <input type="number" name="giaBan" id="edit_giaBan" class="form-control" required min="0" step="1000" />
+                            <input type="text" inputmode="numeric" name="giaBan" id="edit_giaBan" class="form-control fw-bold" required placeholder="Ví dụ: 199000 hoặc 1,990,000" />
                         </div>
                         <div class="col-6">
                             <label class="form-label small fw-semibold text-secondary">Giá gốc ban đầu (VNĐ)</label>
-                            <input type="number" name="giaBanBanDau" id="edit_giaBanBanDau" class="form-control" min="0" step="1000" />
+                            <input type="text" inputmode="numeric" name="giaBanBanDau" id="edit_giaBanBanDau" class="form-control" placeholder="Giá niêm yết (nếu có)" />
                         </div>
                     </div>
 
@@ -271,14 +271,51 @@
         document.getElementById('edit_ma').value = btn.getAttribute('data-ma');
         document.getElementById('edit_mauSac').value = btn.getAttribute('data-mausac');
         document.getElementById('edit_kichThuoc').value = btn.getAttribute('data-kichthuoc');
-        document.getElementById('edit_giaBan').value = btn.getAttribute('data-giaban');
-        document.getElementById('edit_giaBanBanDau').value = btn.getAttribute('data-giagoc');
-        document.getElementById('edit_soLuongTon').value = btn.getAttribute('data-soluong');
-        document.getElementById('edit_trangThai').value = btn.getAttribute('data-trangthai');
+
+        // Làm sạch giá để không bao giờ bị mất tiền triệu hoặc lỗi dấu phẩy
+        let rawGiaBan = (btn.getAttribute('data-giaban') || '').replace(/[,.\s]/g, '');
+        let rawGiaGoc = (btn.getAttribute('data-giagoc') || '').replace(/[,.\s]/g, '');
+
+        document.getElementById('edit_giaBan').value = rawGiaBan;
+        document.getElementById('edit_giaBanBanDau').value = rawGiaGoc;
+
+        let slTon = parseInt(btn.getAttribute('data-soluong') || '0', 10);
+        document.getElementById('edit_soLuongTon').value = slTon;
+
+        let trangThai = btn.getAttribute('data-trangthai');
+        // Logic: Hết hàng (số lượng = 0) thì auto chuyển sang ngừng hoạt động
+        if (slTon <= 0) {
+            trangThai = 'false';
+        }
+        document.getElementById('edit_trangThai').value = trangThai;
 
         const modal = new bootstrap.Modal(document.getElementById('modalSuaBienThe'));
         modal.show();
     }
+
+    // Tự động chuyển sang Ngừng bán khi số lượng tồn kho = 0
+    document.getElementById('edit_soLuongTon').addEventListener('input', function() {
+        let sl = parseInt(this.value, 10);
+        if (isNaN(sl) || sl <= 0) {
+            document.getElementById('edit_trangThai').value = 'false';
+        }
+    });
+
+    document.getElementById('edit_trangThai').addEventListener('change', function() {
+        let sl = parseInt(document.getElementById('edit_soLuongTon').value, 10);
+        if (this.value === 'true' && (isNaN(sl) || sl <= 0)) {
+            alert('Biến thể có số lượng tồn kho = 0 (hết hàng) nên hệ thống tự động đặt trạng thái Ngừng bán!');
+            this.value = 'false';
+        }
+    });
+
+    // Làm sạch ký tự dấu phẩy/chấm trước khi submit để đảm bảo lưu thành công 100%
+    document.querySelector('#modalSuaBienThe form').addEventListener('submit', function() {
+        const gb = document.getElementById('edit_giaBan');
+        const gg = document.getElementById('edit_giaBanBanDau');
+        if (gb) gb.value = gb.value.replace(/[,.\s]/g, '');
+        if (gg) gg.value = gg.value.replace(/[,.\s]/g, '');
+    });
 </script>
 </body>
 </html>

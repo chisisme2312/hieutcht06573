@@ -32,6 +32,22 @@ public class SanPhamAdminController {
     private final ThuocTinhService thuocTinhService;
     private final DatabaseFontFixer databaseFontFixer;
 
+    // Tự động làm sạch dấu phẩy, chấm, khoảng cách khi bind dữ liệu sang BigDecimal (Giá tiền)
+    @InitBinder
+    public void initBinder(org.springframework.web.bind.WebDataBinder binder) {
+        binder.registerCustomEditor(BigDecimal.class, new java.beans.PropertyEditorSupport() {
+            @Override
+            public void setAsText(String text) {
+                if (text == null || text.trim().isEmpty()) {
+                    setValue(null);
+                } else {
+                    String clean = text.replaceAll("[,.\\s]", "");
+                    setValue(clean.isEmpty() ? BigDecimal.ZERO : new BigDecimal(clean));
+                }
+            }
+        });
+    }
+
     // 1.0 Endpoint Sửa Font tiếng Việt Unicode cho toàn bộ sản phẩm
     @GetMapping("/sua-font")
     public String suaFont(RedirectAttributes ra) {
@@ -77,6 +93,7 @@ public class SanPhamAdminController {
             boolean trangThaiMoi = !Boolean.TRUE.equals(sp.getTrangThai());
             sp.setTrangThai(trangThaiMoi);
             sanPhamService.save(sp);
+            sanPhamService.dongBoTrangThaiBienThe(sp.getId(), trangThaiMoi);
             ra.addFlashAttribute("thongBao", "Đã chuyển trạng thái mẫu áo [" + sp.getTenSanPham() + "] thành: " 
                     + (trangThaiMoi ? "🟢 Đang kinh doanh (Hiển thị ở trang bán hàng)" : "⚪ Ngừng kinh doanh (Tạm ẩn khỏi trang khách)"));
         }
@@ -255,8 +272,8 @@ public class SanPhamAdminController {
     public String luuSanPham(@ModelAttribute("sanPham") SanPham sanPham,
                              @RequestParam(value = "mauSacIds", required = false) List<Integer> mauSacIds,
                              @RequestParam(value = "kichThuocIds", required = false) List<Integer> kichThuocIds,
-                             @RequestParam(value = "giaBan", required = false) BigDecimal giaBan,
-                             @RequestParam(value = "giaBanBanDau", required = false) BigDecimal giaBanBanDau,
+                             @RequestParam(value = "giaBan", required = false) String giaBanStr,
+                             @RequestParam(value = "giaBanBanDau", required = false) String giaBanBanDauStr,
                              @RequestParam(value = "soLuongTon", required = false) Integer soLuongTon,
                              RedirectAttributes ra) {
         try {
@@ -265,6 +282,21 @@ public class SanPhamAdminController {
                 var listCoAo = thuocTinhService.getAllCoAo();
                 if (!listCoAo.isEmpty()) {
                     sanPham.setCoAo(listCoAo.get(0));
+                }
+            }
+
+            BigDecimal giaBan = BigDecimal.ZERO;
+            if (giaBanStr != null && !giaBanStr.trim().isEmpty()) {
+                String clean = giaBanStr.replaceAll("[,.\\s]", "");
+                if (!clean.isEmpty()) {
+                    giaBan = new BigDecimal(clean);
+                }
+            }
+            BigDecimal giaBanBanDau = giaBan;
+            if (giaBanBanDauStr != null && !giaBanBanDauStr.trim().isEmpty()) {
+                String clean = giaBanBanDauStr.replaceAll("[,.\\s]", "");
+                if (!clean.isEmpty()) {
+                    giaBanBanDau = new BigDecimal(clean);
                 }
             }
 
@@ -278,12 +310,18 @@ public class SanPhamAdminController {
                     spCu.setNhaCungCap(sanPham.getNhaCungCap());
                     spCu.setChatLieu(sanPham.getChatLieu());
                     spCu.setMoTa(sanPham.getMoTa());
-                    spCu.setTrangThai(sanPham.getTrangThai());
+                    
+                    boolean trangThaiMoi = Boolean.TRUE.equals(sanPham.getTrangThai());
+                    spCu.setTrangThai(trangThaiMoi);
                     if (sanPham.getCoAo() != null) {
                         spCu.setCoAo(sanPham.getCoAo());
                     }
                     sanPhamService.save(spCu);
-                    ra.addFlashAttribute("thongBao", "Cập nhật thông tin mẫu áo thành công!");
+
+                    // Đồng bộ trạng thái mẫu áo sang tất cả biến thể con
+                    sanPhamService.dongBoTrangThaiBienThe(spCu.getId(), trangThaiMoi);
+
+                    ra.addFlashAttribute("thongBao", "Cập nhật thông tin mẫu áo và đồng bộ trạng thái biến thể thành công!");
                 }
             } else {
                 sanPhamService.saveWithVariants(sanPham, mauSacIds, kichThuocIds, giaBan, giaBanBanDau, soLuongTon);
@@ -352,9 +390,12 @@ public class SanPhamAdminController {
                     thuocTinhService.getKichThuocById(chiTiet.getKichThuoc().getId()).ifPresent(chiTiet::setKichThuoc);
                 }
 
-                if (chiTiet.getTrangThai() == null) {
-                    chiTiet.setTrangThai(true);
-                }
+                int tonKho = chiTiet.getSoLuongTon() != null ? chiTiet.getSoLuongTon() : 10;
+                chiTiet.setSoLuongTon(tonKho);
+
+                // Logic hết hàng số lượng = 0 auto ngừng hoạt động, hoặc cha ngừng kinh doanh thì con cũng ngừng
+                boolean statusMoi = Boolean.TRUE.equals(spOpt.get().getTrangThai()) && (tonKho > 0);
+                chiTiet.setTrangThai(statusMoi);
                 
                 // Tránh lỗi null cột gia_ban_ban_dau
                 if (chiTiet.getGiaBanBanDau() == null) {
@@ -362,9 +403,6 @@ public class SanPhamAdminController {
                 }
                 if (chiTiet.getGiaBan() == null) {
                     chiTiet.setGiaBan(BigDecimal.ZERO);
-                }
-                if (chiTiet.getSoLuongTon() == null) {
-                    chiTiet.setSoLuongTon(10);
                 }
                 
                 if (chiTiet.getMaSanPhamChiTiet() == null || chiTiet.getMaSanPhamChiTiet().trim().isEmpty()) {
@@ -390,21 +428,49 @@ public class SanPhamAdminController {
                                  @RequestParam("sanPhamId") Integer sanPhamId,
                                  @RequestParam("mauSacId") Integer mauSacId,
                                  @RequestParam("kichThuocId") Integer kichThuocId,
-                                 @RequestParam("giaBan") BigDecimal giaBan,
-                                 @RequestParam(value = "giaBanBanDau", required = false) BigDecimal giaBanBanDau,
+                                 @RequestParam("giaBan") String giaBanStr,
+                                 @RequestParam(value = "giaBanBanDau", required = false) String giaBanBanDauStr,
                                  @RequestParam("soLuongTon") Integer soLuongTon,
                                  @RequestParam("trangThai") Boolean trangThai,
                                  RedirectAttributes ra) {
         try {
+            BigDecimal giaBan = BigDecimal.ZERO;
+            if (giaBanStr != null && !giaBanStr.trim().isEmpty()) {
+                String clean = giaBanStr.replaceAll("[,.\\s]", "");
+                if (!clean.isEmpty()) {
+                    giaBan = new BigDecimal(clean);
+                }
+            }
+
+            BigDecimal giaBanBanDau = giaBan;
+            if (giaBanBanDauStr != null && !giaBanBanDauStr.trim().isEmpty()) {
+                String clean = giaBanBanDauStr.replaceAll("[,.\\s]", "");
+                if (!clean.isEmpty()) {
+                    giaBanBanDau = new BigDecimal(clean);
+                }
+            }
+
             var ctOpt = sanPhamChiTietService.getById(id);
             if (ctOpt.isPresent()) {
                 SanPhamChiTiet ct = ctOpt.get();
                 thuocTinhService.getMauSacById(mauSacId).ifPresent(ct::setMauSac);
                 thuocTinhService.getKichThuocById(kichThuocId).ifPresent(ct::setKichThuoc);
-                ct.setGiaBan(giaBan != null ? giaBan : BigDecimal.ZERO);
-                ct.setGiaBanBanDau(giaBanBanDau != null ? giaBanBanDau : ct.getGiaBan());
-                ct.setSoLuongTon(soLuongTon != null ? soLuongTon : 0);
-                ct.setTrangThai(trangThai != null ? trangThai : true);
+                ct.setGiaBan(giaBan);
+                ct.setGiaBanBanDau(giaBanBanDau);
+                
+                int tonKho = soLuongTon != null ? soLuongTon : 0;
+                ct.setSoLuongTon(tonKho);
+
+                // Logic: Hết hàng (số lượng = 0) auto chuyển sang ngừng hoạt động
+                boolean statusMoi = Boolean.TRUE.equals(trangThai);
+                if (tonKho <= 0) {
+                    statusMoi = false;
+                }
+                // Nếu mẫu áo cha đang ngừng kinh doanh thì biến thể con không thể kinh doanh
+                if (ct.getSanPham() != null && !Boolean.TRUE.equals(ct.getSanPham().getTrangThai())) {
+                    statusMoi = false;
+                }
+                ct.setTrangThai(statusMoi);
 
                 // Cập nhật lại mã biến thể nếu đổi Màu hoặc Size
                 if (ct.getSanPham() != null) {
@@ -412,7 +478,11 @@ public class SanPhamAdminController {
                 }
 
                 sanPhamChiTietService.save(ct);
-                ra.addFlashAttribute("thongBao", "Cập nhật biến thể thành công!");
+                if (tonKho <= 0) {
+                    ra.addFlashAttribute("thongBao", "Cập nhật biến thể thành công (Tồn kho = 0 nên tự động chuyển sang Ngừng bán)!");
+                } else {
+                    ra.addFlashAttribute("thongBao", "Cập nhật biến thể thành công!");
+                }
             }
         } catch (Exception e) {
             String msg = e.getMessage();
