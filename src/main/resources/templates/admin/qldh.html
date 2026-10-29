@@ -104,13 +104,13 @@
                                 <span class="badge bg-dark-subtle text-dark fw-bold" th:text="${hd.maHoaDon}"></span>
                             </td>
                             <td>
-                            <span class="badge bg-dark-subtle text-dark fw-bold" th:text="${hd.khachHang}"></span>
+                            <span class="badge bg-dark-subtle text-dark fw-bold" th:text="${hd.khachHang.maKhachHang}"></span>
                             </td>
                             <td>
-                                <span class="badge bg-dark-subtle text-dark fw-bold" th:text="${hd.nhanVien}"></span>
+                                <span class="badge bg-dark-subtle text-dark fw-bold" th:text="${hd.nhanVien.maNhanVien}"></span>
                             </td>
                             <td>
-                                <span class="badge bg-dark-subtle text-dark fw-bold" th:text="${hd.giamGia}"></span>
+                                <span class="badge bg-dark-subtle text-dark fw-bold" th:text="${hd.giamGia.maGiamGia}"></span>
                             </td>
                             <td>
                                 <span class="badge bg-dark-subtle text-dark fw-bold" th:text="${hd.tongTien}"></span>
@@ -178,15 +178,6 @@
         </main>
     </div>
 </div>
-<!--                            <td>-->
-<!--                                &lt;!&ndash; Hiển thị badge trạng thái màu sắc riêng biệt &ndash;&gt;-->
-<!--                                <span th:if="${dh.trangThai == 'Chờ xác nhận'}" class="badge bg-warning-subtle text-warning fw-bold">⏳ Chờ xác nhận</span>-->
-<!--                                <span th:if="${dh.trangThai == 'Đã xác nhận'}" class="badge bg-primary-subtle text-primary fw-bold">✅ Đã xác nhận</span>-->
-<!--                                <span th:if="${dh.trangThai == 'Đang giao hàng'}" class="badge bg-info-subtle text-info fw-bold">🚚 Đang giao hàng</span>-->
-<!--                                <span th:if="${dh.trangThai == 'Đã hoàn thành'}" class="badge bg-success-subtle text-success fw-bold">🎉 Hoàn thành</span>-->
-<!--                                <span th:if="${dh.trangThai == 'Đã hủy'}" class="badge bg-danger-subtle text-danger fw-bold">❌ Đã hủy</span>-->
-<!--                            </td>-->
-
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
