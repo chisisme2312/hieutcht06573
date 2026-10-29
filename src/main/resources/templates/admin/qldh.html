@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head th:replace="~{admin/layout :: admin_head('Quản Lý Đơn Hàng - Luôn Vui Tươi Shop')}">
+</head>
+<style>
+    .order-tab-btn {
+        border-radius: 8px;
+        background-color: #f1f5f9;
+        color: #475569;
+        border: 1px solid #e2e8f0;
+        font-weight: 600;
+        font-size: 13px;
+        padding: 8px 16px;
+        transition: all 0.2s ease;
+    }
+    .order-tab-btn:hover {
+        background-color: #e2e8f0;
+        color: #0f172a;
+    }
+    .order-tab-btn.active {
+        background-color: #dc2626 !important;
+        color: #ffffff !important;
+        border-color: #dc2626 !important;
+        box-shadow: 0 3px 10px rgba(220, 38, 38, 0.25);
+    }
+    .card-custom {
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        background: #ffffff;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+</style>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar dùng chung chuẩn phong cách Luôn Vui Tươi -->
+        <aside th:replace="~{admin/layout :: admin_sidebar('orders')}"></aside>
+
+        <!-- Main Content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+
+            <!-- Header Tiêu Đề -->
+            <div class="d-flex flex-wrap justify-content-between align-items-center pb-3 mb-4 border-bottom">
+                <div>
+                    <h3 class="fw-bold text-dark mb-1">📦 Quản Lý Đơn Hàng Online</h3>
+                    <p class="text-secondary mb-0 small">Theo dõi, duyệt đơn, cập nhật trạng thái vận chuyển và xử lý hoàn kho tự động</p>
+                </div>
+                <div class="d-flex gap-2 mt-2 mt-md-0">
+                    <button class="btn btn-outline-secondary fw-semibold btn-sm px-3 bg-white" onclick="location.reload()">
+                        <i class="bi bi-arrow-clockwise me-1"></i> Làm Mới Dữ Liệu
+                    </button>
+                </div>
+            </div>
+
+            <!-- Thanh Tabs Trạng Thái Đơn Hàng -->
+            <div class="d-flex flex-wrap gap-2 mb-4">
+                <a th:href="@{/admin/don-hang}" class="btn order-tab-btn" th:classappend="${param.trangThai == null} ? 'active' : ''">
+                    📋 Tất Cả Đơn <span class="badge bg-light text-dark ms-1" th:text="${tongTatCa}">12</span>
+                </a>
+                <a th:href="@{/admin/don-hang(trangThai='Chờ xác nhận')}" class="btn order-tab-btn" th:classappend="${param.trangThai != null and param.trangThai[0] == 'Chờ xác nhận'} ? 'active' : ''">
+                    ⏳ Chờ Xác Nhận <span class="badge bg-warning text-dark ms-1" th:text="${soChoXacNhan}">3</span>
+                </a>
+                <a th:href="@{/admin/don-hang(trangThai='Đã xác nhận')}" class="btn order-tab-btn" th:classappend="${param.trangThai != null and param.trangThai[0] == 'Đã xác nhận'} ? 'active' : ''">
+                    ✅ Đã Xác Nhận <span class="badge bg-primary text-white ms-1" th:text="${soDaXacNhan}">2</span>
+                </a>
+                <a th:href="@{/admin/don-hang(trangThai='Đang giao hàng')}" class="btn order-tab-btn" th:classappend="${param.trangThai != null and param.trangThai[0] == 'Đang giao hàng'} ? 'active' : ''">
+                    🚚 Đang Giao Hàng <span class="badge bg-info text-dark ms-1" th:text="${soDangGiao}">2</span>
+                </a>
+                <a th:href="@{/admin/don-hang(trangThai='Đã hoàn thành')}" class="btn order-tab-btn" th:classappend="${param.trangThai != null and param.trangThai[0] == 'Đã hoàn thành'} ? 'active' : ''">
+                    🎉 Hoàn Thành <span class="badge bg-success text-white ms-1" th:text="${soHoanThanh}">4</span>
+                </a>
+                <a th:href="@{/admin/don-hang(trangThai='Đã hủy')}" class="btn order-tab-btn" th:classappend="${param.trangThai != null and param.trangThai[0] == 'Đã hủy'} ? 'active' : ''">
+                    ❌ Đã Hủy <span class="badge bg-danger text-white ms-1" th:text="${soDaHuy}">1</span>
+                </a>
+            </div>
+
+            <!-- Bảng Danh Sách Đơn Hàng -->
+            <div class="card card-custom p-4">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light text-secondary uppercase fs-7">
+                        <tr>
+                            <th>Mã Hóa Đơn</th>
+                            <th>Mã Khách Hàng</th>
+                            <th>Mã Nhân Viên</th>
+                            <th>Mã Giảm Giá</th>
+                            <th>Tổng Tiền</th>
+                            <th>Tiền Trước Giảm</th>
+                            <th>Phí Giao Hàng</th>
+                            <th>Phương Thức Thanh Toán</th>
+                            <th>Hình thức</th>
+                            <th>Địa Chỉ Gửi Hàng</th>
+                            <th>Ghi Chú</th>
+                            <th>Trạng Thái</th>
+                            <th>Ngày làm</th>
+                            <th class="text-end">Hành Động Xử Lý</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <!-- Lặp danh sách đơn hàng từ Controller Spring Boot -->
+                        <th:block th:each="hd : ${hoaDon}">
+                        <tr>
+                            <td>
+                                <span class="badge bg-dark-subtle text-dark fw-bold" th:text="${hd.maHoaDon}"></span>
+                            </td>
+                            <td>
+                            <span class="badge bg-dark-subtle text-dark fw-bold" th:text="${hd.khachHang}"></span>
+                            </td>
+                            <td>
+                                <span class="badge bg-dark-subtle text-dark fw-bold" th:text="${hd.nhanVien}"></span>
+                            </td>
+                            <td>
+                                <span class="badge bg-dark-subtle text-dark fw-bold" th:text="${hd.giamGia}"></span>
+                            </td>
+                            <td>
+                                <span class="badge bg-dark-subtle text-dark fw-bold" th:text="${hd.tongTien}"></span>
+                            </td>
+                            <td>
+                                <span class="badge bg-dark-subtle text-dark fw-bold" th:text="${hd.tienTruocGiam}"></span>
+                            </td>
+                            <td>
+                                <span class="badge bg-dark-subtle text-dark fw-bold" th:text="${hd.phiGiaoHang}"></span>
+                            </td>
+                            <td>
+                                <span class="badge bg-dark-subtle text-dark fw-bold" th:text="${hd.phuongThucThanhToan}"></span>
+                            </td>
+                            <td>
+                                <span class="badge bg-dark-subtle text-dark fw-bold" th:text="${hd.hinhThucMuaHang}"></span>
+                            </td>
+                            <td>
+                                <span class="badge bg-dark-subtle text-dark fw-bold" th:text="${hd.diaChiGiaoHang}"></span>
+                            </td>
+                            <td>
+                                <span class="badge bg-dark-subtle text-dark fw-bold" th:text="${hd.ghiChu}"></span>
+                            </td>
+                            <td>
+                                <span class="badge bg-dark-subtle text-dark fw-bold" th:text="${hd.trangThai}"></span>
+                            </td>
+                            <td>
+                                <span class="badge bg-dark-subtle text-dark fw-bold" th:text="${hd.ngayTao}"></span>
+                            </td>
+                            <td class="text-end">
+                                <div class="d-flex justify-content-end gap-1">
+                                    <!-- Nút Xem chi tiết -->
+                                    <a th:href="@{'/admin/don-hang/chi-tiet/' + ${hd.id}}" class="btn btn-outline-dark btn-sm fw-semibold" title="Xem chi tiết đơn hàng">
+                                        <i class="bi bi-eye"></i> Chi tiết
+                                    </a>
+
+                                    <!-- Nút Xử lý nhanh tùy theo trạng thái -->
+                                    <!-- 1. Nếu đang 'Chờ xác nhận' -> Duyệt đơn -->
+                                    <a th:if="${hd.trangThai == 'Chờ xác nhận'}" th:href="@{'/admin/don-hang/duyet/' + ${dh.id}}" class="btn btn-primary btn-sm fw-semibold" onclick="return confirm('Xác nhận duyệt đơn hàng này?')" title="Duyệt đơn hàng">
+                                        <i class="bi bi-check2-circle"></i> Duyệt
+                                    </a>
+
+                                    <!-- 2. Nếu đã 'Đã xác nhận' -> Chuyển sang Đang giao -->
+                                    <a th:if="${hd.trangThai == 'Đã xác nhận'}" th:href="@{'/admin/don-hang/giao-hang/' + ${dh.id}}" class="btn btn-info btn-sm fw-semibold text-white" title="Bắt đầu giao hàng">
+                                        <i class="bi bi-truck"></i> Giao hàng
+                                    </a>
+
+                                    <!-- 3. Nút Hủy đơn (Áp dụng cho đơn chưa hoàn thành/chưa hủy) -->
+                                    <a th:if="${hd.trangThai != 'Đã hoàn thành' and hd.trangThai != 'Đã hủy'}" th:href="@{'/admin/don-hang/huy/' + ${hd.id}}" class="btn btn-outline-danger btn-sm fw-semibold" onclick="return confirm('Bạn có chắc chắn muốn hủy đơn hàng này? Hệ thống sẽ tự động hoàn lại số lượng tồn kho vào sản phẩm.')" title="Hủy đơn và hoàn kho">
+                                        <i class="bi bi-x-circle"></i> Hủy
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        </th:block>
+                        <tr th:if="${#lists.isEmpty(hoaDon)}">
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                <i class="bi bi-inbox fs-2 d-block mb-2"></i> Không có đơn hàng nào trong danh sách này!
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+<!--                            <td>-->
+<!--                                &lt;!&ndash; Hiển thị badge trạng thái màu sắc riêng biệt &ndash;&gt;-->
+<!--                                <span th:if="${dh.trangThai == 'Chờ xác nhận'}" class="badge bg-warning-subtle text-warning fw-bold">⏳ Chờ xác nhận</span>-->
+<!--                                <span th:if="${dh.trangThai == 'Đã xác nhận'}" class="badge bg-primary-subtle text-primary fw-bold">✅ Đã xác nhận</span>-->
+<!--                                <span th:if="${dh.trangThai == 'Đang giao hàng'}" class="badge bg-info-subtle text-info fw-bold">🚚 Đang giao hàng</span>-->
+<!--                                <span th:if="${dh.trangThai == 'Đã hoàn thành'}" class="badge bg-success-subtle text-success fw-bold">🎉 Hoàn thành</span>-->
+<!--                                <span th:if="${dh.trangThai == 'Đã hủy'}" class="badge bg-danger-subtle text-danger fw-bold">❌ Đã hủy</span>-->
+<!--                            </td>-->
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
