@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${sp.tenSanPham + ' - LUÔN VUI TƯƠI SHOP'}">Chi Tiết Sản Phẩm - LUÔN VUI TƯƠI SHOP</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-black: #111827;
+            --primary-red: #dc2626;
+            --primary-red-hover: #b91c1c;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --bg-light: #f9fafb;
+            --border-color: #e5e7eb;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-main);
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Top Announcement Bar */
+        .top-bar {
+            background-color: var(--primary-black);
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 8px 0;
+            letter-spacing: 0.5px;
+        }
+
+        /* Main Header */
+        .main-header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: #ffffff;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        }
+
+        .brand-logo {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--primary-black);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .brand-logo span {
+            color: var(--primary-red);
+        }
+
+        /* Nav menu */
+        .nav-link-custom {
+            font-weight: 700;
+            font-size: 13.5px;
+            text-transform: uppercase;
+            color: var(--primary-black) !important;
+            padding: 16px 14px !important;
+            letter-spacing: 0.5px;
+            transition: color 0.2s;
+            text-decoration: none;
+        }
+
+        .nav-link-custom:hover, .nav-link-custom.active, .nav-link-custom.sale-link {
+            color: var(--primary-red) !important;
+        }
+
+        /* Search Box */
+        .header-search {
+            position: relative;
+        }
+
+        .header-search input {
+            border-radius: 20px;
+            padding: 8px 16px 8px 38px;
+            font-size: 13px;
+            background: #f3f4f6;
+            border: 1px solid transparent;
+        }
+
+        .header-search input:focus {
+            background: #ffffff;
+            border-color: var(--primary-black);
+            box-shadow: none;
+        }
+
+        .header-search .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            font-size: 14px;
+        }
+
+        /* Action icons */
+        .action-icon {
+            font-size: 21px;
+            color: var(--primary-black);
+            text-decoration: none;
+            position: relative;
+            margin-left: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s, color 0.2s;
+        }
+
+        .action-icon:hover {
+            transform: scale(1.1);
+            color: var(--primary-red);
+        }
+
+        .badge-cart {
+            position: absolute;
+            top: -6px;
+            right: -10px;
+            background-color: var(--primary-red);
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: 50%;
+            width: 19px;
+            height: 19px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb-section {
+            background: #f9fafb;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 13.5px;
+        }
+
+        .breadcrumb a {
+            color: var(--text-muted);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--primary-red);
+        }
+
+        /* Product Gallery */
+        .main-gallery-image {
+            width: 100%;
+            aspect-ratio: 3/4;
+            object-fit: cover;
+            border-radius: 12px;
+            background-color: #f3f4f6;
+            border: 1px solid var(--border-color);
+        }
+
+        .thumbnail-list {
+            display: flex;
+            gap: 12px;
+            margin-top: 14px;
+            overflow-x: auto;
+            padding-bottom: 6px;
+        }
+
+        .thumb-img {
+            width: 80px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #f3f4f6;
+        }
+
+        .thumb-img:hover, .thumb-img.active {
+            border-color: var(--primary-red);
+            transform: scale(1.05);
+        }
+
+        /* Product Details Info */
+        .product-brand {
+            font-size: 13px;
+            font-weight: 700;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .product-title-detail {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--primary-black);
+            margin: 6px 0 12px 0;
+            line-height: 1.3;
+        }
+
+        .product-price-detail {
+            background: #fef2f2;
+            padding: 16px 20px;
+            border-radius: 10px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: baseline;
+            gap: 14px;
+        }
+
+        .price-current-large {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--primary-red);
+        }
+
+        .price-old-large {
+            font-size: 16px;
+            color: #9ca3af;
+            text-decoration: line-through;
+        }
+
+        .badge-discount-detail {
+            background: var(--primary-red);
+            color: white;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 4px;
+        }
+
+        /* Variant Option Selector */
+        .option-label {
+            font-size: 13.5px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--primary-black);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .option-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .option-pill {
+            padding: 8px 18px;
+            font-size: 13px;
+            font-weight: 600;
+            border: 1.5px solid var(--border-color);
+            border-radius: 8px;
+            background: #ffffff;
+            color: #374151;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .option-pill:hover {
+            border-color: var(--primary-black);
+        }
+
+        .option-pill.active {
+            border-color: var(--primary-black);
+            background: var(--primary-black);
+            color: #ffffff;
+        }
+
+        .option-pill.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            text-decoration: line-through;
+        }
+
+        /* Stock Status */
+        .stock-badge-box {
+            font-size: 13px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Quantity Box */
+        .qty-input-group {
+            max-width: 130px;
+            display: flex;
+            border: 1.5px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .qty-btn {
+            background: #f9fafb;
+            border: none;
+            width: 38px;
+            font-weight: bold;
+            font-size: 16px;
+            color: #374151;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .qty-btn:hover {
+            background: #e5e7eb;
+        }
+
+        .qty-input {
+            width: 50px;
+            text-align: center;
+            border: none;
+            font-weight: 700;
+            font-size: 14px;
+            outline: none;
+        }
+
+        /* Action Buttons */
+        .btn-add-cart {
+            background: #ffffff;
+            color: var(--primary-red);
+            border: 2px solid var(--primary-red);
+            font-weight: 800;
+            font-size: 14px;
+            text-transform: uppercase;
+            padding: 13px 24px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            flex-grow: 1;
+        }
+
+        .btn-add-cart:hover {
+            background: var(--primary-red);
+            color: #ffffff;
+        }
+
+        .btn-buy-now {
+            background: var(--primary-black);
+            color: #ffffff;
+            border: 2px solid var(--primary-black);
+            font-weight: 800;
+            font-size: 14px;
+            text-transform: uppercase;
+            padding: 13px 24px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            flex-grow: 1;
+        }
+
+        .btn-buy-now:hover {
+            background: #000000;
+            border-color: #000000;
+            color: #ffffff;
+        }
+
+        /* Product Tabs */
+        .product-nav-tabs .nav-link {
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            border: none;
+            border-bottom: 2px solid transparent;
+            padding: 14px 20px;
+        }
+
+        .product-nav-tabs .nav-link.active {
+            color: var(--primary-black);
+            border-bottom: 2px solid var(--primary-black);
+            background: transparent;
+        }
+
+        /* Related Products */
+        .product-card {
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background: #ffffff;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .product-card:hover {
+            box-shadow: 0 12px 24px rgba(0,0,0,0.08);
+            transform: translateY(-4px);
+            border-color: #d1d5db;
+        }
+
+        .product-thumb {
+            position: relative;
+            overflow: hidden;
+            background-color: #f3f4f6;
+            aspect-ratio: 3/4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .product-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .product-card:hover .product-thumb img {
+            transform: scale(1.06);
+        }
+
+        .product-info {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .product-title {
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1.4;
+            color: var(--primary-black);
+            margin-bottom: 8px;
+            text-decoration: none;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            height: 40px;
+        }
+
+        .price-box {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .price-current {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--primary-red);
+        }
+
+        .price-old {
+            font-size: 13px;
+            color: #9ca3af;
+            text-decoration: line-through;
+        }
+
+        .btn-view-product {
+            width: 100%;
+            background: var(--primary-black);
+            color: white;
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+            border: none;
+            padding: 10px 0;
+            border-radius: 6px;
+            transition: background 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-view-product:hover {
+            background: var(--primary-red);
+            color: white;
+        }
+
+        /* Footer */
+        .main-footer {
+            background: var(--primary-black);
+            color: #d1d5db;
+            padding: 60px 0 25px 0;
+            font-size: 13.5px;
+            margin-top: 80px;
+        }
+
+        .footer-title {
+            color: #ffffff;
+            font-weight: 800;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 20px;
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: #9ca3af;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: #ffffff;
+        }
+
+        .copyright-bar {
+            border-top: 1px solid #374151;
+            padding-top: 25px;
+            margin-top: 40px;
+            font-size: 12.5px;
+            color: #9ca3af;
+        }
+    </style>
+</head>
+<body>
+
+<!-- 1. Top Announcement Bar -->
+<div class="top-bar text-center">
+    <div class="container">
+        <span>🔥 SIÊU SALE MÙA HÈ - MIỄN PHÍ VẬN CHUYỂN TOÀN QUỐC CHO ĐƠN TỪ 399.000Đ | ĐỔI TRẢ 15 NGÀY DỄ DÀNG</span>
+    </div>
+</div>
+
+<!-- 2. Header & Menu Điều Hướng -->
+<header class="main-header">
+    <div class="container">
+        <div class="d-flex align-items-center justify-content-between py-3">
+            
+            <!-- Logo -->
+            <a href="/" class="brand-logo">
+                LUÔN VUI TƯƠI <span>&nbsp;SHOP</span>
+            </a>
+
+            <!-- Search Bar in Header -->
+            <form action="/san-pham" method="GET" class="header-search d-none d-lg-block mx-4 flex-grow-1" style="max-width: 400px;">
+                <i class="bi bi-search search-icon"></i>
+                <input type="text" name="keyword" class="form-control" placeholder="Tìm kiếm áo thun, polo, sơ mi...">
+            </form>
+
+            <!-- Action Icons -->
+            <div class="d-flex align-items-center">
+                <a href="/admin" class="btn btn-sm btn-outline-dark fw-bold me-2">
+                    <i class="bi bi-speedometer2 me-1"></i> Quản Trị
+                </a>
+
+                <a href="/san-pham" class="btn btn-sm btn-dark fw-bold me-2 d-none d-md-inline-block">
+                    <i class="bi bi-grid me-1"></i> Danh Mục
+                </a>
+
+                <a href="/gio-hang" class="action-icon" title="Giỏ hàng">
+                    <i class="bi bi-bag"></i>
+                    <span class="badge-cart" id="headerCartBadge" 
+                          th:text="${session.SESSION_CART != null ? session.SESSION_CART.tongSoLuong : 0}">0</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Navigation Categories -->
+        <nav class="d-flex align-items-center border-top overflow-auto">
+            <a href="/" class="nav-link-custom">Trang Chủ</a>
+            <a href="/san-pham" class="nav-link-custom active">Tất Cả Sản Phẩm</a>
+            <a href="/san-pham?sort=moi-nhat" class="nav-link-custom">Hàng Mới Về</a>
+            <a href="/san-pham?loaiSanPhamId=1" class="nav-link-custom">Áo Thun T-Shirt</a>
+            <a href="/san-pham?loaiSanPhamId=2" class="nav-link-custom">Áo Polo</a>
+            <a href="/san-pham?loaiSanPhamId=3" class="nav-link-custom">Áo Sơ Mi</a>
+            <a href="/san-pham?mucGia=duoi-200k" class="nav-link-custom sale-link">🔥 Dưới 200K</a>
+            <a href="/#chinh-sach" class="nav-link-custom ms-auto text-secondary text-capitalize d-none d-lg-block" style="font-weight: 500; font-size: 13px;">Hệ thống 15+ Cửa Hàng</a>
+        </nav>
+    </div>
+</header>
+
+<!-- 3. Breadcrumb -->
+<div class="breadcrumb-section">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="/"><i class="bi bi-house-door me-1"></i>Trang chủ</a></li>
+                <li class="breadcrumb-item"><a href="/san-pham">Sản phẩm</a></li>
+                <li class="breadcrumb-item active" aria-current="page" th:text="${sp.tenSanPham}">Tên Sản Phẩm</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<!-- 4. Product Detail Section -->
+<main class="container my-5">
+    <div class="row g-5">
+        
+        <!-- Left Column: Album Ảnh Sản Phẩm -->
+        <div class="col-lg-6">
+            <div class="position-relative">
+                <!-- Ảnh chính -->
+                <img id="mainProductImg" 
+                     th:src="${listAnh != null and !listAnh.empty ? listAnh.iterator().next().anhUrl : 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800'}" 
+                     th:alt="${sp.tenSanPham}" 
+                     class="main-gallery-image shadow-sm">
+                
+                <span class="badge bg-danger position-absolute top-0 start-0 m-3 px-3 py-2 fs-7 fw-bold" 
+                      id="badgeDiscountDetail" style="display: none;">
+                    GIẢM GIÁ
+                </span>
+            </div>
+
+            <!-- Danh sách Thumbnail Album Ảnh -->
+            <div class="thumbnail-list mt-3" th:if="${listAnh != null and !listAnh.empty}">
+                <img th:each="anh, iter : ${listAnh}" 
+                     th:src="${anh.anhUrl}" 
+                     th:classappend="${iter.index == 0} ? 'active' : ''" 
+                     class="thumb-img" 
+                     onclick="changeMainImage(this.src, this)">
+            </div>
+        </div>
+
+        <!-- Right Column: Thông Tin Sản Phẩm & Chọn Biến Thể -->
+        <div class="col-lg-6">
+            <div class="product-brand" th:text="${sp.nhaCungCap != null ? sp.nhaCungCap.tenNhaCungCap : 'LUÔN VUI TƯƠI'}">COOLMATE</div>
+            <h1 class="product-title-detail" th:text="${sp.tenSanPham}">Áo Thun Cotton Basic Nam</h1>
+            
+            <div class="d-flex align-items-center gap-3 mb-3 text-muted small">
+                <span>Mã SP: <strong class="text-dark" th:text="${sp.maSanPham}">SP001</strong></span>
+                <span>•</span>
+                <span>Mã Biến Thể: <strong class="text-dark" id="displaySku">-</strong></span>
+                <span>•</span>
+                <span class="text-warning">
+                    <i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star-fill"></i>
+                    <span class="text-secondary">(4.9/5)</span>
+                </span>
+            </div>
+
+            <!-- Giá Bán -->
+            <div class="product-price-detail">
+                <span class="price-current-large" id="displayPrice">---.---đ</span>
+                <span class="price-old-large" id="displayOldPrice" style="display: none;">---.---đ</span>
+                <span class="badge-discount-detail" id="displayDiscountBadge" style="display: none;">-15%</span>
+            </div>
+
+            <!-- Form Thêm Vào Giỏ Hàng -->
+            <form id="addToCartForm" action="/gio-hang/them" method="POST">
+                
+                <!-- Hidden Input lưu biến thể ID được chọn -->
+                <input type="hidden" name="sanPhamChiTietId" id="selectedVariantId" value="">
+
+                <!-- 1. Chọn Màu Sắc -->
+                <div class="mb-4">
+                    <div class="option-label">
+                        <span>1. Chọn Màu Sắc: <strong class="text-danger ms-1" id="selectedColorName">Chưa chọn</strong></span>
+                    </div>
+                    <div class="option-pills">
+                        <div th:each="mau : ${listMauSac}" 
+                             class="option-pill color-pill" 
+                             th:data-color-id="${mau.id}" 
+                             th:data-color-name="${mau.tenMauSac}"
+                             onclick="selectColor(this)">
+                            <i class="bi bi-circle-fill me-1" style="font-size: 10px;"></i>
+                            <span th:text="${mau.tenMauSac}">Đen</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Chọn Kích Cỡ (Size) -->
+                <div class="mb-4">
+                    <div class="option-label">
+                        <span>2. Chọn Kích Cỡ (Size): <strong class="text-danger ms-1" id="selectedSizeName">Chưa chọn</strong></span>
+                        <a href="#size-guide" class="text-muted small text-decoration-underline" data-bs-toggle="modal" data-bs-target="#sizeGuideModal">
+                            <i class="bi bi-rulers me-1"></i>Hướng dẫn chọn size
+                        </a>
+                    </div>
+                    <div class="option-pills">
+                        <div th:each="size : ${listKichThuoc}" 
+                             class="option-pill size-pill" 
+                             th:data-size-id="${size.id}" 
+                             th:data-size-name="${size.tenKichThuoc}"
+                             onclick="selectSize(this)">
+                            <span th:text="${size.tenKichThuoc}">L</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Tình Trạng Tồn Kho Theo Biến Thể -->
+                <div class="stock-badge-box">
+                    <span class="text-muted">Tình trạng:</span>
+                    <span id="displayStockStatus" class="fw-bold text-secondary">
+                        <i class="bi bi-info-circle me-1"></i>Vui lòng chọn Màu sắc & Size để xem tồn kho
+                    </span>
+                </div>
+
+                <!-- 4. Chọn Số Lượng -->
+                <div class="mb-4 d-flex align-items-center gap-3">
+                    <span class="fw-bold small text-dark">Số lượng:</span>
+                    <div class="qty-input-group">
+                        <button type="button" class="qty-btn" onclick="decreaseQty()">-</button>
+                        <input type="number" name="soLuong" id="inputQuantity" class="qty-input" value="1" min="1" max="99" readonly>
+                        <button type="button" class="qty-btn" onclick="increaseQty()">+</button>
+                    </div>
+                </div>
+
+                <!-- 5. Nút Thêm Vào Giỏ & Mua Ngay -->
+                <div class="d-flex gap-3 mb-4">
+                    <button type="button" id="btnAddToCart" class="btn-add-cart" onclick="submitAddToCart(false)" disabled>
+                        <i class="bi bi-cart-plus me-1"></i> Thêm Vào Giỏ Hàng
+                    </button>
+                    <button type="button" id="btnBuyNow" class="btn-buy-now" onclick="submitAddToCart(true)" disabled>
+                        <i class="bi bi-bag-check me-1"></i> Mua Ngay
+                    </button>
+                </div>
+
+            </form>
+
+            <!-- Chính Sách Đi Kèm -->
+            <div class="border rounded-3 p-3 bg-light">
+                <div class="row g-2 small">
+                    <div class="col-6">
+                        <i class="bi bi-truck text-success me-1"></i> Freeship đơn từ 399.000đ
+                    </div>
+                    <div class="col-6">
+                        <i class="bi bi-arrow-repeat text-primary me-1"></i> 15 ngày đổi trả miễn phí
+                    </div>
+                    <div class="col-6">
+                        <i class="bi bi-shield-check text-warning me-1"></i> Cam kết chính hãng 100%
+                    </div>
+                    <div class="col-6">
+                        <i class="bi bi-headset text-danger me-1"></i> Hotline hỗ trợ: 0989.792.893
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Product Tabs: Mô Tả, Bảng Size, Chính Sách -->
+    <div class="mt-5 pt-4 border-top">
+        <ul class="nav nav-tabs product-nav-tabs" id="productTab" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active" id="desc-tab" data-bs-toggle="tab" data-bs-target="#desc-content">
+                    Mô Tả Sản Phẩm
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" id="specs-tab" data-bs-toggle="tab" data-bs-target="#specs-content">
+                    Thông Số Chi Tiết
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" id="size-tab" data-bs-toggle="tab" data-bs-target="#size-content">
+                    Bảng Chọn Size
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content p-4 bg-white border border-top-0 rounded-bottom" id="productTabContent">
+            
+            <!-- Tab 1: Mô Tả -->
+            <div class="tab-pane fade show active" id="desc-content">
+                <h6 class="fw-bold mb-3">Đặc điểm nổi bật của <span th:text="${sp.tenSanPham}">Sản phẩm</span>:</h6>
+                <div th:utext="${sp.moTa != null and !sp.moTa.blank ? sp.moTa : 'Sản phẩm được thiết kế tối giản, chất liệu cao cấp thấm hút mồ hôi tối đa, đem lại cảm giác thoải mái suốt cả ngày dài năng động.'}">
+                    Mô tả sản phẩm
+                </div>
+            </div>
+
+            <!-- Tab 2: Thông Số -->
+            <div class="tab-pane fade" id="specs-content">
+                <table class="table table-bordered table-striped" style="max-width: 600px;">
+                    <tbody>
+                        <tr>
+                            <td class="fw-bold" style="width: 200px;">Thương hiệu</td>
+                            <td th:text="${sp.nhaCungCap != null ? sp.nhaCungCap.tenNhaCungCap : 'LUÔN VUI TƯƠI'}">Coolmate</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Loại sản phẩm</td>
+                            <td th:text="${sp.loaiSanPham != null ? sp.loaiSanPham.tenLoaiSanPham : '-'}">Áo Polo</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Chất liệu vải</td>
+                            <td th:text="${sp.chatLieu != null ? sp.chatLieu.tenChatLieu : 'Cotton cao cấp'}">Cotton 100%</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Kiểu cổ áo</td>
+                            <td th:text="${sp.coAo != null ? sp.coAo.tenCoAo : 'Cổ bẻ'}">Cổ tròn</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Xuất xứ</td>
+                            <td>Việt Nam</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Tab 3: Bảng Size -->
+            <div class="tab-pane fade" id="size-content">
+                <h6 class="fw-bold mb-3">Bảng hướng dẫn chọn size chuẩn form người Việt:</h6>
+                <table class="table table-bordered text-center" style="max-width: 650px;">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Size</th>
+                            <th>Chiều cao (cm)</th>
+                            <th>Cân nặng (kg)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="fw-bold">S</td>
+                            <td>150 - 165</td>
+                            <td>45 - 55</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">M</td>
+                            <td>160 - 172</td>
+                            <td>55 - 65</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">L</td>
+                            <td>170 - 178</td>
+                            <td>65 - 75</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">XL</td>
+                            <td>175 - 185</td>
+                            <td>75 - 85</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">XXL</td>
+                            <td>180 - 190</td>
+                            <td>Trên 85</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 5. Sản Phẩm Liên Quan (Related Products) -->
+    <div class="mt-5 pt-4" th:if="${sanPhamLienQuan != null and !sanPhamLienQuan.empty}">
+        <div class="section-header text-start mb-4">
+            <h4 class="fw-bold text-uppercase">CÓ THỂ BẠN CŨNG THÍCH</h4>
+            <p class="text-muted small">Các sản phẩm cùng bộ sưu tập hoặc cùng phong cách</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-6 col-md-3" th:each="related : ${sanPhamLienQuan}">
+                <div class="product-card">
+                    <div class="product-thumb">
+                        <a th:href="@{'/san-pham/' + ${related.id}}">
+                            <img th:if="${related.danhSachAnh != null and !related.danhSachAnh.empty}" 
+                                 th:src="${related.danhSachAnh.iterator().next().anhUrl}" 
+                                 th:alt="${related.tenSanPham}">
+                            <img th:unless="${related.danhSachAnh != null and !related.danhSachAnh.empty}" 
+                                 src="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600" 
+                                 th:alt="${related.tenSanPham}">
+                        </a>
+                    </div>
+                    <div class="product-info">
+                        <a th:href="@{'/san-pham/' + ${related.id}}" class="product-title" th:text="${related.tenSanPham}">
+                            Áo Thun Nam
+                        </a>
+                        <div class="price-box" th:if="${related.danhSachChiTiet != null and !related.danhSachChiTiet.empty}">
+                            <span class="price-current" th:text="${#numbers.formatDecimal(related.danhSachChiTiet.iterator().next().giaBan, 0, 'COMMA', 0, 'POINT') + 'đ'}">189.000đ</span>
+                        </div>
+                        <div class="mt-auto">
+                            <a th:href="@{'/san-pham/' + ${related.id}}" class="btn-view-product">
+                                <i class="bi bi-eye me-1"></i> Xem Chi Tiết
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<!-- Size Guide Modal -->
+<div class="modal fade" id="sizeGuideModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">Bảng Hướng Dẫn Chọn Size</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered text-center">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Size</th>
+                            <th>Chiều cao</th>
+                            <th>Cân nặng</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>S</td><td>150 - 165 cm</td><td>45 - 55 kg</td></tr>
+                        <tr><td>M</td><td>160 - 172 cm</td><td>55 - 65 kg</td></tr>
+                        <tr><td>L</td><td>170 - 178 cm</td><td>65 - 75 kg</td></tr>
+                        <tr><td>XL</td><td>175 - 185 cm</td><td>75 - 85 kg</td></tr>
+                        <tr><td>XXL</td><td>180 - 190 cm</td><td>> 85 kg</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Thông Báo Thêm Vào Giỏ -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 9999;">
+    <div id="liveToast" class="toast align-items-center text-white bg-dark border-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body fs-6" id="toastMessage">
+                <i class="bi bi-check-circle-fill text-success me-2"></i> Đã thêm vào giỏ hàng thành công!
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="main-footer">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6">
+                <h5 class="brand-logo text-white mb-3">LUÔN VUI TƯƠI <span>&nbsp;SHOP</span></h5>
+                <p style="color: #9ca3af; line-height: 1.6;">
+                    Thương hiệu thời trang nam hiện đại với sứ mệnh mang đến sản phẩm áo thun, polo, sơ mi chất lượng cao, chuẩn form dáng cùng trải nghiệm mua sắm tiện lợi nhất.
+                </p>
+            </div>
+
+            <div class="col-lg-2 col-md-6 col-6">
+                <h6 class="footer-title">DANH MỤC</h6>
+                <ul class="footer-links">
+                    <li><a href="/san-pham">Tất cả sản phẩm</a></li>
+                    <li><a href="/san-pham?loaiSanPhamId=1">Áo Thun T-Shirt</a></li>
+                    <li><a href="/san-pham?loaiSanPhamId=2">Áo Polo</a></li>
+                    <li><a href="/san-pham?loaiSanPhamId=3">Áo Sơ Mi</a></li>
+                </ul>
+            </div>
+
+            <div class="col-lg-3 col-md-6 col-6">
+                <h6 class="footer-title">CHÍNH SÁCH BÁN HÀNG</h6>
+                <ul class="footer-links">
+                    <li><a href="#">Chính sách đổi trả 15 ngày</a></li>
+                    <li><a href="#">Chính sách bảo hành sản phẩm</a></li>
+                    <li><a href="#">Chính sách vận chuyển & COD</a></li>
+                </ul>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <h6 class="footer-title">KẾT NỐI VỚI CHÚNG TÔI</h6>
+                <p style="color: #9ca3af;">Đăng ký nhận mã giảm giá 10% cho đơn hàng đầu tiên:</p>
+                <div class="input-group mb-3">
+                    <input type="email" class="form-control" placeholder="Nhập email..." style="font-size: 13px;">
+                    <button class="btn btn-danger fw-bold" style="background: var(--primary-red);">ĐĂNG KÝ</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="copyright-bar text-center">
+            <p class="mb-0">© 2026 LUÔN VUI TƯƠI SHOP - Đồ Án Chuyên Đề Tốt Nghiệp</p>
+        </div>
+    </div>
+</footer>
+
+<!-- Bootstrap JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Dynamic Variant Selector JavaScript -->
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    // Danh sách toàn bộ biến thể từ Controller
+    const variantsData = /*[[${variantsJson}]]*/ '[]';
+    const variants = JSON.parse(variantsData);
+
+    let selectedColorId = null;
+    let selectedSizeId = null;
+    let currentMatchedVariant = null;
+
+    function formatVND(amount) {
+        if (!amount && amount !== 0) return '0đ';
+        return new Intl.NumberFormat('vi-VN').format(amount) + 'đ';
+    }
+
+    // Đổi ảnh thumbnail
+    function changeMainImage(url, element) {
+        document.getElementById('mainProductImg').src = url;
+        document.querySelectorAll('.thumb-img').forEach(el => el.classList.remove('active'));
+        if (element) element.classList.add('active');
+    }
+
+    // Chọn màu sắc
+    function selectColor(element) {
+        const colorId = parseInt(element.getAttribute('data-color-id'));
+        const colorName = element.getAttribute('data-color-name');
+
+        selectedColorId = colorId;
+        document.getElementById('selectedColorName').innerText = colorName;
+
+        document.querySelectorAll('.color-pill').forEach(el => el.classList.remove('active'));
+        element.classList.add('active');
+
+        checkVariantMatching();
+    }
+
+    // Chọn kích cỡ
+    function selectSize(element) {
+        const sizeId = parseInt(element.getAttribute('data-size-id'));
+        const sizeName = element.getAttribute('data-size-name');
+
+        selectedSizeId = sizeId;
+        document.getElementById('selectedSizeName').innerText = sizeName;
+
+        document.querySelectorAll('.size-pill').forEach(el => el.classList.remove('active'));
+        element.classList.add('active');
+
+        checkVariantMatching();
+    }
+
+    // Tìm kiếm biến thể khớp màu + size & Cập nhật số lượng tồn, giá, SKU
+    function checkVariantMatching() {
+        const displayPrice = document.getElementById('displayPrice');
+        const displayOldPrice = document.getElementById('displayOldPrice');
+        const displayDiscountBadge = document.getElementById('displayDiscountBadge');
+        const displayStockStatus = document.getElementById('displayStockStatus');
+        const displaySku = document.getElementById('displaySku');
+        const selectedVariantIdInput = document.getElementById('selectedVariantId');
+        const btnAddToCart = document.getElementById('btnAddToCart');
+        const btnBuyNow = document.getElementById('btnBuyNow');
+        const inputQuantity = document.getElementById('inputQuantity');
+
+        if (!selectedColorId || !selectedSizeId) {
+            displayStockStatus.innerHTML = '<span class="text-secondary"><i class="bi bi-info-circle me-1"></i>Vui lòng chọn đủ Màu sắc & Kích cỡ</span>';
+            btnAddToCart.disabled = true;
+            btnBuyNow.disabled = true;
+            return;
+        }
+
+        // Tìm trong mảng biến thể
+        currentMatchedVariant = variants.find(v => v.mauSacId === selectedColorId && v.kichThuocId === selectedSizeId);
+
+        if (!currentMatchedVariant) {
+            displayPrice.innerText = 'Tạm hết hàng';
+            displayOldPrice.style.display = 'none';
+            displayDiscountBadge.style.display = 'none';
+            displaySku.innerText = '-';
+            selectedVariantIdInput.value = '';
+            displayStockStatus.innerHTML = '<span class="text-danger fw-bold"><i class="bi bi-x-circle me-1"></i>Không có sẵn biến thể này</span>';
+            btnAddToCart.disabled = true;
+            btnBuyNow.disabled = true;
+            return;
+        }
+
+        // Có biến thể: Cập nhật thông tin
+        selectedVariantIdInput.value = currentMatchedVariant.id;
+        displaySku.innerText = currentMatchedVariant.maSanPhamChiTiet || ('SKU-' + currentMatchedVariant.id);
+        displayPrice.innerText = formatVND(currentMatchedVariant.giaBan);
+
+        if (currentMatchedVariant.giaBanBanDau && currentMatchedVariant.giaBanBanDau > currentMatchedVariant.giaBan) {
+            displayOldPrice.innerText = formatVND(currentMatchedVariant.giaBanBanDau);
+            displayOldPrice.style.display = 'inline';
+            const percent = Math.round((1 - (currentMatchedVariant.giaBan / currentMatchedVariant.giaBanBanDau)) * 100);
+            displayDiscountBadge.innerText = '-' + percent + '%';
+            displayDiscountBadge.style.display = 'inline-block';
+        } else {
+            displayOldPrice.style.display = 'none';
+            displayDiscountBadge.style.display = 'none';
+        }
+
+        const stock = currentMatchedVariant.soLuongTon || 0;
+        if (stock > 0) {
+            displayStockStatus.innerHTML = `<span class="text-success fw-bold"><i class="bi bi-check-circle me-1"></i>Còn hàng (${stock} sản phẩm trong kho)</span>`;
+            btnAddToCart.disabled = false;
+            btnBuyNow.disabled = false;
+            inputQuantity.max = stock;
+            if (parseInt(inputQuantity.value) > stock) {
+                inputQuantity.value = stock;
+            }
+        } else {
+            displayStockStatus.innerHTML = '<span class="text-danger fw-bold"><i class="bi bi-exclamation-triangle me-1"></i>Hết hàng trong kho</span>';
+            btnAddToCart.disabled = true;
+            btnBuyNow.disabled = true;
+        }
+    }
+
+    // Tăng giảm số lượng
+    function increaseQty() {
+        const input = document.getElementById('inputQuantity');
+        let current = parseInt(input.value) || 1;
+        const max = currentMatchedVariant ? (currentMatchedVariant.soLuongTon || 99) : 99;
+        if (current < max) {
+            input.value = current + 1;
+        }
+    }
+
+    function decreaseQty() {
+        const input = document.getElementById('inputQuantity');
+        let current = parseInt(input.value) || 1;
+        if (current > 1) {
+            input.value = current - 1;
+        }
+    }
+
+    // Submit Thêm Vào Giỏ Hàng (AJAX hoặc Mua ngay)
+    function submitAddToCart(isBuyNow) {
+        const variantId = document.getElementById('selectedVariantId').value;
+        const qty = parseInt(document.getElementById('inputQuantity').value) || 1;
+
+        if (!variantId) {
+            alert('Vui lòng chọn màu sắc và kích cỡ sản phẩm!');
+            return;
+        }
+
+        if (isBuyNow) {
+            // Chuyển hướng thẳng sang giỏ hàng
+            document.getElementById('addToCartForm').submit();
+            return;
+        }
+
+        // AJAX thêm vào giỏ hàng
+        const formData = new FormData();
+        formData.append('sanPhamChiTietId', variantId);
+        formData.append('soLuong', qty);
+
+        fetch('/gio-hang/them', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Cập nhật badge trên header
+                const badge = document.getElementById('headerCartBadge');
+                if (badge) badge.innerText = data.totalCount;
+
+                // Hiển thị toast
+                const toastEl = document.getElementById('liveToast');
+                document.getElementById('toastMessage').innerHTML = `<i class="bi bi-check-circle-fill text-success me-2"></i> ${data.message}`;
+                const toast = new bootstrap.Toast(toastEl);
+                toast.show();
+            } else {
+                alert(data.message || 'Không thể thêm vào giỏ hàng!');
+            }
+        })
+        .catch(err => {
+            console.error('Lỗi thêm vào giỏ', err);
+            // Fallback sang Form submit
+            document.getElementById('addToCartForm').submit();
+        });
+    }
+
+    // Tự động chọn biến thể đầu tiên có sẵn nếu có
+    document.addEventListener('DOMContentLoaded', function() {
+        if (variants && variants.length > 0) {
+            const firstAvailable = variants.find(v => v.soLuongTon > 0) || variants[0];
+            if (firstAvailable) {
+                const colorEl = document.querySelector(`.color-pill[data-color-id="${firstAvailable.mauSacId}"]`);
+                const sizeEl = document.querySelector(`.size-pill[data-size-id="${firstAvailable.kichThuocId}"]`);
+                if (colorEl) selectColor(colorEl);
+                if (sizeEl) selectSize(sizeEl);
+            }
+        }
+    });
+    /*]]>*/
+</script>
+</body>
+</html>
