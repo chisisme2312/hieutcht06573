@@ -1,5 +1,6 @@
 package com.luonvuituoi.shop.controller.client;
 
+import com.luonvuituoi.shop.entity.KhachHang;
 import com.luonvuituoi.shop.repository.Dcrepository;
 import com.luonvuituoi.shop.repository.GiamGiaRepository;
 import com.luonvuituoi.shop.repository.KhachHangRepository;
@@ -13,13 +14,13 @@ public class CheckoutController {
 @Autowired
     KhachHangRepository khachHangRepository;
 @Autowired
-Dcrepository dcRepository;
+Dcrepository dcrepository;
 @Autowired
 GiamGiaRepository giamGiaRepository;
 @RequestMapping("/dat-hang")
     public String gioHang(Model model) {
         model.addAttribute("khachHang",khachHangRepository.findAll());
-        model.addAttribute("dclp",dcRepository.findAll());
+        model.addAttribute("dclp",dcrepository.findAll());
         model.addAttribute("giamgia",giamGiaRepository.findAll());
         return "/client/checkout";
 }

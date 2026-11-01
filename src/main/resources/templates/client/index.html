@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LUÔN VUI TƯƠI SHOP - Thời Trang Nam Trẻ Trung, Chuẩn Form</title>
+    <title>LUÔN VUI TƯƠI SHOP - Thời Trang Nam Trẻ Trung, Phong Cách Tối Giản</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
@@ -15,11 +15,12 @@
     
     <style>
         :root {
-            --primary-black: #000000;
-            --primary-red: #c92921;
-            --text-main: #111111;
-            --text-muted: #777777;
-            --bg-light: #f8f9fa;
+            --primary-black: #111827;
+            --primary-red: #dc2626;
+            --primary-red-hover: #b91c1c;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --bg-light: #f9fafb;
             --border-color: #e5e7eb;
         }
 
@@ -37,21 +38,22 @@
             color: #ffffff;
             font-size: 13px;
             font-weight: 500;
-            padding: 7px 0;
+            padding: 8px 0;
             letter-spacing: 0.5px;
         }
 
-        /* Main Header 160Store style */
+        /* Main Header */
         .main-header {
             position: sticky;
             top: 0;
             z-index: 1000;
             background: #ffffff;
             border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
         }
 
         .brand-logo {
-            font-size: 26px;
+            font-size: 24px;
             font-weight: 800;
             letter-spacing: -0.5px;
             color: var(--primary-black);
@@ -67,29 +69,29 @@
         /* Nav menu */
         .nav-link-custom {
             font-weight: 700;
-            font-size: 14px;
+            font-size: 13.5px;
             text-transform: uppercase;
             color: var(--primary-black) !important;
-            padding: 18px 14px !important;
+            padding: 16px 14px !important;
             letter-spacing: 0.5px;
             transition: color 0.2s;
+            text-decoration: none;
         }
 
-        .nav-link-custom:hover, .nav-link-custom.sale-link {
+        .nav-link-custom:hover, .nav-link-custom.active, .nav-link-custom.sale-link {
             color: var(--primary-red) !important;
         }
 
         /* Search Box */
         .header-search {
             position: relative;
-            max-width: 280px;
         }
 
         .header-search input {
             border-radius: 20px;
-            padding: 7px 16px 7px 36px;
+            padding: 8px 16px 8px 38px;
             font-size: 13px;
-            background: #f4f4f5;
+            background: #f3f4f6;
             border: 1px solid transparent;
         }
 
@@ -101,25 +103,29 @@
 
         .header-search .search-icon {
             position: absolute;
-            left: 12px;
+            left: 14px;
             top: 50%;
             transform: translateY(-50%);
-            color: #888;
+            color: #9ca3af;
             font-size: 14px;
         }
 
         /* Action icons */
         .action-icon {
-            font-size: 20px;
+            font-size: 21px;
             color: var(--primary-black);
             text-decoration: none;
             position: relative;
-            margin-left: 18px;
-            transition: transform 0.2s;
+            margin-left: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s, color 0.2s;
         }
 
         .action-icon:hover {
             transform: scale(1.1);
+            color: var(--primary-red);
         }
 
         .badge-cart {
@@ -128,23 +134,41 @@
             right: -10px;
             background-color: var(--primary-red);
             color: white;
-            font-size: 10px;
+            font-size: 11px;
             font-weight: 700;
             border-radius: 50%;
-            width: 18px;
-            height: 18px;
+            width: 19px;
+            height: 19px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        /* Hero Banner */
-        .hero-banner {
-            background: linear-gradient(135deg, #111111 0%, #222222 100%);
-            color: white;
-            padding: 80px 0;
+        /* Hero Carousel */
+        .hero-slider .carousel-item {
+            height: 480px;
+            background-size: cover;
+            background-position: center;
             position: relative;
-            overflow: hidden;
+        }
+
+        .hero-slider .carousel-item::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, rgba(17,24,39,0.85) 0%, rgba(17,24,39,0.3) 65%, transparent 100%);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            color: #ffffff;
+            max-width: 620px;
+            padding: 0 15px;
         }
 
         .hero-badge {
@@ -157,39 +181,50 @@
             letter-spacing: 1.5px;
             padding: 6px 14px;
             border-radius: 4px;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
+            width: fit-content;
         }
 
         /* Section Titles */
         .section-header {
             text-align: center;
-            margin: 50px 0 35px 0;
+            margin: 55px 0 35px 0;
         }
 
         .section-header h2 {
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 1px;
-            font-size: 26px;
+            font-size: 24px;
             margin-bottom: 8px;
         }
 
         .section-header p {
             color: var(--text-muted);
-            font-size: 15px;
+            font-size: 14.5px;
         }
 
-        /* Product Card 160Store Style */
+        /* Product Card */
         .product-card {
-            border: none;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
             background: #ffffff;
             transition: all 0.3s ease;
             position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .product-card:hover {
+            box-shadow: 0 12px 24px rgba(0,0,0,0.08);
+            transform: translateY(-4px);
+            border-color: #d1d5db;
         }
 
         .product-thumb {
             position: relative;
-            border-radius: 6px;
             overflow: hidden;
             background-color: #f3f4f6;
             aspect-ratio: 3/4;
@@ -206,7 +241,7 @@
         }
 
         .product-card:hover .product-thumb img {
-            transform: scale(1.05);
+            transform: scale(1.06);
         }
 
         .tag-discount {
@@ -217,16 +252,35 @@
             color: white;
             font-size: 11px;
             font-weight: 800;
-            padding: 3px 8px;
-            border-radius: 3px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            box-shadow: 0 2px 6px rgba(220,38,38,0.4);
+        }
+
+        .tag-hot {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #f59e0b;
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .product-info {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
         }
 
         .tag-brand {
-            font-size: 12px;
+            font-size: 11.5px;
             font-weight: 700;
-            color: #888888;
+            color: #9ca3af;
             text-transform: uppercase;
-            margin-top: 12px;
             margin-bottom: 4px;
         }
 
@@ -242,6 +296,7 @@
             -webkit-box-orient: vertical;
             overflow: hidden;
             height: 40px;
+            transition: color 0.2s;
         }
 
         .product-title:hover {
@@ -251,7 +306,7 @@
         .price-box {
             display: flex;
             align-items: baseline;
-            gap: 10px;
+            gap: 8px;
             margin-bottom: 12px;
         }
 
@@ -267,19 +322,19 @@
             text-decoration: line-through;
         }
 
-        /* Size / Color badges */
         .variant-pill {
             display: inline-block;
             font-size: 11px;
-            padding: 2px 7px;
-            border: 1px solid #e5e7eb;
-            border-radius: 3px;
+            padding: 2px 8px;
+            border: 1px solid var(--border-color);
+            background: #f9fafb;
+            border-radius: 4px;
             margin-right: 4px;
-            color: #555;
+            color: #4b5563;
             font-weight: 600;
         }
 
-        .btn-quick-add {
+        .btn-view-product {
             width: 100%;
             background: var(--primary-black);
             color: white;
@@ -288,12 +343,59 @@
             text-transform: uppercase;
             border: none;
             padding: 10px 0;
-            border-radius: 4px;
+            border-radius: 6px;
             transition: background 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .btn-quick-add:hover {
+        .btn-view-product:hover {
             background: var(--primary-red);
+            color: white;
+        }
+
+        /* Category Card */
+        .category-card {
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px 16px;
+            text-align: center;
+            background: #ffffff;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: var(--text-main);
+            display: block;
+        }
+
+        .category-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.06);
+            border-color: var(--primary-red);
+            color: var(--primary-red);
+        }
+
+        .category-icon {
+            font-size: 32px;
+            color: var(--primary-black);
+            margin-bottom: 12px;
+            transition: color 0.2s;
+        }
+
+        .category-card:hover .category-icon {
+            color: var(--primary-red);
+        }
+
+        .category-card h6 {
+            font-weight: 700;
+            margin-bottom: 4px;
+            font-size: 15px;
+        }
+
+        .category-card span {
+            font-size: 12.5px;
+            color: var(--text-muted);
         }
 
         /* USP Policy Bar */
@@ -301,7 +403,7 @@
             background: #fafafa;
             border-top: 1px solid var(--border-color);
             border-bottom: 1px solid var(--border-color);
-            padding: 30px 0;
+            padding: 35px 0;
             margin-top: 60px;
         }
 
@@ -318,13 +420,13 @@
 
         .usp-text h6 {
             font-weight: 700;
-            font-size: 14px;
+            font-size: 13.5px;
             margin-bottom: 2px;
             text-transform: uppercase;
         }
 
         .usp-text p {
-            font-size: 13px;
+            font-size: 12.5px;
             color: var(--text-muted);
             margin-bottom: 0;
         }
@@ -332,15 +434,15 @@
         /* Footer */
         .main-footer {
             background: var(--primary-black);
-            color: #cccccc;
+            color: #d1d5db;
             padding: 60px 0 25px 0;
-            font-size: 14px;
+            font-size: 13.5px;
         }
 
         .footer-title {
             color: #ffffff;
             font-weight: 800;
-            font-size: 15px;
+            font-size: 14px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin-bottom: 20px;
@@ -357,7 +459,7 @@
         }
 
         .footer-links a {
-            color: #aaaaaa;
+            color: #9ca3af;
             text-decoration: none;
             transition: color 0.2s;
         }
@@ -367,24 +469,24 @@
         }
 
         .copyright-bar {
-            border-top: 1px solid #222222;
+            border-top: 1px solid #374151;
             padding-top: 25px;
             margin-top: 40px;
-            font-size: 13px;
-            color: #777777;
+            font-size: 12.5px;
+            color: #9ca3af;
         }
     </style>
 </head>
 <body>
 
-<!-- 1. Top Announcement Bar (Thông báo đầu trang chuẩn 160Store) -->
+<!-- 1. Top Announcement Bar -->
 <div class="top-bar text-center">
     <div class="container">
         <span>🔥 SIÊU SALE MÙA HÈ - MIỄN PHÍ VẬN CHUYỂN TOÀN QUỐC CHO ĐƠN TỪ 399.000Đ | ĐỔI TRẢ 15 NGÀY DỄ DÀNG</span>
     </div>
 </div>
 
-<!-- 2. Header & Thanh Menu Điều Hướng (Chuẩn phong cách 160Store) -->
+<!-- 2. Header & Menu Điều Hướng -->
 <header class="main-header">
     <div class="container">
         <div class="d-flex align-items-center justify-content-between py-3">
@@ -395,91 +497,163 @@
             </a>
 
             <!-- Search Bar -->
-            <div class="header-search d-none d-lg-block mx-4 flex-grow-1" style="max-width: 380px;">
+            <form action="/san-pham" method="GET" class="header-search d-none d-lg-block mx-4 flex-grow-1" style="max-width: 400px;">
                 <i class="bi bi-search search-icon"></i>
-                <input type="text" class="form-control" placeholder="Tìm kiếm áo thun, polo, sơ mi...">
-            </div>
+                <input type="text" name="keyword" class="form-control" placeholder="Tìm kiếm áo thun, polo, sơ mi...">
+            </form>
 
-            <!-- Action Icons: Admin, Login, Cart -->
+            <!-- Action Icons: Admin, Search mobile, Cart -->
             <div class="d-flex align-items-center">
-                <a href="/admin" class="btn btn-sm btn-outline-dark fw-bold me-3">
-                    <i class="bi bi-gear-fill me-1"></i> Trang Admin
+                <a href="/admin" class="btn btn-sm btn-outline-dark fw-bold me-2">
+                    <i class="bi bi-speedometer2 me-1"></i> Quản Trị
                 </a>
 
-                <a href="/dang-nhap" class="action-icon" title="Tài khoản">
-                    <i class="bi bi-person"></i>
+                <a href="/san-pham" class="btn btn-sm btn-dark fw-bold me-2 d-none d-md-inline-block">
+                    <i class="bi bi-grid me-1"></i> Danh Mục
                 </a>
 
                 <a href="/gio-hang" class="action-icon" title="Giỏ hàng">
                     <i class="bi bi-bag"></i>
-                    <span class="badge-cart">2</span>
+                    <span class="badge-cart" id="headerCartBadge" 
+                          th:text="${session.SESSION_CART != null ? session.SESSION_CART.tongSoLuong : 0}">0</span>
                 </a>
             </div>
         </div>
 
         <!-- Navigation Categories -->
-        <nav class="d-flex align-items-center border-top">
-            <a href="/" class="nav-link-custom">Trang Chủ</a>
-            <a href="#new-arrivals" class="nav-link-custom">Hàng Mới Về</a>
-            <a href="#ao-thun" class="nav-link-custom">Áo Thun T-Shirt</a>
-            <a href="#ao-polo" class="nav-link-custom">Áo Polo</a>
-            <a href="#ao-so-mi" class="nav-link-custom">Áo Sơ Mi</a>
-            <a href="#khuyen-mai" class="nav-link-custom sale-link">🔥 Khuyến Mãi Hot (-15%)</a>
-            <a href="#chinh-sach" class="nav-link-custom ms-auto text-secondary text-capitalize" style="font-weight: 500; font-size: 13px;">Hệ thống 15+ Cửa Hàng</a>
+        <nav class="d-flex align-items-center border-top overflow-auto">
+            <a href="/" class="nav-link-custom active">Trang Chủ</a>
+            <a href="/san-pham" class="nav-link-custom">Tất Cả Sản Phẩm</a>
+            <a href="#moi-ve" class="nav-link-custom">Hàng Mới Về</a>
+            <a href="#ban-chay" class="nav-link-custom">Bán Chạy</a>
+            <a href="#noi-bat" class="nav-link-custom sale-link">🔥 Khuyến Mãi Hot</a>
+            <a href="/san-pham?loaiSanPhamId=1" class="nav-link-custom">Áo Thun T-Shirt</a>
+            <a href="/san-pham?loaiSanPhamId=2" class="nav-link-custom">Áo Polo</a>
+            <a href="/san-pham?loaiSanPhamId=3" class="nav-link-custom">Áo Sơ Mi</a>
+            <a href="#chinh-sach" class="nav-link-custom ms-auto text-secondary text-capitalize d-none d-lg-block" style="font-weight: 500; font-size: 13px;">Hệ thống 15+ Cửa Hàng</a>
         </nav>
     </div>
 </header>
 
-<!-- 3. Hero Banner (Slider phong cách thời trang năng động) -->
-<section class="hero-banner">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-6 py-4">
-                <span class="hero-badge">BỘ SƯU TẬP HÈ 2026</span>
-                <h1 class="display-4 fw-extrabold text-white mb-3" style="font-weight: 800; line-height: 1.15;">
-                    PHONG CÁCH TỐI GIẢN,<br>THOẢI MÁI MỖI NGÀY
-                </h1>
-                <p class="lead text-light mb-4" style="font-size: 17px; opacity: 0.9;">
-                    Dòng sản phẩm áo thun Cotton 100%, Polo cá sấu & Sơ mi lụa chống nhăn độc quyền từ thương hiệu Luôn Vui Tươi Shop.
-                </p>
-                <div class="d-flex gap-3">
-                    <a href="#new-arrivals" class="btn btn-light px-4 py-2 fw-bold text-uppercase" style="border-radius: 4px;">Khám Phá Ngay</a>
-                    <a href="#khuyen-mai" class="btn btn-outline-light px-4 py-2 fw-bold text-uppercase" style="border-radius: 4px;">Xem Ưu Đãi</a>
+<!-- 3. Banner Quảng Cáo (Carousel Banner Đa Năng) -->
+<section class="hero-slider">
+    <div id="homeBannerCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="4500">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#homeBannerCarousel" data-bs-slide-to="0" class="active"></button>
+            <button type="button" data-bs-target="#homeBannerCarousel" data-bs-slide-to="1"></button>
+            <button type="button" data-bs-target="#homeBannerCarousel" data-bs-slide-to="2"></button>
+        </div>
+        <div class="carousel-inner">
+            
+            <!-- Slide 1 -->
+            <div class="carousel-item active" style="background-image: url('https://images.unsplash.com/photo-1523381294911-8d3cead13475?w=1600&auto=format&fit=crop');">
+                <div class="container h-100">
+                    <div class="hero-content">
+                        <span class="hero-badge">BỘ SƯU TẬP HÈ 2026</span>
+                        <h1 class="display-5 fw-bold text-white mb-3" style="line-height: 1.2;">
+                            PHONG CÁCH TỐI GIẢN,<br>THOẢI MÁI MỖI NGÀY
+                        </h1>
+                        <p class="lead text-light mb-4" style="font-size: 16px; opacity: 0.9;">
+                            Trải nghiệm dòng áo thun Cotton 100% thấm hút vượt trội & Polo dệt sợi cao cấp, chuẩn form dáng cho phái mạnh.
+                        </p>
+                        <div class="d-flex gap-3">
+                            <a href="/san-pham" class="btn btn-danger px-4 py-2 fw-bold text-uppercase" style="background: var(--primary-red); border: none;">
+                                Mua Sắm Ngay <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                            <a href="#ban-chay" class="btn btn-outline-light px-4 py-2 fw-bold text-uppercase">
+                                Xem Bán Chạy
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="col-lg-6 text-center d-none d-lg-block">
-                <img src="https://images.unsplash.com/photo-1523381294911-8d3cead13475?w=800&auto=format&fit=crop" 
-                     alt="Banner Thời Trang" 
-                     class="img-fluid rounded shadow-lg" 
-                     style="max-height: 380px; object-fit: cover; width: 85%;">
+
+            <!-- Slide 2 -->
+            <div class="carousel-item" style="background-image: url('https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=1600&auto=format&fit=crop');">
+                <div class="container h-100">
+                    <div class="hero-content">
+                        <span class="hero-badge" style="background: #2563eb;">ƯU ĐÃI ĐẶC BIỆT</span>
+                        <h1 class="display-5 fw-bold text-white mb-3" style="line-height: 1.2;">
+                            ÁO POLO CÔNG SỞ & DẠO PHỐ
+                        </h1>
+                        <p class="lead text-light mb-4" style="font-size: 16px; opacity: 0.9;">
+                            Chất liệu Pique cá sấu co giãn 4 chiều, đứng form lịch sự. Giảm giá đến 15% cho các đơn hàng trong tuần lễ này.
+                        </p>
+                        <div class="d-flex gap-3">
+                            <a href="/san-pham?loaiSanPhamId=2" class="btn btn-light px-4 py-2 fw-bold text-uppercase">
+                                Xem Dòng Polo <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
+
+            <!-- Slide 3 -->
+            <div class="carousel-item" style="background-image: url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1600&auto=format&fit=crop');">
+                <div class="container h-100">
+                    <div class="hero-content">
+                        <span class="hero-badge" style="background: #059669;">CHÍNH SÁCH ĐỘC QUYỀN</span>
+                        <h1 class="display-5 fw-bold text-white mb-3" style="line-height: 1.2;">
+                            FREESHIP ĐƠN TỪ 399K<br>ĐỔI TRẢ 15 NGÀY TẬN TAY
+                        </h1>
+                        <p class="lead text-light mb-4" style="font-size: 16px; opacity: 0.9;">
+                            Cam kết kiểm tra hàng trước khi thanh toán. Đổi size, đổi màu dễ dàng không mất phí phát sinh.
+                        </p>
+                        <div class="d-flex gap-3">
+                            <a href="/san-pham" class="btn btn-danger px-4 py-2 fw-bold text-uppercase" style="background: var(--primary-red); border: none;">
+                                Khám Phá Ngay
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#homeBannerCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#homeBannerCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+        </button>
+    </div>
+</section>
+
+<!-- 4. Quick Category Browse (Khám phá theo danh mục áo) -->
+<section class="container my-5">
+    <div class="row g-3">
+        <div class="col-6 col-md-4 col-lg-2" th:each="loai : ${danhSachLoai}">
+            <a th:href="@{'/san-pham?loaiSanPhamId=' + ${loai.id}}" class="category-card">
+                <div class="category-icon">
+                    <i class="bi bi-tags-fill"></i>
+                </div>
+                <h6 th:text="${loai.tenLoaiSanPham}">Áo thun</h6>
+                <span>Khám phá ngay <i class="bi bi-chevron-right" style="font-size: 11px;"></i></span>
+            </a>
         </div>
     </div>
 </section>
 
-<!-- 4. Danh sách Sản phẩm chuẩn 160Store -->
-<main class="container my-5" id="new-arrivals">
+<!-- 5. SECTION 1: SẢN PHẨM MỚI VỀ (NEW ARRIVALS) -->
+<section class="container my-5" id="moi-ve">
     <div class="section-header">
         <h2>🔥 SẢN PHẨM MỚI VỀ (NEW ARRIVALS)</h2>
-        <p>Những mẫu áo thịnh hành và được yêu thích nhất trong tuần qua</p>
+        <p>Những thiết kế mới nhất vừa cập bến với kiểu dáng trẻ trung, hiện đại</p>
     </div>
 
-    <!-- Product Grid -->
     <div class="row g-4">
-        
-        <!-- Render động từ Database Spring Boot JPA -->
-        <div class="col-6 col-md-4 col-lg-3" th:each="sp : ${danhSachSanPham}">
-            <div class="product-card h-100 d-flex flex-column">
+        <div class="col-6 col-md-4 col-lg-3" th:each="sp : ${sanPhamMoiVe}">
+            <div class="product-card">
                 
                 <!-- Ảnh sản phẩm -->
                 <div class="product-thumb">
-                    <!-- Lấy ảnh đầu tiên nếu có -->
-                    <img th:if="${sp.danhSachAnh != null and !sp.danhSachAnh.empty}" 
-                         th:src="${sp.danhSachAnh.iterator().next().anhUrl}" 
-                         th:alt="${sp.tenSanPham}">
-                    <img th:unless="${sp.danhSachAnh != null and !sp.danhSachAnh.empty}" 
-                         src="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600" 
-                         th:alt="${sp.tenSanPham}">
+                    <a th:href="@{'/san-pham/' + ${sp.id}}">
+                        <img th:if="${sp.danhSachAnh != null and !sp.danhSachAnh.empty}" 
+                             th:src="${sp.danhSachAnh.iterator().next().anhUrl}" 
+                             th:alt="${sp.tenSanPham}">
+                        <img th:unless="${sp.danhSachAnh != null and !sp.danhSachAnh.empty}" 
+                             src="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600" 
+                             th:alt="${sp.tenSanPham}">
+                    </a>
                     
                     <span class="tag-discount" th:if="${sp.danhSachChiTiet != null and !sp.danhSachChiTiet.empty and sp.danhSachChiTiet.iterator().next().khuyenMai != null}">
                         -<span th:text="${sp.danhSachChiTiet.iterator().next().khuyenMai.phanTramGiam}">15</span>%
@@ -487,22 +661,22 @@
                 </div>
 
                 <!-- Thông tin sản phẩm -->
-                <div class="pt-2 d-flex flex-column flex-grow-1">
+                <div class="product-info">
                     <div class="tag-brand" th:text="${sp.nhaCungCap != null ? sp.nhaCungCap.tenNhaCungCap : 'LUÔN VUI TƯƠI'}">COOLMATE</div>
                     
                     <a th:href="@{'/san-pham/' + ${sp.id}}" class="product-title" th:text="${sp.tenSanPham}">
-                        Áo Thun Cotton Basic Luôn Vui Tươi
+                        Áo Thun Nam Trẻ Trung
                     </a>
 
                     <!-- Giá bán -->
                     <div class="price-box" th:if="${sp.danhSachChiTiet != null and !sp.danhSachChiTiet.empty}">
-                        <span class="price-current" th:text="${#numbers.formatDecimal(sp.danhSachChiTiet.iterator().next().giaBan, 0, 'COMMA', 0, 'POINT') + 'đ'}">169.150đ</span>
+                        <span class="price-current" th:text="${#numbers.formatDecimal(sp.danhSachChiTiet.iterator().next().giaBan, 0, 'COMMA', 0, 'POINT') + 'đ'}">169.000đ</span>
                         <span class="price-old" 
                               th:if="${sp.danhSachChiTiet.iterator().next().giaBanBanDau != null and sp.danhSachChiTiet.iterator().next().giaBanBanDau > sp.danhSachChiTiet.iterator().next().giaBan}" 
                               th:text="${#numbers.formatDecimal(sp.danhSachChiTiet.iterator().next().giaBanBanDau, 0, 'COMMA', 0, 'POINT') + 'đ'}">199.000đ</span>
                     </div>
                     <div class="price-box" th:unless="${sp.danhSachChiTiet != null and !sp.danhSachChiTiet.empty}">
-                        <span class="price-current">199.000đ</span>
+                        <span class="price-current">Liên hệ</span>
                     </div>
 
                     <!-- Thuộc tính nhỏ (Chất liệu, Cổ áo) -->
@@ -511,21 +685,160 @@
                         <span class="variant-pill" th:if="${sp.loaiSanPham != null}" th:text="${sp.loaiSanPham.tenLoaiSanPham}">Áo thun</span>
                     </div>
 
-                    <!-- Nút Thêm vào giỏ -->
+                    <!-- Nút Xem chi tiết / Mua ngay -->
                     <div class="mt-auto">
-                        <button class="btn-quick-add">
-                            <i class="bi bi-cart-plus me-1"></i> Thêm Vào Giỏ
-                        </button>
+                        <a th:href="@{'/san-pham/' + ${sp.id}}" class="btn-view-product">
+                            <i class="bi bi-eye me-1"></i> Xem Chi Tiết
+                        </a>
                     </div>
                 </div>
 
             </div>
         </div>
-
     </div>
-</main>
 
-<!-- 5. USP Policy Bar (Thanh cam kết chất lượng chuẩn 160Store) -->
+    <div class="text-center mt-4">
+        <a href="/san-pham" class="btn btn-outline-dark px-4 py-2 fw-bold text-uppercase">
+            Xem Tất Cả Sản Phẩm <i class="bi bi-arrow-right ms-1"></i>
+        </a>
+    </div>
+</section>
+
+<!-- 6. SECTION 2: SẢN PHẨM BÁN CHẠY (BEST SELLERS) -->
+<section class="container my-5" id="ban-chay">
+    <div class="section-header">
+        <h2>🏆 TOP SẢN PHẨM BÁN CHẠY NHẤT</h2>
+        <p>Những mẫu áo được săn đón và nhận hàng nghìn phản hồi tích cực từ khách hàng</p>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-6 col-md-4 col-lg-3" th:each="sp : ${sanPhamBanChay}">
+            <div class="product-card">
+                
+                <!-- Ảnh sản phẩm -->
+                <div class="product-thumb">
+                    <a th:href="@{'/san-pham/' + ${sp.id}}">
+                        <img th:if="${sp.danhSachAnh != null and !sp.danhSachAnh.empty}" 
+                             th:src="${sp.danhSachAnh.iterator().next().anhUrl}" 
+                             th:alt="${sp.tenSanPham}">
+                        <img th:unless="${sp.danhSachAnh != null and !sp.danhSachAnh.empty}" 
+                             src="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600" 
+                             th:alt="${sp.tenSanPham}">
+                    </a>
+                    
+                    <span class="tag-hot">
+                        <i class="bi bi-fire me-1"></i> Bán Chạy
+                    </span>
+
+                    <span class="tag-discount" th:if="${sp.danhSachChiTiet != null and !sp.danhSachChiTiet.empty and sp.danhSachChiTiet.iterator().next().khuyenMai != null}">
+                        -<span th:text="${sp.danhSachChiTiet.iterator().next().khuyenMai.phanTramGiam}">15</span>%
+                    </span>
+                </div>
+
+                <!-- Thông tin sản phẩm -->
+                <div class="product-info">
+                    <div class="tag-brand" th:text="${sp.nhaCungCap != null ? sp.nhaCungCap.tenNhaCungCap : 'LUÔN VUI TƯƠI'}">COOLMATE</div>
+                    
+                    <a th:href="@{'/san-pham/' + ${sp.id}}" class="product-title" th:text="${sp.tenSanPham}">
+                        Áo Polo Nam Classic
+                    </a>
+
+                    <!-- Giá bán -->
+                    <div class="price-box" th:if="${sp.danhSachChiTiet != null and !sp.danhSachChiTiet.empty}">
+                        <span class="price-current" th:text="${#numbers.formatDecimal(sp.danhSachChiTiet.iterator().next().giaBan, 0, 'COMMA', 0, 'POINT') + 'đ'}">189.000đ</span>
+                        <span class="price-old" 
+                              th:if="${sp.danhSachChiTiet.iterator().next().giaBanBanDau != null and sp.danhSachChiTiet.iterator().next().giaBanBanDau > sp.danhSachChiTiet.iterator().next().giaBan}" 
+                              th:text="${#numbers.formatDecimal(sp.danhSachChiTiet.iterator().next().giaBanBanDau, 0, 'COMMA', 0, 'POINT') + 'đ'}">249.000đ</span>
+                    </div>
+                    <div class="price-box" th:unless="${sp.danhSachChiTiet != null and !sp.danhSachChiTiet.empty}">
+                        <span class="price-current">Liên hệ</span>
+                    </div>
+
+                    <!-- Thuộc tính nhỏ -->
+                    <div class="mb-3">
+                        <span class="variant-pill" th:if="${sp.chatLieu != null}" th:text="${sp.chatLieu.tenChatLieu}">Vải Pique</span>
+                        <span class="variant-pill" th:if="${sp.coAo != null}" th:text="${sp.coAo.tenCoAo}">Cổ bẻ</span>
+                    </div>
+
+                    <!-- Nút Xem chi tiết -->
+                    <div class="mt-auto">
+                        <a th:href="@{'/san-pham/' + ${sp.id}}" class="btn-view-product">
+                            <i class="bi bi-cart-plus me-1"></i> Xem & Mua Ngay
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 7. SECTION 3: SẢN PHẨM NỔI BẬT & KHUYẾN MÃI (FEATURED PRODUCTS) -->
+<section class="container my-5" id="noi-bat">
+    <div class="section-header">
+        <h2>⭐ SẢN PHẨM NỔI BẬT & GIẢM GIÁ HOT</h2>
+        <p>Cơ hội sở hữu trang phục chất lượng cao với mức giá ưu đãi nhất</p>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-6 col-md-4 col-lg-3" th:each="sp : ${sanPhamNoiBat}">
+            <div class="product-card">
+                
+                <!-- Ảnh sản phẩm -->
+                <div class="product-thumb">
+                    <a th:href="@{'/san-pham/' + ${sp.id}}">
+                        <img th:if="${sp.danhSachAnh != null and !sp.danhSachAnh.empty}" 
+                             th:src="${sp.danhSachAnh.iterator().next().anhUrl}" 
+                             th:alt="${sp.tenSanPham}">
+                        <img th:unless="${sp.danhSachAnh != null and !sp.danhSachAnh.empty}" 
+                             src="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600" 
+                             th:alt="${sp.tenSanPham}">
+                    </a>
+                    
+                    <span class="tag-discount" th:if="${sp.danhSachChiTiet != null and !sp.danhSachChiTiet.empty and sp.danhSachChiTiet.iterator().next().khuyenMai != null}">
+                        -<span th:text="${sp.danhSachChiTiet.iterator().next().khuyenMai.phanTramGiam}">15</span>%
+                    </span>
+                </div>
+
+                <!-- Thông tin sản phẩm -->
+                <div class="product-info">
+                    <div class="tag-brand" th:text="${sp.nhaCungCap != null ? sp.nhaCungCap.tenNhaCungCap : 'LUÔN VUI TƯƠI'}">TEELAB</div>
+                    
+                    <a th:href="@{'/san-pham/' + ${sp.id}}" class="product-title" th:text="${sp.tenSanPham}">
+                        Áo Sơ Mi Nam Công Sở Chống Nhăn
+                    </a>
+
+                    <!-- Giá bán -->
+                    <div class="price-box" th:if="${sp.danhSachChiTiet != null and !sp.danhSachChiTiet.empty}">
+                        <span class="price-current" th:text="${#numbers.formatDecimal(sp.danhSachChiTiet.iterator().next().giaBan, 0, 'COMMA', 0, 'POINT') + 'đ'}">249.000đ</span>
+                        <span class="price-old" 
+                              th:if="${sp.danhSachChiTiet.iterator().next().giaBanBanDau != null and sp.danhSachChiTiet.iterator().next().giaBanBanDau > sp.danhSachChiTiet.iterator().next().giaBan}" 
+                              th:text="${#numbers.formatDecimal(sp.danhSachChiTiet.iterator().next().giaBanBanDau, 0, 'COMMA', 0, 'POINT') + 'đ'}">299.000đ</span>
+                    </div>
+                    <div class="price-box" th:unless="${sp.danhSachChiTiet != null and !sp.danhSachChiTiet.empty}">
+                        <span class="price-current">Liên hệ</span>
+                    </div>
+
+                    <!-- Thuộc tính nhỏ -->
+                    <div class="mb-3">
+                        <span class="variant-pill" th:if="${sp.chatLieu != null}" th:text="${sp.chatLieu.tenChatLieu}">Lụa chống nhăn</span>
+                        <span class="variant-pill" th:if="${sp.loaiSanPham != null}" th:text="${sp.loaiSanPham.tenLoaiSanPham}">Áo sơ mi</span>
+                    </div>
+
+                    <!-- Nút Xem chi tiết -->
+                    <div class="mt-auto">
+                        <a th:href="@{'/san-pham/' + ${sp.id}}" class="btn-view-product">
+                            <i class="bi bi-arrow-right-circle me-1"></i> Xem Chi Tiết
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 8. USP Policy Bar -->
 <section class="usp-bar" id="chinh-sach">
     <div class="container">
         <div class="row g-4">
@@ -534,7 +847,7 @@
                     <i class="bi bi-truck usp-icon"></i>
                     <div class="usp-text">
                         <h6>GIAO HÀNG TOÀN QUỐC</h6>
-                        <p>Đồng kiểm tra hàng trước khi nhận</p>
+                        <p>Freeship đơn từ 399.000đ</p>
                     </div>
                 </div>
             </div>
@@ -543,7 +856,7 @@
                     <i class="bi bi-arrow-repeat usp-icon"></i>
                     <div class="usp-text">
                         <h6>15 NGÀY ĐỔI HÀNG</h6>
-                        <p>Đổi size, đổi mẫu dễ dàng tận nhà</p>
+                        <p>Đổi size, đổi mẫu tận nhà miễn phí</p>
                     </div>
                 </div>
             </div>
@@ -552,7 +865,7 @@
                     <i class="bi bi-shield-check usp-icon"></i>
                     <div class="usp-text">
                         <h6>CHẤT LƯỢNG CHUẨN HIỆU</h6>
-                        <p>Chất liệu cao cấp, bảo hành 1 năm</p>
+                        <p>Độ bền cao, vải cotton tự nhiên</p>
                     </div>
                 </div>
             </div>
@@ -561,7 +874,7 @@
                     <i class="bi bi-headset usp-icon"></i>
                     <div class="usp-text">
                         <h6>HỖ TRỢ 24/7</h6>
-                        <p>Hotline: 0989.792.893</p>
+                        <p>Hotline CSKH: 0989.792.893</p>
                     </div>
                 </div>
             </div>
@@ -569,14 +882,14 @@
     </div>
 </section>
 
-
+<!-- 9. Footer -->
 <footer class="main-footer">
     <div class="container">
         <div class="row g-4">
             <div class="col-lg-4 col-md-6">
                 <h5 class="brand-logo text-white mb-3">LUÔN VUI TƯƠI <span>&nbsp;SHOP</span></h5>
-                <p style="color: #aaaaaa; line-height: 1.6;">
-                    Thương hiệu thời trang nam hiện đại với sứ mệnh mang đến sản phẩm áo thun, polo, sơ mi chất lượng cao, thiết kế trẻ trung cùng trải nghiệm mua sắm tiện lợi nhất.
+                <p style="color: #9ca3af; line-height: 1.6;">
+                    Thương hiệu thời trang nam hiện đại với sứ mệnh mang đến sản phẩm áo thun, polo, sơ mi chất lượng cao, chuẩn form dáng cùng trải nghiệm mua sắm tiện lợi nhất.
                 </p>
                 <div class="d-flex gap-3 mt-3">
                     <a href="#" class="text-white fs-5"><i class="bi bi-facebook"></i></a>
@@ -587,12 +900,12 @@
             </div>
 
             <div class="col-lg-2 col-md-6 col-6">
-                <h6 class="footer-title">VỀ CHÚNG TÔI</h6>
+                <h6 class="footer-title">DANH MỤC</h6>
                 <ul class="footer-links">
-                    <li><a href="#">Giới thiệu Luôn Vui Tươi</a></li>
-                    <li><a href="#">Tuyển dụng</a></li>
-                    <li><a href="#">Tin tức thời trang</a></li>
-                    <li><a href="#">Hệ thống cửa hàng</a></li>
+                    <li><a href="/san-pham">Tất cả sản phẩm</a></li>
+                    <li><a href="/san-pham?loaiSanPhamId=1">Áo Thun T-Shirt</a></li>
+                    <li><a href="/san-pham?loaiSanPhamId=2">Áo Polo</a></li>
+                    <li><a href="/san-pham?loaiSanPhamId=3">Áo Sơ Mi</a></li>
                 </ul>
             </div>
 
@@ -602,13 +915,13 @@
                     <li><a href="#">Chính sách đổi trả 15 ngày</a></li>
                     <li><a href="#">Chính sách bảo hành sản phẩm</a></li>
                     <li><a href="#">Chính sách vận chuyển & COD</a></li>
-                    <li><a href="#">Hướng dẫn chọn Size áo chuẩn</a></li>
+                    <li><a href="#">Bảng hướng dẫn chọn Size chuẩn</a></li>
                 </ul>
             </div>
 
             <div class="col-lg-3 col-md-6">
                 <h6 class="footer-title">KẾT NỐI VỚI CHÚNG TÔI</h6>
-                <p style="color: #aaaaaa;">Đăng ký nhận mã giảm giá 10% cho đơn hàng đầu tiên:</p>
+                <p style="color: #9ca3af;">Đăng ký nhận mã giảm giá 10% cho đơn hàng đầu tiên:</p>
                 <div class="input-group mb-3">
                     <input type="email" class="form-control" placeholder="Nhập email của bạn..." style="font-size: 13px; border-radius: 4px 0 0 4px;">
                     <button class="btn btn-danger fw-bold" style="background: var(--primary-red); border-radius: 0 4px 4px 0;">ĐĂNG KÝ</button>
@@ -617,7 +930,7 @@
         </div>
 
         <div class="copyright-bar text-center">
-            <p class="mb-0">© 2026 LUÔN VUI TƯƠI SHOP</p>
+            <p class="mb-0">© 2026 LUÔN VUI TƯƠI SHOP - Đồ Án Chuyên Đề Tốt Nghiệp</p>
         </div>
     </div>
 </footer>

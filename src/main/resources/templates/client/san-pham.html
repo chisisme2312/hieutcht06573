@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh Mục Sản Phẩm - LUÔN VUI TƯƠI SHOP</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-black: #111827;
+            --primary-red: #dc2626;
+            --primary-red-hover: #b91c1c;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --bg-light: #f9fafb;
+            --border-color: #e5e7eb;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-main);
+            background-color: #fdfdfd;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Top Announcement Bar */
+        .top-bar {
+            background-color: var(--primary-black);
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 8px 0;
+            letter-spacing: 0.5px;
+        }
+
+        /* Main Header */
+        .main-header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: #ffffff;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        }
+
+        .brand-logo {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--primary-black);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .brand-logo span {
+            color: var(--primary-red);
+        }
+
+        /* Nav menu */
+        .nav-link-custom {
+            font-weight: 700;
+            font-size: 13.5px;
+            text-transform: uppercase;
+            color: var(--primary-black) !important;
+            padding: 16px 14px !important;
+            letter-spacing: 0.5px;
+            transition: color 0.2s;
+            text-decoration: none;
+        }
+
+        .nav-link-custom:hover, .nav-link-custom.active, .nav-link-custom.sale-link {
+            color: var(--primary-red) !important;
+        }
+
+        /* Search Box */
+        .header-search {
+            position: relative;
+        }
+
+        .header-search input {
+            border-radius: 20px;
+            padding: 8px 16px 8px 38px;
+            font-size: 13px;
+            background: #f3f4f6;
+            border: 1px solid transparent;
+        }
+
+        .header-search input:focus {
+            background: #ffffff;
+            border-color: var(--primary-black);
+            box-shadow: none;
+        }
+
+        .header-search .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            font-size: 14px;
+        }
+
+        /* Action icons */
+        .action-icon {
+            font-size: 21px;
+            color: var(--primary-black);
+            text-decoration: none;
+            position: relative;
+            margin-left: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s, color 0.2s;
+        }
+
+        .action-icon:hover {
+            transform: scale(1.1);
+            color: var(--primary-red);
+        }
+
+        .badge-cart {
+            position: absolute;
+            top: -6px;
+            right: -10px;
+            background-color: var(--primary-red);
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: 50%;
+            width: 19px;
+            height: 19px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb-section {
+            background: #f9fafb;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 13.5px;
+        }
+
+        .breadcrumb a {
+            color: var(--text-muted);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--primary-red);
+        }
+
+        /* Filter Sidebar */
+        .filter-sidebar {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            position: sticky;
+            top: 90px;
+        }
+
+        .filter-title {
+            font-size: 14.5px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .filter-group {
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .filter-group:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .filter-label {
+            font-size: 13.5px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--primary-black);
+            display: block;
+        }
+
+        .filter-item {
+            margin-bottom: 8px;
+        }
+
+        .form-check-input:checked {
+            background-color: var(--primary-red);
+            border-color: var(--primary-red);
+        }
+
+        .form-check-label {
+            font-size: 13px;
+            cursor: pointer;
+            color: #374151;
+        }
+
+        /* Color & Size Radio Buttons */
+        .pill-select {
+            display: inline-block;
+            margin: 0 6px 8px 0;
+        }
+
+        .pill-select input[type="radio"] {
+            display: none;
+        }
+
+        .pill-select label {
+            display: inline-block;
+            padding: 6px 14px;
+            font-size: 12.5px;
+            font-weight: 600;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #ffffff;
+            color: #4b5563;
+        }
+
+        .pill-select input[type="radio"]:checked + label {
+            background: var(--primary-black);
+            color: #ffffff;
+            border-color: var(--primary-black);
+        }
+
+        .btn-filter-apply {
+            background: var(--primary-red);
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: none;
+            transition: background 0.2s;
+        }
+
+        .btn-filter-apply:hover {
+            background: var(--primary-red-hover);
+        }
+
+        .btn-filter-reset {
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 12.5px;
+            font-weight: 600;
+            border: 1px solid var(--border-color);
+            width: 100%;
+            padding: 8px;
+            border-radius: 6px;
+            margin-top: 8px;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .btn-filter-reset:hover {
+            background: #f3f4f6;
+            color: var(--primary-black);
+        }
+
+        /* Product Card */
+        .product-card {
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background: #ffffff;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .product-card:hover {
+            box-shadow: 0 12px 24px rgba(0,0,0,0.08);
+            transform: translateY(-4px);
+            border-color: #d1d5db;
+        }
+
+        .product-thumb {
+            position: relative;
+            overflow: hidden;
+            background-color: #f3f4f6;
+            aspect-ratio: 3/4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .product-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .product-card:hover .product-thumb img {
+            transform: scale(1.06);
+        }
+
+        .tag-discount {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: var(--primary-red);
+            color: white;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 4px 8px;
+            border-radius: 4px;
+            box-shadow: 0 2px 6px rgba(220,38,38,0.4);
+        }
+
+        .product-info {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .tag-brand {
+            font-size: 11.5px;
+            font-weight: 700;
+            color: #9ca3af;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .product-title {
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1.4;
+            color: var(--primary-black);
+            margin-bottom: 8px;
+            text-decoration: none;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            height: 40px;
+            transition: color 0.2s;
+        }
+
+        .product-title:hover {
+            color: var(--primary-red);
+        }
+
+        .price-box {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .price-current {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--primary-red);
+        }
+
+        .price-old {
+            font-size: 13px;
+            color: #9ca3af;
+            text-decoration: line-through;
+        }
+
+        .variant-pill {
+            display: inline-block;
+            font-size: 11px;
+            padding: 2px 8px;
+            border: 1px solid var(--border-color);
+            background: #f9fafb;
+            border-radius: 4px;
+            margin-right: 4px;
+            color: #4b5563;
+            font-weight: 600;
+        }
+
+        .btn-view-product {
+            width: 100%;
+            background: var(--primary-black);
+            color: white;
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+            border: none;
+            padding: 10px 0;
+            border-radius: 6px;
+            transition: background 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-view-product:hover {
+            background: var(--primary-red);
+            color: white;
+        }
+
+        /* Pagination */
+        .pagination .page-item .page-link {
+            color: var(--primary-black);
+            border-color: var(--border-color);
+            font-weight: 600;
+            font-size: 13.5px;
+            padding: 8px 16px;
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: var(--primary-black);
+            border-color: var(--primary-black);
+            color: #ffffff;
+        }
+
+        /* Active Filter Badge */
+        .filter-badge {
+            background: #f3f4f6;
+            color: var(--primary-black);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 5px 12px;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            text-decoration: none;
+        }
+
+        .filter-badge:hover {
+            background: #e5e7eb;
+            color: var(--primary-red);
+        }
+
+        /* Footer */
+        .main-footer {
+            background: var(--primary-black);
+            color: #d1d5db;
+            padding: 60px 0 25px 0;
+            font-size: 13.5px;
+            margin-top: 80px;
+        }
+
+        .footer-title {
+            color: #ffffff;
+            font-weight: 800;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 20px;
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: #9ca3af;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: #ffffff;
+        }
+
+        .copyright-bar {
+            border-top: 1px solid #374151;
+            padding-top: 25px;
+            margin-top: 40px;
+            font-size: 12.5px;
+            color: #9ca3af;
+        }
+    </style>
+</head>
+<body>
+
+<!-- 1. Top Announcement Bar -->
+<div class="top-bar text-center">
+    <div class="container">
+        <span>🔥 SIÊU SALE MÙA HÈ - MIỄN PHÍ VẬN CHUYỂN TOÀN QUỐC CHO ĐƠN TỪ 399.000Đ | ĐỔI TRẢ 15 NGÀY DỄ DÀNG</span>
+    </div>
+</div>
+
+<!-- 2. Header & Menu Điều Hướng -->
+<header class="main-header">
+    <div class="container">
+        <div class="d-flex align-items-center justify-content-between py-3">
+            
+            <!-- Logo -->
+            <a href="/" class="brand-logo">
+                LUÔN VUI TƯƠI <span>&nbsp;SHOP</span>
+            </a>
+
+            <!-- Search Bar in Header -->
+            <form action="/san-pham" method="GET" class="header-search d-none d-lg-block mx-4 flex-grow-1" style="max-width: 400px;">
+                <i class="bi bi-search search-icon"></i>
+                <input type="text" name="keyword" th:value="${selectedKeyword}" class="form-control" placeholder="Tìm kiếm áo thun, polo, sơ mi...">
+                <input type="hidden" name="loaiSanPhamId" th:value="${selectedLoaiId}" th:if="${selectedLoaiId != null}">
+                <input type="hidden" name="mauSacId" th:value="${selectedMauSacId}" th:if="${selectedMauSacId != null}">
+                <input type="hidden" name="kichThuocId" th:value="${selectedKichThuocId}" th:if="${selectedKichThuocId != null}">
+                <input type="hidden" name="mucGia" th:value="${selectedMucGia}" th:if="${selectedMucGia != null}">
+                <input type="hidden" name="sort" th:value="${selectedSort}" th:if="${selectedSort != null}">
+            </form>
+
+            <!-- Action Icons -->
+            <div class="d-flex align-items-center">
+                <a href="/admin" class="btn btn-sm btn-outline-dark fw-bold me-2">
+                    <i class="bi bi-speedometer2 me-1"></i> Quản Trị
+                </a>
+
+                <a href="/san-pham" class="btn btn-sm btn-dark fw-bold me-2 d-none d-md-inline-block">
+                    <i class="bi bi-grid me-1"></i> Danh Mục
+                </a>
+
+                <a href="/gio-hang" class="action-icon" title="Giỏ hàng">
+                    <i class="bi bi-bag"></i>
+                    <span class="badge-cart" id="headerCartBadge" 
+                          th:text="${session.SESSION_CART != null ? session.SESSION_CART.tongSoLuong : 0}">0</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Navigation Categories -->
+        <nav class="d-flex align-items-center border-top overflow-auto">
+            <a href="/" class="nav-link-custom">Trang Chủ</a>
+            <a href="/san-pham" class="nav-link-custom active">Tất Cả Sản Phẩm</a>
+            <a href="/san-pham?sort=moi-nhat" class="nav-link-custom">Hàng Mới Về</a>
+            <a href="/san-pham?loaiSanPhamId=1" class="nav-link-custom">Áo Thun T-Shirt</a>
+            <a href="/san-pham?loaiSanPhamId=2" class="nav-link-custom">Áo Polo</a>
+            <a href="/san-pham?loaiSanPhamId=3" class="nav-link-custom">Áo Sơ Mi</a>
+            <a href="/san-pham?mucGia=duoi-200k" class="nav-link-custom sale-link">🔥 Dưới 200K</a>
+            <a href="/#chinh-sach" class="nav-link-custom ms-auto text-secondary text-capitalize d-none d-lg-block" style="font-weight: 500; font-size: 13px;">Hệ thống 15+ Cửa Hàng</a>
+        </nav>
+    </div>
+</header>
+
+<!-- 3. Breadcrumb -->
+<div class="breadcrumb-section">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="/"><i class="bi bi-house-door me-1"></i>Trang chủ</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Danh mục sản phẩm</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<!-- 4. Main Body: Filter Sidebar & Products Grid -->
+<main class="container my-5">
+    <div class="row g-4">
+        
+        <!-- Left: Bộ lọc đa năng (Multi-criteria Filter) -->
+        <div class="col-lg-3 col-md-4">
+            <div class="filter-sidebar">
+                <form id="filterForm" action="/san-pham" method="GET">
+                    
+                    <div class="filter-title">
+                        <span><i class="bi bi-sliders me-2"></i>Bộ Lọc Đa Năng</span>
+                        <a href="/san-pham" class="text-danger fs-6 text-decoration-none" title="Đặt lại bộ lọc">
+                            <i class="bi bi-arrow-counterclockwise"></i>
+                        </a>
+                    </div>
+
+                    <!-- Giữ lại từ khóa tìm kiếm nếu có -->
+                    <input type="hidden" name="keyword" th:value="${selectedKeyword}" th:if="${selectedKeyword != null and !selectedKeyword.blank}">
+
+                    <!-- 1. Lọc theo Loại Áo -->
+                    <div class="filter-group">
+                        <span class="filter-label"><i class="bi bi-tag-fill me-1"></i>Loại Sản Phẩm</span>
+                        <div class="form-check filter-item">
+                            <input class="form-check-input" type="radio" name="loaiSanPhamId" id="loai_all" value="" 
+                                   th:checked="${selectedLoaiId == null}" onchange="document.getElementById('filterForm').submit()">
+                            <label class="form-check-label fw-bold" for="loai_all">Tất cả loại áo</label>
+                        </div>
+                        <div class="form-check filter-item" th:each="loai : ${danhSachLoai}">
+                            <input class="form-check-input" type="radio" name="loaiSanPhamId" th:id="'loai_' + ${loai.id}" 
+                                   th:value="${loai.id}" th:checked="${selectedLoaiId == loai.id}" 
+                                   onchange="document.getElementById('filterForm').submit()">
+                            <label class="form-check-label" th:for="'loai_' + ${loai.id}" th:text="${loai.tenLoaiSanPham}">Áo thun</label>
+                        </div>
+                    </div>
+
+                    <!-- 2. Lọc theo Khoảng Giá -->
+                    <div class="filter-group">
+                        <span class="filter-label"><i class="bi bi-cash-stack me-1"></i>Khoảng Giá</span>
+                        
+                        <div class="form-check filter-item">
+                            <input class="form-check-input" type="radio" name="mucGia" id="gia_all" value="" 
+                                   th:checked="${selectedMucGia == null or selectedMucGia == ''}" onchange="document.getElementById('filterForm').submit()">
+                            <label class="form-check-label fw-bold" for="gia_all">Tất cả mức giá</label>
+                        </div>
+                        <div class="form-check filter-item">
+                            <input class="form-check-input" type="radio" name="mucGia" id="gia_1" value="duoi-200k" 
+                                   th:checked="${selectedMucGia == 'duoi-200k'}" onchange="document.getElementById('filterForm').submit()">
+                            <label class="form-check-label" for="gia_1">Dưới 200.000đ</label>
+                        </div>
+                        <div class="form-check filter-item">
+                            <input class="form-check-input" type="radio" name="mucGia" id="gia_2" value="200k-350k" 
+                                   th:checked="${selectedMucGia == '200k-350k'}" onchange="document.getElementById('filterForm').submit()">
+                            <label class="form-check-label" for="gia_2">200.000đ - 350.000đ</label>
+                        </div>
+                        <div class="form-check filter-item">
+                            <input class="form-check-input" type="radio" name="mucGia" id="gia_3" value="350k-500k" 
+                                   th:checked="${selectedMucGia == '350k-500k'}" onchange="document.getElementById('filterForm').submit()">
+                            <label class="form-check-label" for="gia_3">350.000đ - 500.000đ</label>
+                        </div>
+                        <div class="form-check filter-item">
+                            <input class="form-check-input" type="radio" name="mucGia" id="gia_4" value="tren-500k" 
+                                   th:checked="${selectedMucGia == 'tren-500k'}" onchange="document.getElementById('filterForm').submit()">
+                            <label class="form-check-label" for="gia_4">Trên 500.000đ</label>
+                        </div>
+                    </div>
+
+                    <!-- 3. Lọc theo Màu Sắc -->
+                    <div class="filter-group">
+                        <span class="filter-label"><i class="bi bi-palette-fill me-1"></i>Màu Sắc</span>
+                        <div>
+                            <div class="pill-select">
+                                <input type="radio" name="mauSacId" id="mau_all" value="" 
+                                       th:checked="${selectedMauSacId == null}" onchange="document.getElementById('filterForm').submit()">
+                                <label for="mau_all">Tất cả</label>
+                            </div>
+                            <div class="pill-select" th:each="mau : ${danhSachMauSac}">
+                                <input type="radio" name="mauSacId" th:id="'mau_' + ${mau.id}" th:value="${mau.id}" 
+                                       th:checked="${selectedMauSacId == mau.id}" onchange="document.getElementById('filterForm').submit()">
+                                <label th:for="'mau_' + ${mau.id}" th:text="${mau.tenMauSac}">Đen</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. Lọc theo Kích Cỡ -->
+                    <div class="filter-group">
+                        <span class="filter-label"><i class="bi bi-rulers me-1"></i>Kích Cỡ (Size)</span>
+                        <div>
+                            <div class="pill-select">
+                                <input type="radio" name="kichThuocId" id="size_all" value="" 
+                                       th:checked="${selectedKichThuocId == null}" onchange="document.getElementById('filterForm').submit()">
+                                <label for="size_all">Tất cả</label>
+                            </div>
+                            <div class="pill-select" th:each="size : ${danhSachKichThuoc}">
+                                <input type="radio" name="kichThuocId" th:id="'size_' + ${size.id}" th:value="${size.id}" 
+                                       th:checked="${selectedKichThuocId == size.id}" onchange="document.getElementById('filterForm').submit()">
+                                <label th:for="'size_' + ${size.id}" th:text="${size.tenKichThuoc}">L</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-filter-apply mt-2">
+                        <i class="bi bi-funnel-fill me-1"></i> Lọc Kết Quả
+                    </button>
+                    <a href="/san-pham" class="btn-filter-reset">
+                        <i class="bi bi-x-circle me-1"></i> Xóa Tất Cả Bộ Lọc
+                    </a>
+
+                </form>
+            </div>
+        </div>
+
+        <!-- Right: Danh sách sản phẩm & Sắp xếp -->
+        <div class="col-lg-9 col-md-8">
+            
+            <!-- Toolbar: Tìm kiếm, Bộ lọc đang áp dụng, Sắp xếp -->
+            <div class="bg-white border rounded-3 p-3 mb-4 shadow-sm">
+                <div class="row align-items-center g-3">
+                    
+                    <!-- Thanh tìm kiếm trực tiếp -->
+                    <div class="col-md-6">
+                        <form action="/san-pham" method="GET" class="d-flex">
+                            <input type="text" name="keyword" th:value="${selectedKeyword}" class="form-control form-control-sm me-2" placeholder="Tìm theo tên sản phẩm, mã...">
+                            <input type="hidden" name="loaiSanPhamId" th:value="${selectedLoaiId}" th:if="${selectedLoaiId != null}">
+                            <input type="hidden" name="mauSacId" th:value="${selectedMauSacId}" th:if="${selectedMauSacId != null}">
+                            <input type="hidden" name="kichThuocId" th:value="${selectedKichThuocId}" th:if="${selectedKichThuocId != null}">
+                            <input type="hidden" name="mucGia" th:value="${selectedMucGia}" th:if="${selectedMucGia != null}">
+                            <input type="hidden" name="sort" th:value="${selectedSort}" th:if="${selectedSort != null}">
+                            <button type="submit" class="btn btn-sm btn-dark px-3 fw-bold">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Dropdown Sắp xếp -->
+                    <div class="col-md-6 d-flex align-items-center justify-content-md-end gap-2">
+                        <span class="text-muted fs-7 small text-nowrap"><i class="bi bi-sort-down me-1"></i>Sắp xếp:</span>
+                        <select class="form-select form-select-sm" style="max-width: 200px;" 
+                                onchange="location.href=this.value;">
+                            <option th:value="@{/san-pham(keyword=${selectedKeyword}, loaiSanPhamId=${selectedLoaiId}, mauSacId=${selectedMauSacId}, kichThuocId=${selectedKichThuocId}, mucGia=${selectedMucGia}, sort='moi-nhat')}"
+                                    th:selected="${selectedSort == 'moi-nhat'}">Mới nhất</option>
+                            <option th:value="@{/san-pham(keyword=${selectedKeyword}, loaiSanPhamId=${selectedLoaiId}, mauSacId=${selectedMauSacId}, kichThuocId=${selectedKichThuocId}, mucGia=${selectedMucGia}, sort='gia-tang')}"
+                                    th:selected="${selectedSort == 'gia-tang'}">Giá tăng dần</option>
+                            <option th:value="@{/san-pham(keyword=${selectedKeyword}, loaiSanPhamId=${selectedLoaiId}, mauSacId=${selectedMauSacId}, kichThuocId=${selectedKichThuocId}, mucGia=${selectedMucGia}, sort='gia-giam')}"
+                                    th:selected="${selectedSort == 'gia-giam'}">Giá giảm dần</option>
+                            <option th:value="@{/san-pham(keyword=${selectedKeyword}, loaiSanPhamId=${selectedLoaiId}, mauSacId=${selectedMauSacId}, kichThuocId=${selectedKichThuocId}, mucGia=${selectedMucGia}, sort='ten-az')}"
+                                    th:selected="${selectedSort == 'ten-az'}">Tên A - Z</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <!-- Đếm số lượng sản phẩm & Filter pills -->
+                <div class="d-flex flex-wrap align-items-center justify-content-between pt-3 mt-3 border-top">
+                    <div>
+                        <span class="small text-muted">Hiển thị <strong th:text="${totalElements}">0</strong> sản phẩm phù hợp</span>
+                    </div>
+
+                    <div class="d-flex flex-wrap align-items-center mt-2 mt-md-0">
+                        <span class="small text-secondary me-2" th:if="${(selectedKeyword != null and !selectedKeyword.blank) or selectedLoaiId != null or selectedMauSacId != null or selectedKichThuocId != null or (selectedMucGia != null and !selectedMucGia.blank)}">Đang lọc:</span>
+                        
+                        <a th:if="${selectedKeyword != null and !selectedKeyword.blank}" 
+                           th:href="@{/san-pham(loaiSanPhamId=${selectedLoaiId}, mauSacId=${selectedMauSacId}, kichThuocId=${selectedKichThuocId}, mucGia=${selectedMucGia}, sort=${selectedSort})}" 
+                           class="filter-badge">
+                            Từ khóa: "<span th:text="${selectedKeyword}"></span>" <i class="bi bi-x"></i>
+                        </a>
+
+                        <a th:if="${selectedMucGia != null and !selectedMucGia.blank}" 
+                           th:href="@{/san-pham(keyword=${selectedKeyword}, loaiSanPhamId=${selectedLoaiId}, mauSacId=${selectedMauSacId}, kichThuocId=${selectedKichThuocId}, sort=${selectedSort})}" 
+                           class="filter-badge">
+                            Giá: <span th:text="${selectedMucGia}"></span> <i class="bi bi-x"></i>
+                        </a>
+
+                        <a th:if="${(selectedKeyword != null and !selectedKeyword.blank) or selectedLoaiId != null or selectedMauSacId != null or selectedKichThuocId != null or (selectedMucGia != null and !selectedMucGia.blank)}"
+                           href="/san-pham" class="small text-danger fw-bold ms-2 text-decoration-none">
+                            Xóa hết
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty state nếu không tìm thấy sản phẩm -->
+            <div th:if="${danhSachSanPham == null or danhSachSanPham.empty}" class="text-center py-5 bg-white border rounded-3 my-4">
+                <i class="bi bi-search text-muted" style="font-size: 54px;"></i>
+                <h5 class="fw-bold mt-3">Không tìm thấy sản phẩm nào!</h5>
+                <p class="text-muted small">Vui lòng thử thay đổi từ khóa tìm kiếm hoặc bỏ bớt các tiêu chí lọc bên trái.</p>
+                <a href="/san-pham" class="btn btn-sm btn-dark px-4 py-2 mt-2">
+                    <i class="bi bi-arrow-clockwise me-1"></i> Xem Tất Cả Sản Phẩm
+                </a>
+            </div>
+
+            <!-- Product Grid -->
+            <div class="row g-4" th:unless="${danhSachSanPham == null or danhSachSanPham.empty}">
+                <div class="col-6 col-lg-4" th:each="sp : ${danhSachSanPham}">
+                    <div class="product-card">
+                        
+                        <!-- Ảnh sản phẩm -->
+                        <div class="product-thumb">
+                            <a th:href="@{'/san-pham/' + ${sp.id}}">
+                                <img th:if="${sp.danhSachAnh != null and !sp.danhSachAnh.empty}" 
+                                     th:src="${sp.danhSachAnh.iterator().next().anhUrl}" 
+                                     th:alt="${sp.tenSanPham}">
+                                <img th:unless="${sp.danhSachAnh != null and !sp.danhSachAnh.empty}" 
+                                     src="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600" 
+                                     th:alt="${sp.tenSanPham}">
+                            </a>
+                            
+                            <span class="tag-discount" th:if="${sp.danhSachChiTiet != null and !sp.danhSachChiTiet.empty and sp.danhSachChiTiet.iterator().next().khuyenMai != null}">
+                                -<span th:text="${sp.danhSachChiTiet.iterator().next().khuyenMai.phanTramGiam}">15</span>%
+                            </span>
+                        </div>
+
+                        <!-- Thông tin sản phẩm -->
+                        <div class="product-info">
+                            <div class="tag-brand" th:text="${sp.nhaCungCap != null ? sp.nhaCungCap.tenNhaCungCap : 'LUÔN VUI TƯƠI'}">COOLMATE</div>
+                            
+                            <a th:href="@{'/san-pham/' + ${sp.id}}" class="product-title" th:text="${sp.tenSanPham}">
+                                Áo Polo Nam Classic
+                            </a>
+
+                            <!-- Giá bán -->
+                            <div class="price-box" th:if="${sp.danhSachChiTiet != null and !sp.danhSachChiTiet.empty}">
+                                <span class="price-current" th:text="${#numbers.formatDecimal(sp.danhSachChiTiet.iterator().next().giaBan, 0, 'COMMA', 0, 'POINT') + 'đ'}">189.000đ</span>
+                                <span class="price-old" 
+                                      th:if="${sp.danhSachChiTiet.iterator().next().giaBanBanDau != null and sp.danhSachChiTiet.iterator().next().giaBanBanDau > sp.danhSachChiTiet.iterator().next().giaBan}" 
+                                      th:text="${#numbers.formatDecimal(sp.danhSachChiTiet.iterator().next().giaBanBanDau, 0, 'COMMA', 0, 'POINT') + 'đ'}">249.000đ</span>
+                            </div>
+                            <div class="price-box" th:unless="${sp.danhSachChiTiet != null and !sp.danhSachChiTiet.empty}">
+                                <span class="price-current">Liên hệ</span>
+                            </div>
+
+                            <!-- Thuộc tính nhỏ (Chất liệu, Cổ áo) -->
+                            <div class="mb-3">
+                                <span class="variant-pill" th:if="${sp.chatLieu != null}" th:text="${sp.chatLieu.tenChatLieu}">Cotton 100%</span>
+                                <span class="variant-pill" th:if="${sp.loaiSanPham != null}" th:text="${sp.loaiSanPham.tenLoaiSanPham}">Áo thun</span>
+                            </div>
+
+                            <!-- Nút Xem chi tiết -->
+                            <div class="mt-auto">
+                                <a th:href="@{'/san-pham/' + ${sp.id}}" class="btn-view-product">
+                                    <i class="bi bi-eye me-1"></i> Xem Chi Tiết
+                                </a>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phân trang (Pagination) -->
+            <div th:if="${totalPages > 1}" class="d-flex justify-content-center mt-5">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        
+                        <!-- Nút trang trước -->
+                        <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                            <a class="page-link" th:href="@{/san-pham(page=${currentPage - 1}, keyword=${selectedKeyword}, loaiSanPhamId=${selectedLoaiId}, mauSacId=${selectedMauSacId}, kichThuocId=${selectedKichThuocId}, mucGia=${selectedMucGia}, sort=${selectedSort})}">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                        </li>
+
+                        <!-- Các trang số -->
+                        <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}" 
+                            th:classappend="${i == currentPage} ? 'active'">
+                            <a class="page-link" th:href="@{/san-pham(page=${i}, keyword=${selectedKeyword}, loaiSanPhamId=${selectedLoaiId}, mauSacId=${selectedMauSacId}, kichThuocId=${selectedKichThuocId}, mucGia=${selectedMucGia}, sort=${selectedSort})}" 
+                               th:text="${i + 1}">1</a>
+                        </li>
+
+                        <!-- Nút trang sau -->
+                        <li class="page-item" th:classappend="${currentPage >= totalPages - 1} ? 'disabled'">
+                            <a class="page-link" th:href="@{/san-pham(page=${currentPage + 1}, keyword=${selectedKeyword}, loaiSanPhamId=${selectedLoaiId}, mauSacId=${selectedMauSacId}, kichThuocId=${selectedKichThuocId}, mucGia=${selectedMucGia}, sort=${selectedSort})}">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+
+                    </ul>
+                </nav>
+            </div>
+
+        </div>
+
+    </div>
+</main>
+
+<!-- Footer -->
+<footer class="main-footer">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6">
+                <h5 class="brand-logo text-white mb-3">LUÔN VUI TƯƠI <span>&nbsp;SHOP</span></h5>
+                <p style="color: #9ca3af; line-height: 1.6;">
+                    Thương hiệu thời trang nam hiện đại với sứ mệnh mang đến sản phẩm áo thun, polo, sơ mi chất lượng cao, chuẩn form dáng cùng trải nghiệm mua sắm tiện lợi nhất.
+                </p>
+                <div class="d-flex gap-3 mt-3">
+                    <a href="#" class="text-white fs-5"><i class="bi bi-facebook"></i></a>
+                    <a href="#" class="text-white fs-5"><i class="bi bi-instagram"></i></a>
+                    <a href="#" class="text-white fs-5"><i class="bi bi-tiktok"></i></a>
+                    <a href="#" class="text-white fs-5"><i class="bi bi-youtube"></i></a>
+                </div>
+            </div>
+
+            <div class="col-lg-2 col-md-6 col-6">
+                <h6 class="footer-title">DANH MỤC</h6>
+                <ul class="footer-links">
+                    <li><a href="/san-pham">Tất cả sản phẩm</a></li>
+                    <li><a href="/san-pham?loaiSanPhamId=1">Áo Thun T-Shirt</a></li>
+                    <li><a href="/san-pham?loaiSanPhamId=2">Áo Polo</a></li>
+                    <li><a href="/san-pham?loaiSanPhamId=3">Áo Sơ Mi</a></li>
+                </ul>
+            </div>
+
+            <div class="col-lg-3 col-md-6 col-6">
+                <h6 class="footer-title">CHÍNH SÁCH BÁN HÀNG</h6>
+                <ul class="footer-links">
+                    <li><a href="#">Chính sách đổi trả 15 ngày</a></li>
+                    <li><a href="#">Chính sách bảo hành sản phẩm</a></li>
+                    <li><a href="#">Chính sách vận chuyển & COD</a></li>
+                    <li><a href="#">Bảng hướng dẫn chọn Size chuẩn</a></li>
+                </ul>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <h6 class="footer-title">KẾT NỐI VỚI CHÚNG TÔI</h6>
+                <p style="color: #9ca3af;">Đăng ký nhận mã giảm giá 10% cho đơn hàng đầu tiên:</p>
+                <div class="input-group mb-3">
+                    <input type="email" class="form-control" placeholder="Nhập email của bạn..." style="font-size: 13px; border-radius: 4px 0 0 4px;">
+                    <button class="btn btn-danger fw-bold" style="background: var(--primary-red); border-radius: 0 4px 4px 0;">ĐĂNG KÝ</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="copyright-bar text-center">
+            <p class="mb-0">© 2026 LUÔN VUI TƯƠI SHOP - Đồ Án Chuyên Đề Tốt Nghiệp</p>
+        </div>
+    </div>
+</footer>
+
+<!-- Bootstrap JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,6 +1,7 @@
 package com.luonvuituoi.shop.controller.client;
 
 import com.luonvuituoi.shop.service.SanPhamService;
+import com.luonvuituoi.shop.service.ThuocTinhService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,11 +12,22 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class HomeController {
 
     private final SanPhamService sanPhamService;
+    private final ThuocTinhService thuocTinhService;
 
-    // TODO: Thành viên làm Giao diện khách hàng (Client) code ở đây
     @GetMapping("/")
     public String trangChu(Model model) {
-        model.addAttribute("danhSachSanPham", sanPhamService.getActiveWithDetails());
+        // 1. Sản phẩm Mới Về (New Arrivals)
+        model.addAttribute("sanPhamMoiVe", sanPhamService.getSanPhamMoiVe(8));
+
+        // 2. Sản phẩm Nổi Bật (Featured / Khuyến Mãi)
+        model.addAttribute("sanPhamNoiBat", sanPhamService.getSanPhamNoiBat(8));
+
+        // 3. Sản phẩm Bán Chạy (Best Sellers)
+        model.addAttribute("sanPhamBanChay", sanPhamService.getSanPhamBanChay(8));
+
+        // 4. Danh mục loại áo để hiển thị quick category cards
+        model.addAttribute("danhSachLoai", thuocTinhService.getAllLoaiSanPham());
+
         return "client/index";
     }
 }
