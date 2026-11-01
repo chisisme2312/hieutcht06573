@@ -16,6 +16,9 @@ public class HomeController {
 
     @GetMapping("/")
     public String trangChu(Model model) {
+        // Danh sách sản phẩm đầy đủ cho trang chủ
+        model.addAttribute("danhSachSanPham", sanPhamService.getActiveWithDetails());
+
         // 1. Sản phẩm Mới Về (New Arrivals)
         model.addAttribute("sanPhamMoiVe", sanPhamService.getSanPhamMoiVe(8));
 
