@@ -13,9 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +24,7 @@ public class SanPhamServiceImpl implements SanPhamService {
     private final SanPhamChiTietRepository sanPhamChiTietRepository;
     private final MauSacRepository mauSacRepository;
     private final KichThuocRepository kichThuocRepository;
+    private final HoaDonChiTietRepository hoaDonChiTietRepository;
 
     @Override
     public List<SanPham> getAll() {
@@ -39,6 +39,11 @@ public class SanPhamServiceImpl implements SanPhamService {
     @Override
     public Optional<SanPham> getById(Integer id) {
         return sanPhamRepository.findById(id);
+    }
+
+    @Override
+    public Optional<SanPham> getByIdWithDetails(Integer id) {
+        return sanPhamRepository.findActiveByIdWithDetails(id);
     }
 
     @Override
@@ -64,20 +69,104 @@ public class SanPhamServiceImpl implements SanPhamService {
     }
 
     @Override
+    public Page<SanPham> filterClientSanPham(String keyword, Integer loaiSanPhamId, Integer mauSacId, Integer kichThuocId,
+                                            BigDecimal minGia, BigDecimal maxGia, String sort, int page, int size) {
+        String cleanKeyword = (keyword != null && !keyword.trim().isEmpty()) ? keyword.trim() : null;
+
+        if ("gia-tang".equalsIgnoreCase(sort)) {
+            Pageable pageable = PageRequest.of(page, size);
+            return sanPhamRepository.filterClientSanPhamPriceAsc(cleanKeyword, loaiSanPhamId, mauSacId, kichThuocId, minGia, maxGia, pageable);
+        } else if ("gia-giam".equalsIgnoreCase(sort)) {
+            Pageable pageable = PageRequest.of(page, size);
+            return sanPhamRepository.filterClientSanPhamPriceDesc(cleanKeyword, loaiSanPhamId, mauSacId, kichThuocId, minGia, maxGia, pageable);
+        } else if ("ten-az".equalsIgnoreCase(sort)) {
+            Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "tenSanPham"));
+            return sanPhamRepository.filterClientSanPham(cleanKeyword, loaiSanPhamId, mauSacId, kichThuocId, minGia, maxGia, pageable);
+        } else {
+            // Mặc định hoặc "moi-nhat"
+            Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+            return sanPhamRepository.filterClientSanPham(cleanKeyword, loaiSanPhamId, mauSacId, kichThuocId, minGia, maxGia, pageable);
+        }
+    }
+
+    @Override
+    public List<SanPham> getSanPhamMoiVe(int limit) {
+        List<SanPham> list = sanPhamRepository.findTop12ByTrangThaiTrueOrderByIdDesc();
+        if (list.size() > limit) {
+            return list.subList(0, limit);
+        }
+        return list;
+    }
+
+    @Override
+    public List<SanPham> getSanPhamNoiBat(int limit) {
+        List<SanPham> featured = sanPhamRepository.findTopFeatured(PageRequest.of(0, limit));
+        if (featured.size() < limit) {
+            Set<Integer> existingIds = featured.stream().map(SanPham::getId).collect(Collectors.toSet());
+            List<SanPham> allActive = sanPhamRepository.findTop12ByTrangThaiTrueOrderByIdDesc();
+            for (SanPham sp : allActive) {
+                if (!existingIds.contains(sp.getId())) {
+                    featured.add(sp);
+                    existingIds.add(sp.getId());
+                    if (featured.size() >= limit) break;
+                }
+            }
+        }
+        return featured;
+    }
+
+    @Override
+    public List<SanPham> getSanPhamBanChay(int limit) {
+        try {
+            List<Object[]> topIdsResult = hoaDonChiTietRepository.findTopSellingProductIds(PageRequest.of(0, limit));
+            if (topIdsResult != null && !topIdsResult.isEmpty()) {
+                List<Integer> ids = topIdsResult.stream()
+                        .map(row -> (Integer) row[0])
+                        .collect(Collectors.toList());
+                List<SanPham> products = sanPhamRepository.findAllById(ids);
+                Map<Integer, SanPham> productMap = products.stream()
+                        .collect(Collectors.toMap(SanPham::getId, sp -> sp));
+                List<SanPham> sorted = new ArrayList<>();
+                for (Integer id : ids) {
+                    SanPham sp = productMap.get(id);
+                    if (sp != null && Boolean.TRUE.equals(sp.getTrangThai())) {
+                        sorted.add(sp);
+                    }
+                }
+                if (!sorted.isEmpty()) {
+                    return sorted;
+                }
+            }
+        } catch (Exception ignored) {
+        }
+        return getSanPhamMoiVe(limit);
+    }
+
+    @Override
+    public List<SanPham> getSanPhamLienQuan(Integer loaiSanPhamId, Integer currentProductId, int limit) {
+        if (loaiSanPhamId == null) {
+            return Collections.emptyList();
+        }
+        List<SanPham> list = sanPhamRepository.findTop8ByLoaiSanPhamIdAndIdNotAndTrangThaiTrue(loaiSanPhamId, currentProductId);
+        if (list.size() > limit) {
+            return list.subList(0, limit);
+        }
+        return list;
+    }
+
+    @Override
     @Transactional
     public void dongBoTrangThaiBienThe(Integer sanPhamId, boolean trangThaiSanPham) {
         List<SanPhamChiTiet> variants = sanPhamChiTietRepository.findBySanPhamId(sanPhamId);
         if (variants != null && !variants.isEmpty()) {
             for (SanPhamChiTiet ct : variants) {
                 if (!trangThaiSanPham) {
-                    // Mẫu áo cha ngừng kinh doanh -> tất cả biến thể đều ngừng kinh doanh
                     ct.setTrangThai(false);
                 } else {
-                    // Mẫu áo cha đang kinh doanh: chỉ kích hoạt biến thể còn hàng (> 0)
                     if (ct.getSoLuongTon() != null && ct.getSoLuongTon() > 0) {
                         ct.setTrangThai(true);
                     } else {
-                        ct.setTrangThai(false); // Hết hàng (tồn <= 0) tự động chuyển sang ngừng hoạt động
+                        ct.setTrangThai(false);
                     }
                 }
                 sanPhamChiTietRepository.save(ct);
@@ -100,40 +189,40 @@ public class SanPhamServiceImpl implements SanPhamService {
             sanPham.setTrangThai(true);
         }
 
-        // Lưu sản phẩm cha trước
-        SanPham savedSp = sanPhamRepository.save(sanPham);
+        SanPham savedSanPham = sanPhamRepository.save(sanPham);
 
-        // Sinh các biến thể chi tiết kết hợp giữa Màu Sắc và Kích Thước
-        if (listMauSacId != null && !listMauSacId.isEmpty() && listKichThuocId != null && !listKichThuocId.isEmpty()) {
-            int slTon = soLuongTon != null ? soLuongTon : 10;
-            boolean variantStatus = Boolean.TRUE.equals(savedSp.getTrangThai()) && (slTon > 0);
+        if (listMauSacId != null && listKichThuocId != null && !listMauSacId.isEmpty() && !listKichThuocId.isEmpty()) {
+            int counter = 1;
+            for (Integer mauSacId : listMauSacId) {
+                MauSac mauSac = mauSacRepository.findById(mauSacId).orElse(null);
+                if (mauSac == null) continue;
 
-            for (Integer idMau : listMauSacId) {
-                MauSac ms = mauSacRepository.findById(idMau).orElse(null);
-                if (ms == null) continue;
+                for (Integer kichThuocId : listKichThuocId) {
+                    KichThuoc kichThuoc = kichThuocRepository.findById(kichThuocId).orElse(null);
+                    if (kichThuoc == null) continue;
 
-                for (Integer idSize : listKichThuocId) {
-                    KichThuoc kt = kichThuocRepository.findById(idSize).orElse(null);
-                    if (kt == null) continue;
+                    String sku = String.format("%s-%s-%s-%03d",
+                            savedSanPham.getMaSanPham(),
+                            kichThuoc.getTenKichThuoc(),
+                            mauSac.getTenMauSac().replaceAll("\\s+", ""),
+                            counter++);
 
-                    String maCt = savedSp.getMaSanPham() + "-" + ms.getId() + "-" + kt.getId();
-                    
-                    SanPhamChiTiet ct = SanPhamChiTiet.builder()
-                            .maSanPhamChiTiet(maCt)
-                            .sanPham(savedSp)
-                            .mauSac(ms)
-                            .kichThuoc(kt)
+                    SanPhamChiTiet variant = SanPhamChiTiet.builder()
+                            .sanPham(savedSanPham)
+                            .mauSac(mauSac)
+                            .kichThuoc(kichThuoc)
+                            .maSanPhamChiTiet(sku)
                             .giaBan(giaBan != null ? giaBan : BigDecimal.ZERO)
-                            .giaBanBanDau(giaBanBanDau != null ? giaBanBanDau : giaBan)
-                            .soLuongTon(slTon)
-                            .trangThai(variantStatus)
+                            .giaBanBanDau(giaBanBanDau != null ? giaBanBanDau : (giaBan != null ? giaBan : BigDecimal.ZERO))
+                            .soLuongTon(soLuongTon != null ? soLuongTon : 0)
+                            .trangThai(savedSanPham.getTrangThai() && (soLuongTon != null && soLuongTon > 0))
                             .build();
 
-                    sanPhamChiTietRepository.save(ct);
+                    sanPhamChiTietRepository.save(variant);
                 }
             }
         }
 
-        return savedSp;
+        return savedSanPham;
     }
 }
