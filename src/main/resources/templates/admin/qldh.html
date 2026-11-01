@@ -34,11 +34,10 @@
 <div class="container-fluid">
     <div class="row">
         <!-- Sidebar dùng chung chuẩn phong cách Luôn Vui Tươi -->
-        <aside th:replace="~{admin/layout :: admin_sidebar('online_orders')}"></aside>
+        <aside th:replace="~{admin/layout :: admin_sidebar('orders')}"></aside>
 
         <!-- Main Content -->
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
-            <div th:replace="~{admin/layout :: admin_topbar('Quản Lý Đơn Hàng Online')}"></div>
 
             <!-- Header Tiêu Đề -->
             <div class="d-flex flex-wrap justify-content-between align-items-center pb-3 mb-4 border-bottom">
@@ -105,13 +104,13 @@
                                 <span class="badge bg-dark-subtle text-dark fw-bold" th:text="${hd.maHoaDon}"></span>
                             </td>
                             <td>
-                            <span class="badge bg-dark-subtle text-dark fw-bold" th:text="${hd.khachHang.maKhachHang}"></span>
+                            <span class="badge bg-dark-subtle text-dark fw-bold" th:text="${hd.khachHang}"></span>
                             </td>
                             <td>
-                                <span class="badge bg-dark-subtle text-dark fw-bold" th:text="${hd.nhanVien.maNhanVien}"></span>
+                                <span class="badge bg-dark-subtle text-dark fw-bold" th:text="${hd.nhanVien}"></span>
                             </td>
                             <td>
-                                <span class="badge bg-dark-subtle text-dark fw-bold" th:text="${hd.giamGia.maGiamGia}"></span>
+                                <span class="badge bg-dark-subtle text-dark fw-bold" th:text="${hd.giamGia}"></span>
                             </td>
                             <td>
                                 <span class="badge bg-dark-subtle text-dark fw-bold" th:text="${hd.tongTien}"></span>
@@ -123,7 +122,7 @@
                                 <span class="badge bg-dark-subtle text-dark fw-bold" th:text="${hd.phiGiaoHang}"></span>
                             </td>
                             <td>
-                                <span class="badge bg-dark-subtle text-dark fw-bold" th:text="${hd.phuongThucThanhToan}"></span>
+                                <span class="badge bg-dark-subtle text-dark fw-bold" th:text="${hd.phuongThucThanhToan} ? 'Chuyển khoản' : 'Tiền mặt / COD'"></span>
                             </td>
                             <td>
                                 <span class="badge bg-dark-subtle text-dark fw-bold" th:text="${hd.hinhThucMuaHang}"></span>
@@ -144,18 +143,7 @@
                                 <div class="d-flex justify-content-end gap-1">
                                     <!-- Nút Xem chi tiết -->
                                     <a th:href="@{'/admin/don-hang/chi-tiet/' + ${hd.id}}" class="btn btn-outline-dark btn-sm fw-semibold" title="Xem chi tiết đơn hàng">
-                                        <i class="bi bi-eye"></i> Chi tiết
-                                    </a>
-
-                                    <!-- Nút Xử lý nhanh tùy theo trạng thái -->
-                                    <!-- 1. Nếu đang 'Chờ xác nhận' -> Duyệt đơn -->
-                                    <a th:if="${hd.trangThai == 'Chờ xác nhận'}" th:href="@{'/admin/don-hang/duyet/' + ${dh.id}}" class="btn btn-primary btn-sm fw-semibold" onclick="return confirm('Xác nhận duyệt đơn hàng này?')" title="Duyệt đơn hàng">
-                                        <i class="bi bi-check2-circle"></i> Duyệt
-                                    </a>
-
-                                    <!-- 2. Nếu đã 'Đã xác nhận' -> Chuyển sang Đang giao -->
-                                    <a th:if="${hd.trangThai == 'Đã xác nhận'}" th:href="@{'/admin/don-hang/giao-hang/' + ${dh.id}}" class="btn btn-info btn-sm fw-semibold text-white" title="Bắt đầu giao hàng">
-                                        <i class="bi bi-truck"></i> Giao hàng
+                                        <i class="bi bi-eye"></i> Nhập
                                     </a>
 
                                     <!-- 3. Nút Hủy đơn (Áp dụng cho đơn chưa hoàn thành/chưa hủy) -->
@@ -179,6 +167,7 @@
         </main>
     </div>
 </div>
+
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
