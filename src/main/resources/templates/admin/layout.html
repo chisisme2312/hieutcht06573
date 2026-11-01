@@ -13,66 +13,99 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --sidebar-bg: #111827;
-            --sidebar-hover: #1f2937;
+            --sidebar-bg: #0f172a;
+            --sidebar-border: rgba(255, 255, 255, 0.08);
+            --sidebar-hover: #1e293b;
             --accent-red: #dc2626;
+            --accent-red-hover: #b91c1c;
             --bg-page: #f8fafc;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
         }
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: var(--bg-page);
-            color: #0f172a;
+            color: var(--text-dark);
+            min-height: 100vh;
         }
         .sidebar {
             min-height: 100vh;
             background: var(--sidebar-bg);
             color: #fff;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+            box-shadow: 4px 0 24px rgba(0,0,0,0.08);
+            border-right: 1px solid var(--sidebar-border);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
         .sidebar .brand-box {
             padding: 24px 20px;
-            text-align: center;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
+            text-align: left;
+            border-bottom: 1px solid var(--sidebar-border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .brand-logo-icon {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 18px;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
         }
         .sidebar .nav-link {
             color: #94a3b8;
             font-weight: 500;
-            padding: 11px 18px;
-            border-radius: 8px;
-            margin: 3px 14px;
-            transition: all 0.2s;
+            padding: 10px 16px;
+            border-radius: 10px;
+            margin: 3px 12px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
             align-items: center;
             text-decoration: none;
-            font-size: 14px;
+            font-size: 13.5px;
+        }
+        .sidebar .nav-link i {
+            font-size: 16px;
+            width: 24px;
         }
         .sidebar .nav-link:hover {
             color: #ffffff;
             background-color: var(--sidebar-hover);
+            transform: translateX(3px);
         }
         .sidebar .nav-link.active {
-            background-color: var(--accent-red);
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
             color: #ffffff;
             font-weight: 700;
-            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+            box-shadow: 0 4px 14px rgba(220, 38, 38, 0.35);
         }
         .nav-section-title {
             padding: 16px 20px 6px;
             font-size: 11px;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: #64748b;
+            letter-spacing: 0.6px;
+            color: #475569;
         }
         .card-custom {
-            border: none;
+            border: 1px solid #e2e8f0;
             border-radius: 14px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+            box-shadow: 0 4px 20px -2px rgba(0,0,0,0.03);
             background: #ffffff;
+            transition: all 0.2s ease;
+        }
+        .card-custom:hover {
+            box-shadow: 0 6px 24px -2px rgba(0,0,0,0.06);
         }
         .badge-status {
             padding: 6px 12px;
-            border-radius: 6px;
+            border-radius: 9999px;
             font-weight: 600;
             font-size: 12px;
         }
@@ -84,37 +117,157 @@
             font-weight: 700;
             letter-spacing: 0.5px;
             border-bottom: 2px solid #e2e8f0;
+            padding: 12px 14px;
+        }
+        .table tbody td {
+            padding: 13px 14px;
+            vertical-align: middle;
+        }
+        .form-control, .form-select {
+            border-radius: 9px;
+            border: 1.5px solid #e2e8f0;
+            padding: 9px 13px;
+            font-size: 14px;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: var(--accent-red);
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+        }
+        .btn {
+            border-radius: 9px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        .btn-danger {
+            background-color: var(--accent-red);
+            border-color: var(--accent-red);
+        }
+        .btn-danger:hover {
+            background-color: var(--accent-red-hover);
+            border-color: var(--accent-red-hover);
+            box-shadow: 0 4px 14px rgba(220, 38, 38, 0.3);
+        }
+        .admin-topbar {
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 12px 24px;
+            margin: -1.5rem -1.5rem 1.5rem -1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .user-pill {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 5px 12px 5px 6px;
+            border-radius: 9999px;
+        }
+        .avatar-circle {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #0f172a, #334155);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 13px;
         }
     </style>
 </head>
 <body>
 
-<!-- Fragment Sidebar chung: Gọn gàng chỉ giữ các phân hệ chính, KHÔNG có danh mục thuộc tính ở cột này -->
+<!-- Fragment Sidebar chung -->
 <aside th:fragment="admin_sidebar(activeMenu)" class="col-md-3 col-lg-2 d-md-block sidebar px-0">
-    <div class="brand-box">
-        <h5 class="fw-bold mb-0 text-white tracking-wide">LUÔN VUI TƯƠI</h5>
-        <small class="text-secondary text-uppercase fw-semibold" style="font-size: 11px; letter-spacing: 1px;">Hệ Thống Quản Trị</small>
+    <div>
+        <div class="brand-box">
+            <div class="brand-logo-icon">
+                <i class="bi bi-fire"></i>
+            </div>
+            <div>
+                <h6 class="fw-bold mb-0 text-white tracking-wide">LUÔN VUI TƯƠI</h6>
+                <small class="text-secondary text-uppercase fw-semibold" style="font-size: 10px; letter-spacing: 0.8px;">Quản Trị Bán Hàng</small>
+            </div>
+        </div>
+
+        <div class="py-3">
+            <a href="/admin" class="nav-link" th:classappend="${activeMenu == 'dashboard' ? 'active' : ''}">
+                <i class="bi bi-speedometer2 me-2"></i> Tổng Quan
+            </a>
+            <a href="/admin/san-pham" class="nav-link" th:classappend="${activeMenu == 'san-pham' || activeMenu == 'thuoc-tinh' ? 'active' : ''}">
+                <i class="bi bi-box-seam me-2"></i> Mẫu Áo & Biến Thể
+            </a>
+
+            <div class="nav-section-title">Nghiệp Vụ Bán Hàng</div>
+            <a href="/admin/ban-hang" class="nav-link" th:classappend="${activeMenu == 'pos' ? 'active' : ''}">
+                <i class="bi bi-shop-window me-2"></i> Bán Tại Quầy (POS)
+            </a>
+            <a href="/admin/hoa-don" class="nav-link" th:classappend="${activeMenu == 'orders' ? 'active' : ''}">
+                <i class="bi bi-receipt me-2"></i> Quản Lý Hóa Đơn
+            </a>
+            <a href="/admin/qldhdh" class="nav-link" th:classappend="${activeMenu == 'online_orders' ? 'active' : ''}">
+                <i class="bi bi-truck me-2"></i> Đơn Hàng Online
+            </a>
+            <a href="#" class="nav-link">
+                <i class="bi bi-ticket-perforated me-2"></i> Mã Giảm Giá
+            </a>
+            <a href="#" class="nav-link">
+                <i class="bi bi-people me-2"></i> Khách Hàng
+            </a>
+            <a href="#" class="nav-link">
+                <i class="bi bi-person-badge me-2"></i> Nhân Viên
+            </a>
+
+            <hr class="border-secondary mx-3 my-3 opacity-25">
+            <a href="/" target="_blank" class="nav-link text-info">
+                <i class="bi bi-box-arrow-up-right me-2"></i> Xem Shop Online
+            </a>
+        </div>
     </div>
 
-    <div class="py-3">
-        <a href="/admin" class="nav-link" th:classappend="${activeMenu == 'dashboard' ? 'active' : ''}">
-            <i class="bi bi-speedometer2 me-2"></i> Tổng Quan (Dashboard)
-        </a>
-        <a href="/admin/san-pham" class="nav-link" th:classappend="${activeMenu == 'san-pham' || activeMenu == 'thuoc-tinh' ? 'active' : ''}">
-            <i class="bi bi-box-seam me-2"></i> Quản Lý Sản Phẩm
-        </a>
-
-        <div class="nav-section-title">Nghiệp Vụ Bán Hàng</div>
-        <a href="/admin/ban-hang" class="nav-link" th:classappend="${activeMenu == 'pos' ? 'active' : ''}"><i class="bi bi-shop-window me-2"></i> Bán hàng tại quầy (POS)</a>
-        <a href="/admin/hoa-don" class="nav-link" th:classappend="${activeMenu == 'orders' ? 'active' : ''}"><i class="bi bi-receipt me-2"></i> Quản Lý Hóa Đơn</a>
-        <a href="#" class="nav-link"><i class="bi bi-ticket-perforated me-2"></i> Quản Lý Voucher</a>
-        <a href="#" class="nav-link"><i class="bi bi-people me-2"></i> Quản Lý Khách Hàng</a>
-        <a href="#" class="nav-link"><i class="bi bi-person-badge me-2"></i> Quản Lý Nhân Viên</a>
-
-        <hr class="border-secondary mx-3 my-3 opacity-25">
-        <a href="/" class="nav-link text-info"><i class="bi bi-shop me-2"></i> Ra Trang Bán Hàng</a>
+    <!-- Thông tin nhân viên đăng nhập ở góc dưới sidebar -->
+    <div class="p-3 border-top border-secondary border-opacity-25 bg-black bg-opacity-25">
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-2 overflow-hidden">
+                <div class="avatar-circle flex-shrink-0" th:text="${currentUser != null ? #strings.substring(currentUser.hoTen, 0, 1).toUpperCase() : 'A'}">A</div>
+                <div class="overflow-hidden">
+                    <div class="text-white small fw-bold text-truncate" th:text="${currentUser != null ? currentUser.hoTen : 'Quản Trị Viên'}">Admin</div>
+                    <span class="badge bg-danger text-white py-0 px-1" style="font-size: 10px;" th:text="${currentUser != null ? currentUser.vaiTro : 'ADMIN'}">ADMIN</span>
+                </div>
+            </div>
+            <a href="/logout" class="btn btn-outline-danger btn-sm p-1 border-0" title="Đăng Xuất">
+                <i class="bi bi-box-arrow-right fs-5"></i>
+            </a>
+        </div>
     </div>
 </aside>
+
+<!-- Fragment Topbar chung cho Admin -->
+<div th:fragment="admin_topbar(pageTitle)" class="admin-topbar">
+    <div class="d-flex align-items-center gap-2">
+        <h5 class="fw-bold mb-0 text-dark" th:text="${pageTitle}">Hệ Thống Quản Trị</h5>
+    </div>
+    <div class="d-flex align-items-center gap-3">
+        <a href="/" target="_blank" class="btn btn-outline-secondary btn-sm d-none d-md-flex align-items-center gap-1">
+            <i class="bi bi-shop"></i> Xem Cửa Hàng
+        </a>
+        <div class="user-pill">
+            <div class="avatar-circle" th:text="${currentUser != null ? #strings.substring(currentUser.hoTen, 0, 1).toUpperCase() : 'A'}">A</div>
+            <div class="d-none d-sm-block">
+                <span class="small fw-bold text-dark d-block lh-1" th:text="${currentUser != null ? currentUser.hoTen : 'Quản Trị Viên'}">Quản Trị Viên</span>
+                <span class="badge bg-danger-subtle text-danger py-0 px-1" style="font-size: 10px;" th:text="${currentUser != null ? currentUser.vaiTro : 'ADMIN'}">ADMIN</span>
+            </div>
+            <a href="/logout" class="text-secondary ms-1 text-decoration-none" title="Đăng xuất khỏi hệ thống">
+                <i class="bi bi-box-arrow-right fs-6"></i>
+            </a>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>

@@ -225,4 +225,60 @@ public class SanPhamServiceImpl implements SanPhamService {
 
         return savedSanPham;
     }
+
+    @Override
+    @Transactional
+    public SanPham saveWithCustomVariants(SanPham sanPham,
+                                          List<Integer> listMauSacId,
+                                          List<Integer> listKichThuocId,
+                                          List<BigDecimal> listGiaBan,
+                                          List<BigDecimal> listGiaBanBanDau,
+                                          List<Integer> listSoLuongTon) {
+        if (sanPham.getId() == null && sanPham.getNgayTao() == null) {
+            sanPham.setNgayTao(LocalDateTime.now());
+        }
+        if (sanPham.getTrangThai() == null) {
+            sanPham.setTrangThai(true);
+        }
+
+        SanPham savedSanPham = sanPhamRepository.save(sanPham);
+
+        if (listMauSacId != null && !listMauSacId.isEmpty()) {
+            int total = listMauSacId.size();
+            for (int i = 0; i < total; i++) {
+                Integer msId = listMauSacId.get(i);
+                Integer ktId = (listKichThuocId != null && listKichThuocId.size() > i) ? listKichThuocId.get(i) : null;
+                BigDecimal giaBan = (listGiaBan != null && listGiaBan.size() > i && listGiaBan.get(i) != null) ? listGiaBan.get(i) : BigDecimal.ZERO;
+                BigDecimal giaGoc = (listGiaBanBanDau != null && listGiaBanBanDau.size() > i && listGiaBanBanDau.get(i) != null) ? listGiaBanBanDau.get(i) : giaBan;
+                Integer soLuong = (listSoLuongTon != null && listSoLuongTon.size() > i && listSoLuongTon.get(i) != null) ? listSoLuongTon.get(i) : 0;
+
+                MauSac ms = (msId != null) ? mauSacRepository.findById(msId).orElse(null) : null;
+                KichThuoc kt = (ktId != null) ? kichThuocRepository.findById(ktId).orElse(null) : null;
+                if (ms == null || kt == null) continue;
+
+                String sku = String.format("%s-%s-%s-%03d",
+                        savedSanPham.getMaSanPham(),
+                        kt.getTenKichThuoc(),
+                        ms.getTenMauSac().replaceAll("\\s+", ""),
+                        i + 1);
+
+                boolean status = Boolean.TRUE.equals(savedSanPham.getTrangThai()) && (soLuong > 0);
+
+                SanPhamChiTiet variant = SanPhamChiTiet.builder()
+                        .sanPham(savedSanPham)
+                        .mauSac(ms)
+                        .kichThuoc(kt)
+                        .maSanPhamChiTiet(sku)
+                        .giaBan(giaBan)
+                        .giaBanBanDau(giaGoc)
+                        .soLuongTon(soLuong)
+                        .trangThai(status)
+                        .build();
+
+                sanPhamChiTietRepository.save(variant);
+            }
+        }
+
+        return savedSanPham;
+    }
 }

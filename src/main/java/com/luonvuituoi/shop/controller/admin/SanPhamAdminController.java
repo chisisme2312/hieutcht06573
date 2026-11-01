@@ -20,6 +20,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -95,7 +96,7 @@ public class SanPhamAdminController {
             sanPhamService.save(sp);
             sanPhamService.dongBoTrangThaiBienThe(sp.getId(), trangThaiMoi);
             ra.addFlashAttribute("thongBao", "Đã chuyển trạng thái mẫu áo [" + sp.getTenSanPham() + "] thành: " 
-                    + (trangThaiMoi ? "🟢 Đang kinh doanh (Hiển thị ở trang bán hàng)" : "⚪ Ngừng kinh doanh (Tạm ẩn khỏi trang khách)"));
+                    + (trangThaiMoi ? "🟢 Đang kinh doanh" : "⚪ Ngừng kinh doanh"));
         }
         return "redirect:/admin/san-pham";
     }
@@ -275,6 +276,11 @@ public class SanPhamAdminController {
                              @RequestParam(value = "giaBan", required = false) String giaBanStr,
                              @RequestParam(value = "giaBanBanDau", required = false) String giaBanBanDauStr,
                              @RequestParam(value = "soLuongTon", required = false) Integer soLuongTon,
+                             @RequestParam(value = "customVariantMauSacId", required = false) List<Integer> customVariantMauSacIds,
+                             @RequestParam(value = "customVariantKichThuocId", required = false) List<Integer> customVariantKichThuocIds,
+                             @RequestParam(value = "customVariantGiaBan", required = false) List<String> customVariantGiaBans,
+                             @RequestParam(value = "customVariantGiaGoc", required = false) List<String> customVariantGiaGocs,
+                             @RequestParam(value = "customVariantSoLuongTon", required = false) List<Integer> customVariantSoLuongTons,
                              RedirectAttributes ra) {
         try {
             // Đảm bảo coAo luôn có giá trị hợp lệ để không bị lỗi NOT NULL trong CSDL
@@ -324,8 +330,28 @@ public class SanPhamAdminController {
                     ra.addFlashAttribute("thongBao", "Cập nhật thông tin mẫu áo và đồng bộ trạng thái biến thể thành công!");
                 }
             } else {
-                sanPhamService.saveWithVariants(sanPham, mauSacIds, kichThuocIds, giaBan, giaBanBanDau, soLuongTon);
-                ra.addFlashAttribute("thongBao", "Thêm mẫu áo và tạo biến thể thành công!");
+                // Kiểm tra nếu có danh sách biến thể tùy chỉnh chi tiết từ giao diện
+                if (customVariantMauSacIds != null && !customVariantMauSacIds.isEmpty()) {
+                    List<BigDecimal> listGiaBan = new ArrayList<>();
+                    if (customVariantGiaBans != null) {
+                        for (String s : customVariantGiaBans) {
+                            String clean = (s != null) ? s.replaceAll("[,.\\s]", "") : "";
+                            listGiaBan.add(!clean.isEmpty() ? new BigDecimal(clean) : BigDecimal.ZERO);
+                        }
+                    }
+                    List<BigDecimal> listGiaGoc = new ArrayList<>();
+                    if (customVariantGiaGocs != null) {
+                        for (String s : customVariantGiaGocs) {
+                            String clean = (s != null) ? s.replaceAll("[,.\\s]", "") : "";
+                            listGiaGoc.add(!clean.isEmpty() ? new BigDecimal(clean) : BigDecimal.ZERO);
+                        }
+                    }
+                    sanPhamService.saveWithCustomVariants(sanPham, customVariantMauSacIds, customVariantKichThuocIds, listGiaBan, listGiaGoc, customVariantSoLuongTons);
+                    ra.addFlashAttribute("thongBao", "Thêm mẫu áo và tùy chỉnh " + customVariantMauSacIds.size() + " biến thể thành công!");
+                } else {
+                    sanPhamService.saveWithVariants(sanPham, mauSacIds, kichThuocIds, giaBan, giaBanBanDau, soLuongTon);
+                    ra.addFlashAttribute("thongBao", "Thêm mẫu áo và tạo biến thể thành công!");
+                }
             }
         } catch (Exception e) {
             String msg = e.getMessage();

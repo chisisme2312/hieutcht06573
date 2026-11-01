@@ -11,6 +11,7 @@
 
         <!-- Main Content -->
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+            <div th:replace="~{admin/layout :: admin_topbar('Quản Lý Mẫu Áo & Biến Thể')}"></div>
             
             <div class="d-flex justify-content-between align-items-center pb-3 mb-4 border-bottom">
                 <div>
@@ -177,7 +178,7 @@
                                     <a th:href="@{'/admin/san-pham/doi-trang-thai/' + ${sp.id}}" 
                                        class="badge text-decoration-none py-2 px-2"
                                        th:classappend="${sp.trangThai == true ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-secondary-subtle text-secondary border border-secondary-subtle'}"
-                                       th:title="${sp.trangThai == true ? 'Bấm để chuyển sang Ngừng kinh doanh (Tạm ẩn khỏi trang khách)' : 'Bấm để chuyển sang Đang kinh doanh (Hiện ở trang khách)'}">
+                                       th:title="${sp.trangThai == true ? 'Bấm để chuyển sang Ngừng kinh doanh' : 'Bấm để chuyển sang Đang kinh doanh'}">
                                         <i class="bi me-1" th:classappend="${sp.trangThai == true ? 'bi-check-circle-fill' : 'bi-slash-circle'}"></i>
                                         <span th:text="${sp.trangThai == true ? 'Đang kinh doanh' : 'Ngừng kinh doanh'}"></span>
                                     </a>

@@ -34,10 +34,11 @@
 <div class="container-fluid">
     <div class="row">
         <!-- Sidebar dùng chung chuẩn phong cách Luôn Vui Tươi -->
-        <aside th:replace="~{admin/layout :: admin_sidebar('orders')}"></aside>
+        <aside th:replace="~{admin/layout :: admin_sidebar('online_orders')}"></aside>
 
         <!-- Main Content -->
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+            <div th:replace="~{admin/layout :: admin_topbar('Quản Lý Đơn Hàng Online')}"></div>
 
             <!-- Header Tiêu Đề -->
             <div class="d-flex flex-wrap justify-content-between align-items-center pb-3 mb-4 border-bottom">

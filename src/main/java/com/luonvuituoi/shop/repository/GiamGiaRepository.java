@@ -9,4 +9,5 @@ import java.util.Optional;
 @Repository
 public interface GiamGiaRepository extends JpaRepository<GiamGia, Integer> {
     Optional<GiamGia> findByMaGiamGiaAndTrangThaiTrue(String maGiamGia);
+    java.util.List<GiamGia> findByTrangThaiTrue();
 }

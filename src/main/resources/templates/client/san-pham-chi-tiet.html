@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -564,23 +564,42 @@
                 <input type="text" name="keyword" class="form-control" placeholder="Tìm kiếm áo thun, polo, sơ mi...">
             </form>
 
-            <!-- Action Icons -->
-            <div class="d-flex align-items-center">
-                <a href="/admin" class="btn btn-sm btn-outline-dark fw-bold me-2">
-                    <i class="bi bi-speedometer2 me-1"></i> Quản Trị
+                        <!-- Action Icons: User Auth, Admin (if staff), Catalog, Cart -->
+            <div class="d-flex align-items-center gap-2">
+                <!-- 1. Khi chua dang nhap: Nut Dang Nhap -->
+                <a th:if="${currentUser == null}" href="/login" class="btn btn-sm btn-outline-danger fw-bold">
+                    <i class="bi bi-box-arrow-in-right me-1"></i> Đăng Nhập
                 </a>
 
-                <a href="/san-pham" class="btn btn-sm btn-dark fw-bold me-2 d-none d-md-inline-block">
+                <!-- 2. Khi da dang nhap la Nhan Vien hoac Admin: Nut vao Quan Tri + Ten + Dang Xuat -->
+                <div th:if="${currentUser != null and currentUser.isNhanVien()}" class="d-flex align-items-center gap-2">
+                    <a href="/admin" class="btn btn-sm btn-danger fw-bold">
+                        <i class="bi bi-speedometer2 me-1"></i> Quản Trị
+                    </a>
+                    <span class="small fw-bold text-dark d-none d-md-inline" th:text="${currentUser.hoTen}">Admin</span>
+                    <a href="/logout" class="btn btn-sm btn-outline-secondary" title="Đăng Xuất">
+                        <i class="bi bi-box-arrow-right"></i>
+                    </a>
+                </div>
+
+                <!-- 3. Khi da dang nhap la Khach Hang: Chi hien Ten + Dang Xuat (KHONG CO QUAN TRI) -->
+                <div th:if="${currentUser != null and !currentUser.isNhanVien()}" class="d-flex align-items-center gap-2">
+                    <span class="small fw-semibold text-secondary d-none d-md-inline">Xin chào, <strong class="text-dark" th:text="${currentUser.hoTen}">Khách</strong></span>
+                    <a href="/logout" class="btn btn-sm btn-outline-secondary" title="Đăng Xuất">
+                        <i class="bi bi-box-arrow-right"></i>
+                    </a>
+                </div>
+
+                <a href="/san-pham" class="btn btn-sm btn-dark fw-bold d-none d-md-inline-block">
                     <i class="bi bi-grid me-1"></i> Danh Mục
                 </a>
 
-                <a href="/gio-hang" class="action-icon" title="Giỏ hàng">
+                <a href="/gio-hang" class="action-icon position-relative ms-1" title="Giỏ hàng">
                     <i class="bi bi-bag"></i>
                     <span class="badge-cart" id="headerCartBadge" 
                           th:text="${session.SESSION_CART != null ? session.SESSION_CART.tongSoLuong : 0}">0</span>
                 </a>
             </div>
-        </div>
 
         <!-- Navigation Categories -->
         <nav class="d-flex align-items-center border-top overflow-auto">

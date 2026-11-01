@@ -1,8 +1,12 @@
 package com.luonvuituoi.shop.controller.admin;
 
+import com.luonvuituoi.shop.dto.AuthUser;
 import com.luonvuituoi.shop.entity.*;
 import com.luonvuituoi.shop.repository.*;
+import com.luonvuituoi.shop.service.AuthService;
 import com.luonvuituoi.shop.service.BanHangService;
+import com.luonvuituoi.shop.service.impl.AuthServiceImpl;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -24,6 +28,7 @@ public class BanHangTaiQuayController {
     private final SanPhamChiTietRepository sanPhamChiTietRepository;
     private final KhachHangRepository khachHangRepository;
     private final NhanVienRepository nhanVienRepository;
+    private final GiamGiaRepository giamGiaRepository;
 
     @Value("${pos.qr.bank-id:}") private String bankId;
     @Value("${pos.qr.account-number:}") private String accountNumber;
@@ -43,14 +48,30 @@ public class BanHangTaiQuayController {
         model.addAttribute("sanPhamList", sanPhamRepository.findAllActiveWithDetails());
         model.addAttribute("khachHangList", khachHangRepository.findAll());
         model.addAttribute("nhanVienList", nhanVienRepository.findByTrangThaiTrue());
-        model.addAttribute("voucherList", List.of());
+        model.addAttribute("voucherList", giamGiaRepository.findByTrangThaiTrue());
         return "admin/ban-hang/index";
     }
 
     @PostMapping("/tao-hoa-don")
-    public String taoHoaDon(@RequestParam(required = false) Integer nhanVienId, RedirectAttributes ra) {
-        try { HoaDon hd = banHangService.taoHoaDon(nhanVienId); ra.addFlashAttribute("success", "Đã tạo hóa đơn " + hd.getMaHoaDon()); return "redirect:/admin/ban-hang?hoaDonId=" + hd.getId(); }
-        catch (RuntimeException e) { ra.addFlashAttribute("error", e.getMessage()); return "redirect:/admin/ban-hang"; }
+    public String taoHoaDon(HttpSession session, RedirectAttributes ra) {
+        try {
+            Integer nvId = null;
+            AuthUser auth = (AuthUser) session.getAttribute(AuthServiceImpl.SESSION_USER_KEY);
+            if (auth != null && auth.isNhanVien()) {
+                nvId = auth.getId();
+            } else {
+                var activeNvs = nhanVienRepository.findByTrangThaiTrue();
+                if (!activeNvs.isEmpty()) {
+                    nvId = activeNvs.get(0).getId();
+                }
+            }
+            HoaDon hd = banHangService.taoHoaDon(nvId);
+            ra.addFlashAttribute("success", "Đã tạo hóa đơn mới: " + hd.getMaHoaDon());
+            return "redirect:/admin/ban-hang?hoaDonId=" + hd.getId();
+        } catch (RuntimeException e) {
+            ra.addFlashAttribute("error", e.getMessage());
+            return "redirect:/admin/ban-hang";
+        }
     }
 
     @PostMapping("/{id}/them-san-pham")

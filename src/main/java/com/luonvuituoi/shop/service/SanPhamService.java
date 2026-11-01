@@ -40,4 +40,12 @@ public interface SanPhamService {
                              BigDecimal giaBan, 
                              BigDecimal giaBanBanDau, 
                              Integer soLuongTon);
+
+    // Lưu sản phẩm kèm danh sách biến thể tùy chỉnh chi tiết từng dòng
+    SanPham saveWithCustomVariants(SanPham sanPham,
+                                   List<Integer> listMauSacId,
+                                   List<Integer> listKichThuocId,
+                                   List<BigDecimal> listGiaBan,
+                                   List<BigDecimal> listGiaBanBanDau,
+                                   List<Integer> listSoLuongTon);
 }
