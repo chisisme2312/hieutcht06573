@@ -32,4 +32,13 @@ public class HoaDonChiTiet {
 
     @Column(name = "don_gia", nullable = false)
     private BigDecimal donGia;
+    // Tính thành tiền = đơn giá x số lượng
+    @Transient
+    public BigDecimal getThanhTien() {
+        if (donGia == null || soLuong == null) {
+            return BigDecimal.ZERO;
+        }
+
+        return donGia.multiply(BigDecimal.valueOf(soLuong.longValue()));
+    }
 }

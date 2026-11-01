@@ -1,0 +1,555 @@
+```html
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{admin/layout :: admin_head('Bán hàng tại quầy - POS')}">
+    <title>Bán hàng tại quầy</title>
+</head>
+
+<body>
+<div class="container-fluid">
+    <div class="row">
+
+        <!-- SIDEBAR -->
+        <div th:replace="~{admin/layout :: admin_sidebar('pos')}"></div>
+
+        <main class="col-md-10 ms-sm-auto px-md-4 py-4">
+
+            <!-- TIÊU ĐỀ -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h3 class="fw-bold mb-1">Bán hàng tại quầy</h3>
+                    <p class="text-muted mb-0">Quản lý hóa đơn và thanh toán trực tiếp</p>
+                </div>
+
+                <form th:action="@{/admin/ban-hang/tao-hoa-don}"
+                      method="post"
+                      class="d-flex gap-2">
+
+                    <select name="nhanVienId" class="form-select">
+                        <option value="">-- Chọn nhân viên --</option>
+                        <option th:each="nv : ${nhanVienList}"
+                                th:value="${nv.id}"
+                                th:text="${nv.hoVaTen}">
+                        </option>
+                    </select>
+
+                    <button type="submit" class="btn btn-primary text-nowrap">
+                        + Tạo hóa đơn
+                    </button>
+                </form>
+            </div>
+
+            <!-- THÔNG BÁO -->
+            <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+            <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+            <!-- DANH SÁCH HÓA ĐƠN -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="fw-bold mb-0">Hóa đơn đang chờ thanh toán</h5>
+                </div>
+
+                <div class="card-body">
+                    <div th:if="${#lists.isEmpty(hoaDonCho)}"
+                         class="text-center text-muted py-3">
+                        Chưa có hóa đơn nào. Hãy tạo hóa đơn mới.
+                    </div>
+
+                    <div th:unless="${#lists.isEmpty(hoaDonCho)}"
+                         class="d-flex flex-wrap gap-2">
+
+                        <a th:each="hd : ${hoaDonCho}"
+                           th:href="@{/admin/ban-hang(hoaDonId=${hd.id})}"
+                           class="btn"
+                           th:classappend="${hoaDonDangChon != null and hoaDonDangChon.id == hd.id}
+                                ? ' btn-primary' : ' btn-outline-primary'">
+
+                            <span th:text="${hd.maHoaDon}"></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CHƯA CHỌN HÓA ĐƠN -->
+            <div th:if="${hoaDonDangChon == null}" class="card shadow-sm">
+                <div class="card-body text-center py-5">
+                    <h5>Chưa có hóa đơn được chọn</h5>
+                    <p class="text-muted mb-0">
+                        Tạo hóa đơn mới hoặc chọn hóa đơn đang chờ.
+                    </p>
+                </div>
+            </div>
+
+            <!-- KHU VỰC BÁN HÀNG -->
+            <div th:if="${hoaDonDangChon != null}">
+                <div class="row g-4">
+
+                    <!-- CỘT TRÁI: SẢN PHẨM VÀ GIỎ HÀNG -->
+                    <div class="col-lg-8">
+
+                        <!-- THÔNG TIN HÓA ĐƠN -->
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-body d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="fw-bold mb-2">
+                                        Hóa đơn:
+                                        <span class="text-primary"
+                                              th:text="${hoaDonDangChon.maHoaDon}"></span>
+                                    </h5>
+
+                                    <span class="badge bg-warning text-dark"
+                                          th:text="${hoaDonDangChon.trangThai}">
+                                    </span>
+                                </div>
+
+                                <form th:action="@{/admin/ban-hang/{id}/huy(id=${hoaDonDangChon.id})}"
+                                      method="post"
+                                      onsubmit="return confirm('Bạn có chắc muốn hủy hóa đơn?')">
+
+                                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                                        Hủy hóa đơn
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- DANH SÁCH SẢN PHẨM -->
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                                <h5 class="fw-bold mb-0">Danh sách sản phẩm</h5>
+
+                                <input type="text"
+                                       id="searchProduct"
+                                       class="form-control"
+                                       style="max-width: 250px"
+                                       placeholder="Tìm sản phẩm..."
+                                       oninput="filterProducts()">
+                            </div>
+
+                            <div class="card-body">
+
+                                <div th:if="${#lists.isEmpty(sanPhamList)}"
+                                     class="text-center text-muted py-4">
+                                    Không có sản phẩm.
+                                </div>
+
+                                <div class="row g-3"
+                                     th:unless="${#lists.isEmpty(sanPhamList)}">
+
+                                    <th:block th:each="sp : ${sanPhamList}">
+                                        <th:block th:each="ct : ${sp.danhSachChiTiet}">
+
+                                            <div class="col-md-4 product-card"
+                                                 th:if="${ct.trangThai == true
+                                                    and ct.soLuongTon != null
+                                                    and ct.soLuongTon > 0}">
+
+                                                <div class="border rounded p-3 h-100">
+
+                                                    <span class="badge bg-success mb-2">
+                                                        Còn hàng
+                                                    </span>
+
+                                                    <h6 class="fw-bold product-name"
+                                                        th:text="${sp.tenSanPham}">
+                                                    </h6>
+
+                                                    <p class="small mb-1">
+                                                        Mã:
+                                                        <span class="product-code"
+                                                              th:text="${sp.maSanPham}">
+                                                        </span>
+                                                    </p>
+
+                                                    <p class="small mb-1">
+                                                        Màu:
+                                                        <span th:text="${ct.mauSac != null
+                                                            ? ct.mauSac.tenMauSac : 'Không có'}">
+                                                        </span>
+                                                    </p>
+
+                                                    <p class="small mb-1">
+                                                        Kích thước:
+                                                        <span th:text="${ct.kichThuoc != null
+                                                            ? ct.kichThuoc.tenKichThuoc : 'Không có'}">
+                                                        </span>
+                                                    </p>
+
+                                                    <p class="small mb-2">
+                                                        Tồn kho:
+                                                        <strong th:text="${ct.soLuongTon}"></strong>
+                                                    </p>
+
+                                                    <h6 class="text-danger fw-bold mb-3"
+                                                        th:text="${#numbers.formatDecimal(ct.giaBan, 0, 'COMMA', 0, 'POINT')} + ' đ'">
+                                                    </h6>
+
+                                                    <!-- THÊM VÀO GIỎ -->
+                                                    <form th:action="@{/admin/ban-hang/{id}/them-san-pham(id=${hoaDonDangChon.id})}"
+                                                          method="post">
+
+                                                        <input type="hidden"
+                                                               name="sanPhamChiTietId"
+                                                               th:value="${ct.id}">
+
+                                                        <input type="hidden"
+                                                               name="soLuong"
+                                                               value="1">
+
+                                                        <button type="submit"
+                                                                class="btn btn-primary btn-sm w-100">
+                                                            + Thêm vào giỏ
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+
+                                        </th:block>
+                                    </th:block>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- GIỎ HÀNG -->
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-white">
+                                <h5 class="fw-bold mb-0">Giỏ hàng</h5>
+                            </div>
+
+                            <div class="card-body">
+
+                                <div th:if="${#lists.isEmpty(chiTietHoaDon)}"
+                                     class="text-center text-muted py-4">
+                                    Chưa có sản phẩm trong giỏ hàng.
+                                </div>
+
+                                <div th:unless="${#lists.isEmpty(chiTietHoaDon)}"
+                                     class="table-responsive">
+
+                                    <table class="table table-bordered align-middle">
+                                        <thead class="table-light">
+                                        <tr>
+                                            <th>Sản phẩm</th>
+                                            <th>Phân loại</th>
+                                            <th>Đơn giá</th>
+                                            <th>Số lượng</th>
+                                            <th>Thành tiền</th>
+                                            <th>Thao tác</th>
+                                        </tr>
+                                        </thead>
+
+                                        <tbody>
+                                        <tr th:each="dong : ${chiTietHoaDon}"
+                                            th:if="${dong != null}">
+
+                                            <td>
+                                                <strong th:text="${dong.sanPhamChiTiet.sanPham.tenSanPham}"></strong>
+                                            </td>
+
+                                            <td>
+                                                <div>
+                                                    Màu:
+                                                    <span th:text="${dong.sanPhamChiTiet.mauSac != null
+                                                        ? dong.sanPhamChiTiet.mauSac.tenMauSac : ''}">
+                                                    </span>
+                                                </div>
+
+                                                <div>
+                                                    Size:
+                                                    <span th:text="${dong.sanPhamChiTiet.kichThuoc != null
+                                                        ? dong.sanPhamChiTiet.kichThuoc.tenKichThuoc : ''}">
+                                                    </span>
+                                                </div>
+                                            </td>
+
+                                            <td th:text="${#numbers.formatDecimal(dong.donGia, 0, 'COMMA', 0, 'POINT')} + ' đ'"></td>
+
+                                            <!-- CẬP NHẬT SỐ LƯỢNG -->
+                                            <td>
+                                                <form th:action="@{/admin/ban-hang/{id}/cap-nhat-so-luong(id=${hoaDonDangChon.id})}"
+                                                      method="post"
+                                                      class="d-flex gap-1">
+
+                                                    <input type="hidden"
+                                                           name="chiTietId"
+                                                           th:value="${dong.id}">
+
+                                                    <input type="number"
+                                                           name="soLuong"
+                                                           min="1"
+                                                           th:max="${dong.sanPhamChiTiet.soLuongTon}"
+                                                           th:value="${dong.soLuong}"
+                                                           class="form-control form-control-sm"
+                                                           style="width: 75px">
+
+                                                    <button type="submit"
+                                                            class="btn btn-warning btn-sm">
+                                                        Lưu
+                                                    </button>
+                                                </form>
+                                            </td>
+
+                                            <td th:text="${#numbers.formatDecimal(dong.thanhTien, 0, 'COMMA', 0, 'POINT')} + ' đ'"></td>
+
+                                            <!-- XÓA SẢN PHẨM -->
+                                            <td>
+                                                <form th:action="@{/admin/ban-hang/{id}/xoa-san-pham(id=${hoaDonDangChon.id})}"
+                                                      method="post"
+                                                      onsubmit="return confirm('Xóa sản phẩm này khỏi giỏ hàng?')">
+
+                                                    <input type="hidden"
+                                                           name="chiTietId"
+                                                           th:value="${dong.id}">
+
+                                                    <button type="submit"
+                                                            class="btn btn-danger btn-sm">
+                                                        Xóa
+                                                    </button>
+                                                </form>
+                                            </td>
+
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CỘT PHẢI: KHÁCH HÀNG, VOUCHER, THANH TOÁN -->
+                    <div class="col-lg-4">
+
+                        <!-- KHÁCH HÀNG -->
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-white">
+                                <h5 class="fw-bold mb-0">Khách hàng</h5>
+                            </div>
+
+                            <div class="card-body">
+
+                                <!-- CHỌN KHÁCH HÀNG -->
+                                <form th:action="@{/admin/ban-hang/{id}/gan-khach-hang(id=${hoaDonDangChon.id})}"
+                                      method="post">
+
+                                    <label class="form-label">Chọn khách hàng</label>
+
+                                    <select name="khachHangId" class="form-select mb-3">
+                                        <option value="">Khách lẻ</option>
+
+                                        <option th:each="kh : ${khachHangList}"
+                                                th:value="${kh.id}"
+                                                th:selected="${hoaDonDangChon.khachHang != null
+                                                    and hoaDonDangChon.khachHang.id == kh.id}"
+                                                th:text="${kh.hoTen + ' - '
+                                                    + (kh.soDienThoai != null ? kh.soDienThoai : '')}">
+                                        </option>
+                                    </select>
+
+                                    <button type="submit"
+                                            class="btn btn-outline-primary w-100">
+                                        Cập nhật khách hàng
+                                    </button>
+                                </form>
+
+                                <hr>
+
+                                <!-- THÊM KHÁCH HÀNG NHANH -->
+                                <h6 class="fw-bold">Thêm khách hàng nhanh</h6>
+
+                                <form th:action="@{/admin/ban-hang/{id}/them-khach-hang(id=${hoaDonDangChon.id})}"
+                                      method="post">
+
+                                    <input type="text"
+                                           name="hoTen"
+                                           class="form-control mb-2"
+                                           placeholder="Họ và tên"
+                                           required>
+
+                                    <input type="text"
+                                           name="soDienThoai"
+                                           class="form-control mb-2"
+                                           placeholder="Số điện thoại">
+
+                                    <input type="email"
+                                           name="email"
+                                           class="form-control mb-2"
+                                           placeholder="Email">
+
+                                    <button type="submit"
+                                            class="btn btn-success w-100">
+                                        + Thêm khách hàng
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- VOUCHER -->
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-white">
+                                <h5 class="fw-bold mb-0">Mã giảm giá</h5>
+                            </div>
+
+                            <div class="card-body">
+                                <form th:action="@{/admin/ban-hang/{id}/voucher(id=${hoaDonDangChon.id})}"
+                                      method="post">
+
+                                    <input type="text"
+                                           name="maVoucher"
+                                           class="form-control mb-2"
+                                           placeholder="Nhập mã voucher"
+                                           th:value="${hoaDonDangChon.giamGia != null
+                                                ? hoaDonDangChon.giamGia.maGiamGia : ''}">
+
+                                    <button type="submit"
+                                            class="btn btn-outline-success w-100">
+                                        Áp dụng voucher
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- THANH TOÁN -->
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-white">
+                                <h5 class="fw-bold mb-0">Thanh toán</h5>
+                            </div>
+
+                            <div class="card-body">
+
+                                <!-- TẠM TÍNH -->
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Tạm tính:</span>
+
+                                    <strong th:text="${#numbers.formatDecimal(
+                                        hoaDonDangChon.tienTruocGiam != null
+                                            ? hoaDonDangChon.tienTruocGiam : 0,
+                                        0, 'COMMA', 0, 'POINT')} + ' đ'">
+                                    </strong>
+                                </div>
+
+                                <!-- GIẢM GIÁ -->
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Giảm giá:</span>
+
+                                    <strong class="text-success"
+                                            th:text="${#numbers.formatDecimal(
+                                                (hoaDonDangChon.tienTruocGiam != null
+                                                    ? hoaDonDangChon.tienTruocGiam : 0)
+                                                .subtract(hoaDonDangChon.tongTien != null
+                                                    ? hoaDonDangChon.tongTien : 0),
+                                                0, 'COMMA', 0, 'POINT')} + ' đ'">
+                                    </strong>
+                                </div>
+
+                                <hr>
+
+                                <!-- TỔNG THANH TOÁN -->
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <span class="fw-bold">Khách cần trả:</span>
+
+                                    <h5 class="text-danger fw-bold mb-0"
+                                        id="totalAmount"
+                                        th:text="${#numbers.formatDecimal(
+                                            hoaDonDangChon.tongTien != null
+                                                ? hoaDonDangChon.tongTien : 0,
+                                            0, 'COMMA', 0, 'POINT')} + ' đ'">
+                                    </h5>
+                                </div>
+
+                                <!-- TIỀN MẶT -->
+                                <form th:action="@{/admin/ban-hang/{id}/thanh-toan-tien-mat(id=${hoaDonDangChon.id})}"
+                                      method="post"
+                                      onsubmit="return confirm('Xác nhận thanh toán tiền mặt?')">
+
+                                    <label class="form-label fw-bold">
+                                        Tiền khách đưa
+                                    </label>
+
+                                    <input type="number"
+                                           name="tienKhachDua"
+                                           id="cashGiven"
+                                           min="0"
+                                           step="1"
+                                           class="form-control mb-2"
+                                           placeholder="Nhập số tiền khách đưa"
+                                           required>
+
+                                    <div class="d-flex justify-content-between mb-3">
+                                        <span>Tiền thừa:</span>
+
+                                        <strong id="changeAmount" class="text-success">
+                                            0 đ
+                                        </strong>
+                                    </div>
+
+                                    <button type="submit"
+                                            class="btn btn-success w-100 mb-2"
+                                            th:disabled="${#lists.isEmpty(chiTietHoaDon)}">
+                                        Thanh toán tiền mặt
+                                    </button>
+                                </form>
+
+                                <!-- QR -->
+                                <a th:href="@{/admin/ban-hang/{id}/qr(id=${hoaDonDangChon.id})}"
+                                   class="btn btn-outline-primary w-100"
+                                   th:classappend="${#lists.isEmpty(chiTietHoaDon)}
+                                        ? ' disabled' : ''">
+                                    Thanh toán bằng QR
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- JAVASCRIPT -->
+<script th:inline="javascript">
+
+    // TÌM KIẾM SẢN PHẨM
+    function filterProducts() {
+        const input = document.getElementById("searchProduct");
+        if (!input) return;
+
+        const keyword = input.value.toLowerCase().trim();
+
+        document.querySelectorAll(".product-card").forEach(card => {
+            const content = card.innerText.toLowerCase();
+            card.style.display = content.includes(keyword) ? "" : "none";
+        });
+    }
+
+    // TÍNH TIỀN THỪA
+    const total = Number(
+        /*[[${hoaDonDangChon != null and hoaDonDangChon.tongTien != null
+            ? hoaDonDangChon.tongTien : 0}]]*/ 0
+    );
+
+    function calcChange() {
+        const input = document.getElementById("cashGiven");
+        const output = document.getElementById("changeAmount");
+
+        if (!input || !output) return;
+
+        const cash = Number(input.value || 0);
+        const change = Math.max(0, cash - total);
+
+        output.innerText =
+            new Intl.NumberFormat("vi-VN").format(change) + " đ";
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const cashInput = document.getElementById("cashGiven");
+
+        if (cashInput) {
+            cashInput.addEventListener("input", calcChange);
+        }
+    });
+
+</script>
+
+</body>
+</html>

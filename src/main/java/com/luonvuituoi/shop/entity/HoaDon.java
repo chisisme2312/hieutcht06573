@@ -62,4 +62,12 @@ public class HoaDon {
 
     @OneToMany(mappedBy = "hoaDon", cascade = CascadeType.ALL)
     private List<HoaDonChiTiet> danhSachChiTiet;
+    @Transient
+    public BigDecimal getTienGiam() {
+        if (tienTruocGiam == null || tongTien == null) {
+            return BigDecimal.ZERO;
+        }
+
+        return tienTruocGiam.subtract(tongTien);
+    }
 }

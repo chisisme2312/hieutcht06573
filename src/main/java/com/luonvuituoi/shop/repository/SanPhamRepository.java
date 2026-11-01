@@ -15,6 +15,7 @@ public interface SanPhamRepository extends JpaRepository<SanPham, Integer> {
     
     List<SanPham> findByTenSanPhamContainingIgnoreCase(String keyword);
     List<SanPham> findByTrangThaiTrue();
+    Page<SanPham> findByTrangThaiTrue(Pageable pageable);
 
     @Query("SELECT DISTINCT sp FROM SanPham sp LEFT JOIN FETCH sp.danhSachAnh LEFT JOIN FETCH sp.danhSachChiTiet ct LEFT JOIN FETCH ct.mauSac LEFT JOIN FETCH ct.kichThuoc WHERE sp.trangThai = true")
     List<SanPham> findAllActiveWithDetails();

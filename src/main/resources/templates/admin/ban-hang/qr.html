@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head th:replace="~{admin/layout :: admin_head('Thanh toán QR - POS')}"></head>
+<body><div class="container-fluid"><div class="row"><aside th:replace="~{admin/layout :: admin_sidebar('pos')}"></aside>
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4"><div class="d-flex justify-content-between align-items-center mb-3"><div><h3 class="fw-bold">Thanh toán chuyển khoản QR</h3><p class="text-secondary mb-0" th:text="${hoaDon.maHoaDon}"></p></div><a th:href="@{/admin/ban-hang(hoaDonId=${hoaDon.id})}" class="btn btn-outline-secondary">Quay lại POS</a></div>
+<div class="row justify-content-center"><div class="col-lg-7"><div class="card card-custom p-4 text-center"><div class="text-secondary">Số tiền cần chuyển</div><div class="display-5 fw-bold text-danger mb-2" th:text="${#numbers.formatDecimal(hoaDon.tongTien,0,'COMMA',0,'POINT')} + ' đ'"></div><div class="fw-semibold mb-3" th:text="${'Nội dung: Thanh toan ' + hoaDon.maHoaDon}"></div>
+<div th:if="${qrConfigured}" class="mb-3"><img th:src="${qrUrl}" alt="Mã QR chuyển khoản" class="img-fluid border rounded p-2" style="max-width:340px"><div class="small text-secondary mt-2" th:text="${@environment.getProperty('pos.qr.account-name')}"></div></div>
+<div th:unless="${qrConfigured}" class="alert alert-warning text-start"><strong>Chưa cấu hình tài khoản nhận tiền.</strong><p class="mb-0">Thêm mã ngân hàng, số tài khoản và tên chủ tài khoản vào application.properties theo hướng dẫn sau khi tải project.</p></div>
+<div class="alert alert-info text-start small">Chỉ xác nhận sau khi nhân viên đã kiểm tra tài khoản ngân hàng và thấy tiền thực nhận. Màn hình QR hiện tại không tự xác minh giao dịch.</div>
+<form th:action="@{/admin/ban-hang/{id}/xac-nhan-qr(id=${hoaDon.id})}" method="post" onsubmit="return confirm('Bạn đã kiểm tra tài khoản và xác nhận đã nhận đủ tiền?')"><button class="btn btn-success btn-lg w-100" th:disabled="${!qrConfigured}">Xác nhận đã nhận chuyển khoản</button></form>
+</div></div></div></main></div></div></body></html>

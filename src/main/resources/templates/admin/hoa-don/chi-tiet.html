@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+
+<head th:replace="~{admin/layout :: admin_head('Chi tiết hóa đơn')}"></head>
+
+<body>
+<div class="container-fluid">
+    <div class="row">
+
+        <!-- SIDEBAR -->
+        <aside th:replace="~{admin/layout :: admin_sidebar('orders')}"></aside>
+
+        <!-- NỘI DUNG -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+
+            <!-- TIÊU ĐỀ -->
+            <div class="d-flex justify-content-between align-items-center mb-3 no-print">
+                <div>
+                    <h3 class="fw-bold">Chi tiết hóa đơn</h3>
+                    <div class="text-secondary" th:text="${hoaDon.maHoaDon}"></div>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <a th:href="@{/admin/hoa-don}" class="btn btn-outline-secondary">
+                        Quay lại
+                    </a>
+
+                    <button class="btn btn-danger" onclick="window.print()">
+                        <i class="bi bi-printer"></i> In hóa đơn
+                    </button>
+                </div>
+            </div>
+
+            <div class="card card-custom p-4" id="receipt">
+
+                <!-- THÔNG TIN CỬA HÀNG -->
+                <div class="text-center mb-4">
+                    <h4 class="fw-bold">LUÔN VUI TƯƠI SHOP</h4>
+                    <div>HÓA ĐƠN BÁN HÀNG</div>
+                    <strong th:text="${hoaDon.maHoaDon}"></strong>
+                </div>
+
+                <!-- THÔNG TIN HÓA ĐƠN -->
+                <div class="row mb-3">
+
+                    <div class="col-md-6">
+                        <div>
+                            <b>Khách hàng:</b>
+                            <span th:text="${hoaDon.khachHang != null ? hoaDon.khachHang.hoTen : 'Khách lẻ'}"></span>
+                        </div>
+
+                        <div>
+                            <b>Nhân viên:</b>
+                            <span th:text="${hoaDon.nhanVien != null ? hoaDon.nhanVien.hoVaTen : '-'}"></span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <b>Ngày tạo:</b>
+
+                        <span th:if="${hoaDon.ngayTao != null}"
+                              th:text="${#temporals.format(hoaDon.ngayTao, 'dd/MM/yyyy HH:mm')}">
+    </span>
+
+                        <span th:if="${hoaDon.ngayTao == null}">
+        -
+    </span>
+                    </div>

@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thanh Toán Đơn Hàng - LUÔN VUI TƯƠI SHOP</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-black: #000000;
+            --primary-red: #c92921;
+            --text-main: #111111;
+            --text-muted: #777777;
+            --bg-light: #f8f9fa;
+            --border-color: #e5e7eb;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-main);
+            background-color: #f9fafb;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Header tối giản riêng cho trang thanh toán */
+        .checkout-header {
+            background: #ffffff;
+            border-bottom: 1px solid var(--border-color);
+            padding: 15px 0;
+        }
+
+        .brand-logo {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--primary-black);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .brand-logo span {
+            color: var(--primary-red);
+        }
+
+        /* Card tùy chỉnh */
+        .card-custom {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: #ffffff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Form Controls */
+        .form-label {
+            font-weight: 600;
+            font-size: 13px;
+            color: #374151;
+        }
+
+        .form-control, .form-select {
+            border-radius: 6px;
+            padding: 10px 14px;
+            font-size: 14px;
+            border: 1px solid var(--border-color);
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-black);
+            box-shadow: none;
+        }
+
+        /* Payment Method Options */
+        .payment-method-box {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px 16px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .payment-method-box:hover {
+            border-color: #9ca3af;
+        }
+
+        .payment-method-box input[type="radio"]:checked ~ .payment-label {
+            font-weight: 700;
+        }
+
+        /* Product mini item in summary */
+        .summary-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .summary-item img {
+            width: 60px;
+            height: 75px;
+            object-fit: cover;
+            border-radius: 4px;
+            background: #f3f4f6;
+        }
+
+        .item-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 3px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .item-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Nút Đặt hàng */
+        .btn-order {
+            width: 100%;
+            background: var(--primary-black);
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+            border: none;
+            padding: 14px 0;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .btn-order:hover {
+            background: var(--primary-red);
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header đơn giản -->
+<header class="checkout-header">
+    <div class="container d-flex justify-content-between align-items-center">
+        <a href="/" class="brand-logo">
+            LUÔN VUI TƯƠI <span>&nbsp;SHOP</span>
+        </a>
+        <span class="text-muted fw-bold" style="font-size: 14px;"><i class="bi bi-shield-lock-fill text-success me-1"></i> Thanh toán bảo mật 100%</span>
+    </div>
+</header>
+
+<!-- Main Checkout Content -->
+<main class="container my-4">
+    <form th:action="@{/dat-hang/succeed}" method="POST">
+        <div class="row g-4">
+
+            <!-- CỘT TRÁI: Thông tin khách hàng & Vận chuyển -->
+            <div class="col-lg-7">
+
+                <!-- 1. Thông tin người nhận -->
+                <div class="card-custom p-4 mb-4">
+                    <div class="section-title">
+                        <i class="bi bi-person-lines-fill text-danger"></i> 1. Thông tin người nhận hàng
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Họ và tên người nhận</label>
+                     <select name="hoTen" class="form-control" onchange="dienThongTinKhachHang(this)">
+                         <option value="" selected>-- Chọn khách hàng --</option>
+                         <th:block th:each="kh : ${khachHang}">
+                         <option th:value="${kh.id}" th:text="${kh.hoTen}" th:data-hoTen="${kh.hoTen}" th:data-soDienThoai="${kh.soDienThoai}" th:data-email="${kh.email}"></option>
+                         </th:block>
+                     </select>
+                            <!--                            <input type="text" class="form-control" name="hoTen" placeholder="Ví dụ: Nguyễn Văn A" required>-->
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Số điện thoại liên hệ</label>
+                            <input type="tel" class="form-control" id="inputSoDienThoai" name="soDienThoai" placeholder="Ví dụ: 0989xxxxxx" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Email (để nhận xác nhận đơn hàng)</label>
+                            <input type="email" class="form-control" id="inputEmail" name="email" placeholder="Ví dụ: email@gmail.com">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Địa chỉ nhận hàng chi tiết (Số nhà, đường, phường/xã, quận/huyện)</label>
+                            <select name="tinhThanhPho" class="form-control">
+                                <option value="" selected>-- Chọn địa chỉ --</option>
+                                <th:block th:each="dc : ${dclp}">
+                                    <option th:value="${dc.id}" th:text="${dc.tinhThanhPho}"></option>
+                                </th:block>
+                            </select>
+<!--                            <input type="text" class="form-control" name="diaChi" placeholder="Ví dụ: Số 123, Đường Cầu Giấy, Phường Quan Hoa" required>-->
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Ghi chú giao hàng (Tùy chọn)</label>
+                            <textarea class="form-control" name="ghiChu" rows="2" placeholder="Ví dụ: Giao giờ hành chính, gọi trước khi đến..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Phương thức thanh toán -->
+                <div class="card-custom p-4">
+                    <div class="section-title">
+                        <i class="bi bi-credit-card-2-front-fill text-danger"></i> 2. Phương thức thanh toán
+                    </div>
+
+                    <div class="payment-method-box d-flex align-items-center">
+                        <input class="form-check-input me-3" type="radio" name="phuongThucThanhToan" id="cod" value="COD" checked>
+                        <label class="payment-label flex-grow-1 mb-0" for="cod">
+                            <div class="fw-bold">Thanh toán khi giao hàng (COD)</div>
+                            <div class="text-muted" style="font-size: 12px;">Bạn chỉ phải trả tiền khi nhận được sản phẩm</div>
+                        </label>
+                        <i class="bi bi-cash-coin fs-4 text-secondary"></i>
+                    </div>
+
+                    <div class="payment-method-box d-flex align-items-center">
+                        <input class="form-check-input me-3" type="radio" name="phuongThucThanhToan" id="banking" value="BANKING">
+                        <label class="payment-label flex-grow-1 mb-0" for="banking">
+                            <div class="fw-bold">Chuyển khoản ngân hàng trước (QR Code)</div>
+                            <div class="text-muted" style="font-size: 12px;">Nhanh chóng, miễn phí vận chuyển thêm cho đơn từ 200k</div>
+                        </label>
+                        <i class="bi bi-qr-code-scan fs-4 text-secondary"></i>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- CỘT PHẢI: Tóm tắt đơn hàng (Order Summary) -->
+            <div class="col-lg-5">
+                <div class="card-custom p-4 sticky-top" style="top: 20px;">
+                    <div class="section-title justify-content-between">
+                        <span><i class="bi bi-bag-check-fill text-danger"></i> Đơn hàng của bạn</span>
+                        <a href="/gio-hang" class="text-decoration-none text-danger" style="font-size: 13px; font-weight: 600;">Sửa giỏ hàng</a>
+                    </div>
+
+                    <!-- Danh sách sản phẩm rút gọn -->
+                    <div class="product-list mb-3" style="max-height: 280px; overflow-y: auto;">
+
+                        <!-- Lặp qua các sản phẩm trong giỏ hàng (Ví dụ Thymeleaf) -->
+                        <div class="summary-item" th:each="item : ${danhSachGioHang}">
+                            <img src="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=300" alt="Sản phẩm">
+                            <div class="flex-grow-1">
+                                <div class="item-name" th:text="${item.tenSanPham}">Áo Thun Cotton Basic</div>
+                                <div class="item-meta">Size: <span th:text="${item.kichCo}">L</span> | Màu: <span th:text="${item.mauSac}">Đen</span></div>
+                                <div class="item-meta">SL: <span th:text="${item.soLuong}">1</span> x <span th:text="${#numbers.formatDecimal(item.gia, 0, 'COMMA', 0, 'POINT')}">169.000</span>đ</div>
+                            </div>
+                            <div class="fw-bold text-end" style="font-size: 14px;" th:text="${#numbers.formatDecimal(item.gia * item.soLuong, 0, 'COMMA', 0, 'POINT') + 'đ'}">169.000đ</div>
+                        </div>
+
+                    </div>
+
+                    <!-- Mã giảm giá -->
+                    <div class="input-group mb-3">
+<!--                        <input type="text" class="form-control" placeholder="Nhập mã giảm giá...">-->
+                        <select name="maGiamGia" class="form-control">
+                            <option value="" selected>-- Chọn mã giảm giá --</option>
+                            <th:block th:each="gg : ${giamgia}">
+                                <option th:value="${gg.id}" th:text="${gg.maGiamGia}"></option>
+                            </th:block>
+                        </select>
+                        <button class="btn btn-outline-dark fw-bold" type="button" style="font-size: 13px;">Áp Dụng</button>
+                    </div>
+
+                    <hr class="text-muted">
+
+                    <!-- Các khoản tính tiền -->
+                    <div class="d-flex justify-content-between mb-2" style="font-size: 14px;">
+                        <span class="text-muted">Tạm tính</span>
+                        <span class="fw-semibold">338.000đ</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2" style="font-size: 14px;">
+                        <span class="text-muted">Phí vận chuyển</span>
+                        <span class="fw-semibold text-success">Miễn phí (Đơn từ 399k)</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3" style="font-size: 14px;">
+                        <span class="text-muted">Giảm giá voucher</span>
+                        <span class="fw-semibold text-danger">-0đ</span>
+                    </div>
+
+                    <hr class="text-muted">
+
+                    <div class="d-flex justify-content-between mb-4 align-items-center">
+                        <span class="fw-bold fs-6 text-uppercase">Tổng thanh toán</span>
+                        <span class="fw-extrabold fs-4 text-danger" style="font-weight: 800;">338.000đ</span>
+                    </div>
+
+                    <!-- Nút bấm Đặt Hàng -->
+                    <button type="submit" class="btn-order">
+                        <i class="bi bi-shield-check me-1"></i> HOÀN TẤT ĐẶT HÀNG
+                    </button>
+
+                    <p class="text-center text-muted mt-3 mb-0" style="font-size: 12px;">
+                        Bằng cách đặt hàng, bạn đồng ý với <a href="#" class="text-decoration-none">Điều khoản dịch vụ</a> của Luôn Vui Tươi Shop.
+                    </p>
+
+                </div>
+            </div>
+
+        </div>
+    </form>
+</main>
+
+<!-- Bootstrap JS Bundle -->
+<script>
+    function dienThongTinKhachHang(selectElement) {
+        // Lấy option đang được chọn
+        var selectedOption = selectElement.options[selectElement.selectedIndex];
+
+        // Lấy dữ liệu từ các thuộc tính th:data-* đã gán ở thẻ option
+        var sdt = selectedOption.getAttribute('data-soDienThoai');
+        var email = selectedOption.getAttribute('data-email');
+
+        // Tự động in/điền dữ liệu vào các ô input tương ứng
+        document.getElementById('inputSoDienThoai').value = sdt ? sdt : '';
+        document.getElementById('inputEmail').value = email ? email : '';
+    }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

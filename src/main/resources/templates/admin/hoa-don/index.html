@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head th:replace="~{admin/layout :: admin_head('Quản lý hóa đơn')}"></head>
+<body><div class="container-fluid"><div class="row"><aside th:replace="~{admin/layout :: admin_sidebar('orders')}"></aside>
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4"><div class="d-flex justify-content-between align-items-center mb-4"><div><h3 class="fw-bold">Quản lý hóa đơn</h3><p class="text-secondary mb-0">Danh sách hóa đơn online và bán hàng tại quầy</p></div><a class="btn btn-danger" th:href="@{/admin/ban-hang}"><i class="bi bi-shop"></i> Mở POS</a></div>
+<div class="card card-custom p-3"><div class="table-responsive"><table class="table table-hover align-middle"><thead><tr><th>Mã hóa đơn</th><th>Khách hàng</th><th>Nhân viên</th><th>Hình thức</th><th>Thanh toán</th><th>Tổng tiền</th><th>Trạng thái</th><th>Ngày tạo</th><th></th></tr></thead><tbody>
+<tr th:each="hd:${hoaDonList}"><td class="fw-semibold" th:text="${hd.maHoaDon}"></td><td th:text="${hd.khachHang != null ? hd.khachHang.hoTen : 'Khách lẻ'}"></td><td th:text="${hd.nhanVien != null ? hd.nhanVien.hoVaTen : '-'}"></td><td><span class="badge" th:classappend="${hd.hinhThucMuaHang} ? 'bg-primary' : 'bg-secondary'" th:text="${hd.hinhThucMuaHang} ? 'Tại quầy' : 'Online'"></span></td><td th:text="${hd.phuongThucThanhToan} ? 'Chuyển khoản' : 'Tiền mặt/COD'"></td><td class="fw-bold" th:text="${#numbers.formatDecimal(hd.tongTien,0,'COMMA',0,'POINT')} + ' đ'"></td><td th:text="${hd.trangThai}"></td><td th:text="${#temporals.format(hd.ngayTao,'dd/MM/yyyy HH:mm')}"></td><td><a class="btn btn-sm btn-outline-primary" th:href="@{/admin/hoa-don/{id}(id=${hd.id})}">Chi tiết</a></td></tr>
+<tr th:if="${#lists.isEmpty(hoaDonList)}"><td colspan="9" class="text-center text-muted py-4">Chưa có hóa đơn</td></tr>
+</tbody></table></div></div></main></div></div></body></html>
