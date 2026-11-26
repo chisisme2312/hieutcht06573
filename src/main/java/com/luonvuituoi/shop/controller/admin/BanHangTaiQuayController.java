@@ -35,30 +35,26 @@ public class BanHangTaiQuayController {
     @Value("${pos.qr.account-name:}") private String accountName;
 
     @GetMapping
-    public String index(@RequestParam(required = false) Integer hoaDonId, HttpSession session, Model model) {
+    public String index(@RequestParam(required = false) Integer hoaDonId, HttpSession session, Model model, RedirectAttributes ra) {
         AuthUser auth = (AuthUser) session.getAttribute(AuthServiceImpl.SESSION_USER_KEY);
-
-        // Phân quyền hóa đơn chờ: Nhân viên chỉ xem hóa đơn của mình, Admin xem tất cả
-        List<HoaDon> hoaDonCho;
-        if (auth != null && auth.isStaff() && !auth.isAdmin()) {
-            hoaDonCho = hoaDonRepository.findByHinhThucMuaHangTrueOrderByNgayTaoDesc().stream()
-                    .filter(h -> BanHangService.CHO_THANH_TOAN.equals(h.getTrangThai()))
-                    .filter(h -> h.getNhanVien() != null && h.getNhanVien().getId().equals(auth.getId()))
-                    .toList();
-        } else {
-            hoaDonCho = hoaDonRepository.findByHinhThucMuaHangTrueOrderByNgayTaoDesc().stream()
-                    .filter(h -> BanHangService.CHO_THANH_TOAN.equals(h.getTrangThai()))
-                    .toList();
+        if (auth == null || !auth.isNhanVien()) {
+            ra.addFlashAttribute("errorMsg", "Vui lòng đăng nhập tài khoản nhân viên để truy cập Bán hàng tại quầy!");
+            return "redirect:/login?redirect=/admin/ban-hang";
         }
+
+        // Mỗi tài khoản chỉ quản lý hóa đơn của chính mình, tuyệt đối không chung đụng
+        final Integer currentNvId = auth.getId();
+        List<HoaDon> hoaDonCho = hoaDonRepository.findByHinhThucMuaHangTrueOrderByNgayTaoDesc().stream()
+                .filter(h -> BanHangService.CHO_THANH_TOAN.equals(h.getTrangThai()))
+                .filter(h -> h.getNhanVien() != null && h.getNhanVien().getId().equals(currentNvId))
+                .toList();
 
         HoaDon selected = null;
         if (hoaDonId != null) {
             selected = hoaDonRepository.findById(hoaDonId).orElse(null);
-            // Nhân viên thường không được xem hóa đơn chờ của nhân viên khác
-            if (selected != null && auth != null && auth.isStaff() && !auth.isAdmin()) {
-                if (selected.getNhanVien() != null && !selected.getNhanVien().getId().equals(auth.getId())) {
-                    selected = null;
-                }
+            // Chỉ xem được hóa đơn của chính tài khoản mình
+            if (selected != null && (selected.getNhanVien() == null || !selected.getNhanVien().getId().equals(currentNvId))) {
+                selected = null;
             }
         }
         if (selected != null && (!Boolean.TRUE.equals(selected.getHinhThucMuaHang()) || !BanHangService.CHO_THANH_TOAN.equals(selected.getTrangThai()))) selected = null;
@@ -70,23 +66,33 @@ public class BanHangTaiQuayController {
         model.addAttribute("khachHangList", khachHangRepository.findAll());
         model.addAttribute("nhanVienList", nhanVienRepository.findByTrangThaiTrue());
         model.addAttribute("voucherList", giamGiaRepository.findByTrangThaiTrue());
+        model.addAttribute("currentUser", auth);
         return "admin/ban-hang/index";
     }
 
     @PostMapping("/tao-hoa-don")
     public String taoHoaDon(HttpSession session, RedirectAttributes ra) {
+        AuthUser auth = (AuthUser) session.getAttribute(AuthServiceImpl.SESSION_USER_KEY);
+        if (auth == null || !auth.isNhanVien()) {
+            ra.addFlashAttribute("errorMsg", "Vui lòng đăng nhập!");
+            return "redirect:/login?redirect=/admin/ban-hang";
+        }
+
+        // Kiểm tra nguyên tắc: Mỗi tài khoản chỉ có tối đa 1 hóa đơn chờ tại quầy
+        final Integer currentNvId = auth.getId();
+        List<HoaDon> existingCho = hoaDonRepository.findByHinhThucMuaHangTrueOrderByNgayTaoDesc().stream()
+                .filter(h -> BanHangService.CHO_THANH_TOAN.equals(h.getTrangThai()))
+                .filter(h -> h.getNhanVien() != null && h.getNhanVien().getId().equals(currentNvId))
+                .toList();
+
+        if (!existingCho.isEmpty()) {
+            HoaDon hdTonTai = existingCho.get(0);
+            ra.addFlashAttribute("error", "Mỗi tài khoản chỉ được mở 1 hóa đơn chờ tại quầy! Bạn đang có hóa đơn [" + hdTonTai.getMaHoaDon() + "], vui lòng hoàn tất hoặc hủy trước khi tạo mới.");
+            return "redirect:/admin/ban-hang?hoaDonId=" + hdTonTai.getId();
+        }
+
         try {
-            Integer nvId = null;
-            AuthUser auth = (AuthUser) session.getAttribute(AuthServiceImpl.SESSION_USER_KEY);
-            if (auth != null && auth.isNhanVien()) {
-                nvId = auth.getId();
-            } else {
-                var activeNvs = nhanVienRepository.findByTrangThaiTrue();
-                if (!activeNvs.isEmpty()) {
-                    nvId = activeNvs.get(0).getId();
-                }
-            }
-            HoaDon hd = banHangService.taoHoaDon(nvId);
+            HoaDon hd = banHangService.taoHoaDon(currentNvId);
             ra.addFlashAttribute("success", "Đã tạo hóa đơn mới: " + hd.getMaHoaDon());
             return "redirect:/admin/ban-hang?hoaDonId=" + hd.getId();
         } catch (RuntimeException e) {
@@ -198,12 +204,12 @@ public class BanHangTaiQuayController {
     }
 
     private boolean kiemTraQuyenHoaDon(Integer hoaDonId, AuthUser auth) {
-        if (auth == null) return false;
-        if (auth.isAdmin()) return true;
+        if (auth == null || auth.getId() == null) return false;
         var hdOpt = hoaDonRepository.findById(hoaDonId);
         if (hdOpt.isEmpty()) return false;
         HoaDon hd = hdOpt.get();
-        return hd.getNhanVien() == null || hd.getNhanVien().getId().equals(auth.getId());
+        // Mỗi tài khoản chỉ quản lý hóa đơn của chính mình, tuyệt đối không chung đụng
+        return hd.getNhanVien() != null && hd.getNhanVien().getId().equals(auth.getId());
     }
 
     private String xuLy(Integer id, HttpSession session, RedirectAttributes ra, Runnable action) {

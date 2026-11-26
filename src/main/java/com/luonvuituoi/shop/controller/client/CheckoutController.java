@@ -50,57 +50,46 @@ public class CheckoutController {
     private final SanPhamChiTietRepository sanPhamChiTietRepository;
     private final Dcrepository dcrepository;
 
-    // 1. Giao diện Thanh toán phong cách Shopee (1 khối Địa chỉ duy nhất, có nút Thay đổi)
+    // 1. Giao diện Thanh toán phong cách Shopee (BẮT BUỘC ĐĂNG NHẬP MỚI ĐƯỢC MUA HÀNG)
     @GetMapping({"/dat-hang", "/checkout"})
     public String trangThanhToan(HttpSession session, Model model, RedirectAttributes ra) {
+        // Kiểm tra bắt buộc đăng nhập
+        AuthUser currentUser = (AuthUser) session.getAttribute(AuthServiceImpl.SESSION_USER_KEY);
+        if (currentUser == null) {
+            ra.addFlashAttribute("errorMsg", "Vui lòng đăng nhập tài khoản để mua hàng và thanh toán!");
+            return "redirect:/login?redirect=/checkout";
+        }
+
         CartDto cart = gioHangService.getGioHang(session);
         if (cart == null || cart.getItems().isEmpty()) {
             ra.addFlashAttribute("thongBaoLoi", "Giỏ hàng của bạn đang trống! Vui lòng chọn sản phẩm trước khi thanh toán.");
             return "redirect:/gio-hang";
         }
 
-        AuthUser currentUser = (AuthUser) session.getAttribute(AuthServiceImpl.SESSION_USER_KEY);
         model.addAttribute("cart", cart);
         model.addAttribute("currentUser", currentUser);
         model.addAttribute("voucherList", giamGiaRepository.findByTrangThaiTrue());
 
-        // Lấy thông tin họ tên, SĐT và địa chỉ giao hàng chuẩn Shopee
-        String hoTen = "";
-        String soDienThoai = "";
-        String email = "";
+        // Lấy thông tin thật của khách hàng đã đăng nhập
+        String hoTen = currentUser.getHoTen() != null ? currentUser.getHoTen() : "";
+        String soDienThoai = currentUser.getSoDienThoai() != null ? currentUser.getSoDienThoai() : "";
+        String email = currentUser.getEmail() != null ? currentUser.getEmail() : "";
         String diaChi = "";
         DiaChi currentDiaChi = null;
 
-        if (currentUser != null && currentUser.isCustomer()) {
-            hoTen = currentUser.getHoTen() != null ? currentUser.getHoTen() : "";
-            soDienThoai = currentUser.getSoDienThoai() != null ? currentUser.getSoDienThoai() : "";
-            email = currentUser.getEmail() != null ? currentUser.getEmail() : "";
+        KhachHang kh = khachHangRepository.findById(currentUser.getId()).orElse(null);
+        if (kh != null) {
+            if (kh.getHoTen() != null && !kh.getHoTen().isBlank()) hoTen = kh.getHoTen();
+            if (kh.getSoDienThoai() != null && !kh.getSoDienThoai().isBlank()) soDienThoai = kh.getSoDienThoai();
+            if (kh.getEmail() != null && !kh.getEmail().isBlank()) email = kh.getEmail();
 
             // Tìm địa chỉ mặc định trong bảng dia_chi
-            currentDiaChi = dcrepository.findFirstByKhachHangIdAndMacDinhTrue(currentUser.getId())
-                    .or(() -> dcrepository.findFirstByKhachHangIdOrderByIdDesc(currentUser.getId()))
+            currentDiaChi = dcrepository.findFirstByKhachHangIdAndMacDinhTrue(kh.getId())
+                    .or(() -> dcrepository.findFirstByKhachHangIdOrderByIdDesc(kh.getId()))
                     .orElse(null);
 
             if (currentDiaChi != null) {
                 diaChi = currentDiaChi.getDiaChiDayDu();
-            } else {
-                // Nếu chưa có địa chỉ, khởi tạo địa chỉ mặc định từ thông tin khách
-                diaChi = "Số 123 Đường Cầu Giấy, Phường Quan Hoa, Quận Cầu Giấy, Hà Nội";
-            }
-        } else {
-            // Khách chưa đăng nhập: Kiểm tra xem đã lưu tạm vào session chưa
-            String sessionHoTen = (String) session.getAttribute("GUEST_HOTEN");
-            String sessionSdt = (String) session.getAttribute("GUEST_SDT");
-            String sessionDc = (String) session.getAttribute("GUEST_DIACHI");
-
-            if (sessionHoTen != null && !sessionHoTen.isBlank()) {
-                hoTen = sessionHoTen;
-                soDienThoai = sessionSdt != null ? sessionSdt : "";
-                diaChi = sessionDc != null ? sessionDc : "";
-            } else {
-                hoTen = "Khách Hàng";
-                soDienThoai = "0989888888";
-                diaChi = "Số 123 Đường Cầu Giấy, Phường Quan Hoa, Quận Cầu Giấy, Hà Nội";
             }
         }
 
@@ -135,59 +124,50 @@ public class CheckoutController {
         String diaChiTrim = diaChi.trim();
 
         AuthUser currentUser = (AuthUser) session.getAttribute(AuthServiceImpl.SESSION_USER_KEY);
-        if (currentUser != null && currentUser.isCustomer()) {
-            KhachHang kh = khachHangRepository.findById(currentUser.getId()).orElse(null);
-            if (kh != null) {
-                kh.setHoTen(hoTenTrim);
-                kh.setSoDienThoai(sdtTrim);
-                if (email != null && !email.isBlank()) kh.setEmail(email.trim());
-                khachHangRepository.save(kh);
-
-                // Cập nhật lại session AuthUser
-                currentUser.setHoTen(hoTenTrim);
-                currentUser.setSoDienThoai(sdtTrim);
-                if (email != null && !email.isBlank()) currentUser.setEmail(email.trim());
-                session.setAttribute(AuthServiceImpl.SESSION_USER_KEY, currentUser);
-
-                // Cập nhật bảng dia_chi
-                DiaChi dc = dcrepository.findFirstByKhachHangIdAndMacDinhTrue(kh.getId())
-                        .or(() -> dcrepository.findFirstByKhachHangIdOrderByIdDesc(kh.getId()))
-                        .orElse(null);
-
-                if (dc == null) {
-                    dc = new DiaChi();
-                    dc.setKhachHang(kh);
-                    dc.setMacDinh(true);
-                }
-
-                dc.setDuong(diaChiTrim);
-                if (xaPhuong != null && !xaPhuong.isBlank()) dc.setXaPhuong(xaPhuong.trim());
-                if (quanHuyen != null && !quanHuyen.isBlank()) dc.setQuanHuyen(quanHuyen.trim());
-                if (tinhThanhPho != null && !tinhThanhPho.isBlank()) dc.setTinhThanhPho(tinhThanhPho.trim());
-                dcrepository.save(dc);
-
-                Map<String, Object> resp = new HashMap<>();
-                resp.put("success", true);
-                resp.put("hoTen", hoTenTrim);
-                resp.put("soDienThoai", sdtTrim);
-                resp.put("diaChi", dc.getDiaChiDayDu());
-                resp.put("message", "Đã cập nhật địa chỉ nhận hàng thành công!");
-                return ResponseEntity.ok(resp);
-            }
+        if (currentUser == null) {
+            return ResponseEntity.status(401).body(Map.of("success", false, "message", "Vui lòng đăng nhập tài khoản để thực hiện!"));
         }
 
-        // Lưu tạm vào session đối với khách vãng lai
-        session.setAttribute("GUEST_HOTEN", hoTenTrim);
-        session.setAttribute("GUEST_SDT", sdtTrim);
-        session.setAttribute("GUEST_DIACHI", diaChiTrim);
+        KhachHang kh = khachHangRepository.findById(currentUser.getId()).orElse(null);
+        if (kh != null) {
+            kh.setHoTen(hoTenTrim);
+            kh.setSoDienThoai(sdtTrim);
+            if (email != null && !email.isBlank()) kh.setEmail(email.trim());
+            khachHangRepository.save(kh);
 
-        Map<String, Object> resp = new HashMap<>();
-        resp.put("success", true);
-        resp.put("hoTen", hoTenTrim);
-        resp.put("soDienThoai", sdtTrim);
-        resp.put("diaChi", diaChiTrim);
-        resp.put("message", "Đã cập nhật thông tin nhận hàng!");
-        return ResponseEntity.ok(resp);
+            // Cập nhật lại session AuthUser
+            currentUser.setHoTen(hoTenTrim);
+            currentUser.setSoDienThoai(sdtTrim);
+            if (email != null && !email.isBlank()) currentUser.setEmail(email.trim());
+            session.setAttribute(AuthServiceImpl.SESSION_USER_KEY, currentUser);
+
+            // Cập nhật bảng dia_chi
+            DiaChi dc = dcrepository.findFirstByKhachHangIdAndMacDinhTrue(kh.getId())
+                    .or(() -> dcrepository.findFirstByKhachHangIdOrderByIdDesc(kh.getId()))
+                    .orElse(null);
+
+            if (dc == null) {
+                dc = new DiaChi();
+                dc.setKhachHang(kh);
+                dc.setMacDinh(true);
+            }
+
+            dc.setDuong(diaChiTrim);
+            if (xaPhuong != null && !xaPhuong.isBlank()) dc.setXaPhuong(xaPhuong.trim());
+            if (quanHuyen != null && !quanHuyen.isBlank()) dc.setQuanHuyen(quanHuyen.trim());
+            if (tinhThanhPho != null && !tinhThanhPho.isBlank()) dc.setTinhThanhPho(tinhThanhPho.trim());
+            dcrepository.save(dc);
+
+            Map<String, Object> resp = new HashMap<>();
+            resp.put("success", true);
+            resp.put("hoTen", hoTenTrim);
+            resp.put("soDienThoai", sdtTrim);
+            resp.put("diaChi", dc.getDiaChiDayDu());
+            resp.put("message", "Đã cập nhật địa chỉ nhận hàng thành công!");
+            return ResponseEntity.ok(resp);
+        }
+
+        return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Không tìm thấy khách hàng!"));
     }
 
     // 2. Xử lý Đặt hàng Online (Trừ tồn kho nguyên tử, Chống bán trùng khi đông khách, Lưu hóa đơn & Chi tiết)
@@ -204,15 +184,22 @@ public class CheckoutController {
             HttpSession session,
             RedirectAttributes ra) {
 
+        // Bắt buộc đăng nhập
+        AuthUser currentUser = (AuthUser) session.getAttribute(AuthServiceImpl.SESSION_USER_KEY);
+        if (currentUser == null) {
+            ra.addFlashAttribute("errorMsg", "Vui lòng đăng nhập tài khoản để đặt hàng!");
+            return "redirect:/login?redirect=/checkout";
+        }
+
         CartDto cart = gioHangService.getGioHang(session);
         if (cart == null || cart.getItems().isEmpty()) {
             ra.addFlashAttribute("thongBaoLoi", "Giỏ hàng trống! Không thể hoàn tất đặt hàng.");
             return "redirect:/gio-hang";
         }
 
-        if (hoTen == null || hoTen.trim().isEmpty() || soDienThoai == null || soDienThoai.trim().isEmpty() || diaChi == null || diaChi.trim().isEmpty()) {
-            ra.addFlashAttribute("thongBaoLoi", "Vui lòng nhập đầy đủ: Tên người nhận, Số điện thoại và Địa chỉ nhận hàng!");
-            return "redirect:/dat-hang";
+        if (hoTen == null || hoTen.trim().isEmpty() || soDienThoai == null || soDienThoai.trim().isEmpty() || diaChi == null || diaChi.trim().isEmpty() || diaChi.contains("Chưa thiết lập")) {
+            ra.addFlashAttribute("thongBaoLoi", "Bạn chưa có địa chỉ nhận hàng hợp lệ! Vui lòng bấm 'Thay Đổi' để nhập địa chỉ giao hàng.");
+            return "redirect:/checkout";
         }
 
         // BƯỚC 1: Kiểm tra và trừ tồn kho nguyên tử (Atomic deduction) cho tất cả sản phẩm
@@ -231,38 +218,27 @@ public class CheckoutController {
             sanPhamChiTietRepository.capNhatHetHang(item.getSanPhamChiTietId());
         }
 
-        // BƯỚC 2: Xác định hoặc tạo Khách hàng
-        AuthUser currentUser = (AuthUser) session.getAttribute(AuthServiceImpl.SESSION_USER_KEY);
-        KhachHang khachHang = null;
-        if (currentUser != null && currentUser.isCustomer()) {
-            khachHang = khachHangRepository.findById(currentUser.getId()).orElse(null);
-        }
+        // BƯỚC 2: Khách hàng đã đăng nhập
+        KhachHang khachHang = khachHangRepository.findById(currentUser.getId()).orElse(null);
         if (khachHang == null) {
-            String sdtTrim = soDienThoai.trim();
-            khachHang = khachHangRepository.findBySoDienThoai(sdtTrim).orElse(null);
-            if (khachHang == null) {
-                khachHang = new KhachHang();
-                khachHang.setMaKhachHang("KH" + System.currentTimeMillis() % 1000000);
-                khachHang.setHoTen(hoTen.trim());
-                khachHang.setSoDienThoai(sdtTrim);
-                khachHang.setEmail(email != null && !email.isBlank() ? email.trim() : null);
-                khachHang.setTrangThai(true);
-                khachHang.setNgayTao(LocalDateTime.now());
-                khachHang = khachHangRepository.save(khachHang);
-            }
+            ra.addFlashAttribute("errorMsg", "Không tìm thấy thông tin tài khoản khách hàng!");
+            return "redirect:/login";
         }
 
+        khachHang.setHoTen(hoTen.trim());
+        khachHang.setSoDienThoai(soDienThoai.trim());
+        if (email != null && !email.isBlank()) khachHang.setEmail(email.trim());
+        khachHangRepository.save(khachHang);
+
         // Lưu / Cập nhật địa chỉ nhận hàng vào sổ địa chỉ nếu chưa có
-        if (khachHang != null && khachHang.getId() != null) {
-            final KhachHang khRef = khachHang;
-            dcrepository.findFirstByKhachHangId(khRef.getId()).orElseGet(() -> {
-                DiaChi newDc = new DiaChi();
-                newDc.setKhachHang(khRef);
-                newDc.setDuong(diaChi.trim());
-                newDc.setMacDinh(true);
-                return dcrepository.save(newDc);
-            });
-        }
+        final KhachHang khRef = khachHang;
+        dcrepository.findFirstByKhachHangId(khRef.getId()).orElseGet(() -> {
+            DiaChi newDc = new DiaChi();
+            newDc.setKhachHang(khRef);
+            newDc.setDuong(diaChi.trim());
+            newDc.setMacDinh(true);
+            return dcrepository.save(newDc);
+        });
 
         // BƯỚC 3: Tính toán Voucher giảm giá
         BigDecimal tamTinh = cart.getTamTinh();

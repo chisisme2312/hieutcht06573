@@ -230,7 +230,8 @@
                             <span class="ms-1" id="displaySoDienThoai" th:text="${defaultSoDienThoai}">(+84) 0989xxxxxx</span>
                         </span>
                         <span class="text-secondary mx-2">•</span>
-                        <span class="text-dark me-2" id="displayDiaChi" th:text="${defaultDiaChi}">Số 123 Đường Cầu Giấy, Phường Quan Hoa, Quận Cầu Giấy, Hà Nội</span>
+                        <span th:if="${defaultDiaChi != null and !defaultDiaChi.isEmpty()}" class="text-dark me-2" id="displayDiaChi" th:text="${defaultDiaChi}">Số 123 Đường Cầu Giấy, Phường Quan Hoa, Quận Cầu Giấy, Hà Nội</span>
+                        <span th:unless="${defaultDiaChi != null and !defaultDiaChi.isEmpty()}" class="text-danger fw-semibold fst-italic me-2" id="displayDiaChi">Chưa thiết lập địa chỉ nhận hàng (Bấm "Thay Đổi" để cập nhật)</span>
                         <span class="badge-shopee-default">Mặc Định</span>
                     </div>
                     <div>
@@ -531,6 +532,18 @@
         alertEl.classList.add('d-none');
         alertEl.classList.remove('show');
     }
+
+    // Kiểm tra chặn submit nếu chưa có địa chỉ nhận hàng
+    document.getElementById('checkoutForm').addEventListener('submit', function(e) {
+        const diaChiVal = document.getElementById('inputDiaChi').value.trim();
+        if (!diaChiVal || diaChiVal.includes('Chưa thiết lập')) {
+            e.preventDefault();
+            alert('Bạn chưa thiết lập địa chỉ nhận hàng! Vui lòng bấm nút "Thay Đổi" để nhập địa chỉ giao hàng trước khi đặt.');
+            const modalEl = document.getElementById('modalThayDoiDiaChi');
+            const modalInstance = new bootstrap.Modal(modalEl);
+            modalInstance.show();
+        }
+    });
 </script>
 <!-- Bootstrap 5 Bundle JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

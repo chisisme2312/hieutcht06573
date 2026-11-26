@@ -24,21 +24,35 @@
 
                 <form th:action="@{/admin/ban-hang/tao-hoa-don}"
                       method="post"
-                      class="d-flex gap-2">
-                    <button type="submit" class="btn btn-danger text-nowrap fw-bold shadow-sm px-3">
+                      class="d-flex align-items-center gap-2">
+                    <span th:if="${!#lists.isEmpty(hoaDonCho)}" class="badge bg-warning-subtle text-dark border border-warning-subtle py-2 px-3 fw-semibold">
+                        <i class="bi bi-info-circle me-1"></i> Đang mở 1 hóa đơn (Mỗi tài khoản chỉ 1 hóa đơn)
+                    </span>
+                    <button type="submit" class="btn btn-danger text-nowrap fw-bold shadow-sm px-3"
+                            th:disabled="${!#lists.isEmpty(hoaDonCho)}"
+                            th:title="${!#lists.isEmpty(hoaDonCho) ? 'Bạn đang có 1 hóa đơn chờ! Vui lòng hoàn tất hoặc hủy trước khi tạo mới.' : 'Tạo hóa đơn chờ mới'}">
                         <i class="bi bi-plus-circle me-1"></i> + Tạo Hóa Đơn Mới
                     </button>
                 </form>
             </div>
 
             <!-- THÔNG BÁO -->
-            <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
-            <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i> <span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i> <span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
 
-            <!-- DANH SÁCH HÓA ĐƠN -->
+            <!-- DANH SÁCH HÓA ĐƠN RIÊNG BIỆT CỦA TÀI KHOẢN -->
             <div class="card shadow-sm mb-4">
-                <div class="card-header bg-white">
-                    <h5 class="fw-bold mb-0">Hóa đơn đang chờ thanh toán</h5>
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold mb-0">
+                        <i class="bi bi-person-badge text-danger me-2"></i> Hóa đơn chờ của bạn (<span th:text="${currentUser != null ? currentUser.hoTen : 'Nhân viên'}"></span>)
+                    </h5>
+                    <span class="badge bg-danger text-white">Độc lập - Không chung đụng</span>
                 </div>
 
                 <div class="card-body">
