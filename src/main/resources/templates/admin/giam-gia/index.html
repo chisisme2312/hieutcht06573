@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head th:replace="~{admin/layout :: admin_head('Quản Lý Mã Giảm Giá - Luôn Vui Tươi Shop')}">
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <aside th:replace="~{admin/layout :: admin_sidebar('vouchers')}"></aside>
+
+        <!-- Main Content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+            <div th:replace="~{admin/layout :: admin_topbar('Quản Lý Mã Giảm Giá')}"></div>
+
+            <div class="d-flex flex-wrap justify-content-between align-items-center pb-3 mb-4 border-bottom">
+                <div>
+                    <h3 class="fw-bold text-dark mb-1">🎟️ Quản Lý Mã Giảm Giá (Vouchers)</h3>
+                    <p class="text-secondary mb-0 small">Thiết lập các chương trình khuyến mại, mã giảm giá cho khách mua hàng</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="/admin/giam-gia/them-moi" class="btn btn-danger fw-bold btn-sm px-3 shadow-sm">
+                        <i class="bi bi-plus-circle me-1"></i> Tạo Mã Mới
+                    </a>
+                </div>
+            </div>
+
+            <!-- Flash messages -->
+            <div th:if="${successMsg}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i> <span th:text="${successMsg}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <div th:if="${errorMsg}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i> <span th:text="${errorMsg}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Thanh tìm kiếm -->
+            <div class="card card-custom p-3 mb-4">
+                <form th:action="@{/admin/giam-gia}" method="GET" class="row g-2 align-items-center">
+                    <div class="col-md-5">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                            <input type="text" name="keyword" class="form-control border-start-0" placeholder="Tìm theo mã hoặc tên voucher..." th:value="${keyword}">
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-dark fw-bold btn-sm px-3">Tìm Kiếm</button>
+                        <a href="/admin/giam-gia" class="btn btn-light border fw-semibold btn-sm ms-1" th:if="${keyword}">Xóa lọc</a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Bảng danh sách mã giảm giá -->
+            <div class="card card-custom overflow-hidden shadow-sm">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                        <tr>
+                            <th style="width: 50px;">STT</th>
+                            <th>Mã Giảm Giá</th>
+                            <th>Tên Chương Trình</th>
+                            <th>Mức Giảm</th>
+                            <th>Điều Kiện Tối Thiểu</th>
+                            <th>Số Lượng Còn</th>
+                            <th>Thời Gian Áp Dụng</th>
+                            <th class="text-center">Trạng Thái</th>
+                            <th class="text-center" style="width: 140px;">Thao Tác</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:if="${#lists.isEmpty(listGiamGia)}">
+                            <td colspan="9" class="text-center py-5 text-muted">
+                                <i class="bi bi-ticket-perforated fs-1 d-block mb-2 text-secondary opacity-50"></i>
+                                Không tìm thấy mã giảm giá nào phù hợp.
+                            </td>
+                        </tr>
+                        <tr th:each="gg, iter : ${listGiamGia}">
+                            <td class="text-muted fw-bold" th:text="${iter.count}">1</td>
+                            <td>
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle fw-bold px-2 py-1 fs-6" th:text="${gg.maGiamGia}">SUMMER2026</span>
+                            </td>
+                            <td>
+                                <div class="fw-bold text-dark" th:text="${gg.tenGiamGia}">Khuyến mại mùa hè</div>
+                                <small class="text-muted" th:text="${gg.moTa}">Ưu đãi đặc biệt</small>
+                            </td>
+                            <td>
+                                <span class="fw-bold text-danger" th:if="${gg.loaiGiamGia == 1}" th:text="${gg.giaTriGiam + '% (Tối đa ' + #numbers.formatDecimal(gg.toiDaGiamGia, 0, 'COMMA', 0, 'POINT') + 'đ)'}"></span>
+                                <span class="fw-bold text-danger" th:unless="${gg.loaiGiamGia == 1}" th:text="${#numbers.formatDecimal(gg.giaTriGiam, 0, 'COMMA', 0, 'POINT') + 'đ'}"></span>
+                            </td>
+                            <td>
+                                <span th:if="${gg.giaTriToiThieu != null and gg.giaTriToiThieu.compareTo(T(java.math.BigDecimal).ZERO) > 0}" th:text="${'Đơn từ ' + #numbers.formatDecimal(gg.giaTriToiThieu, 0, 'COMMA', 0, 'POINT') + 'đ'}"></span>
+                                <span th:unless="${gg.giaTriToiThieu != null and gg.giaTriToiThieu.compareTo(T(java.math.BigDecimal).ZERO) > 0}" class="text-muted">Không giới hạn</span>
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary-subtle text-dark fw-bold px-2 py-1" th:text="${gg.soLuong}">50</span>
+                            </td>
+                            <td style="font-size: 13px;">
+                                <div th:text="${#temporals.format(gg.ngayBatDau, 'dd/MM/yyyy HH:mm')}"></div>
+                                <div class="text-muted" th:text="'đến ' + ${#temporals.format(gg.ngayKetThuc, 'dd/MM/yyyy HH:mm')}"></div>
+                            </td>
+                            <td class="text-center">
+                                <span th:if="${gg.trangThai == true}" class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">Kích hoạt</span>
+                                <span th:unless="${gg.trangThai == true}" class="badge bg-secondary-subtle text-secondary px-2 py-1">Tạm dừng</span>
+                            </td>
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center gap-1">
+                                    <a th:href="@{'/admin/giam-gia/chinh-sua/' + ${gg.id}}" class="btn btn-sm btn-outline-secondary" title="Chỉnh sửa">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form th:action="@{'/admin/giam-gia/doi-trang-thai/' + ${gg.id}}" method="POST" class="d-inline">
+                                        <button type="submit" class="btn btn-sm" th:classappend="${gg.trangThai == true ? 'btn-outline-warning' : 'btn-outline-success'}" th:title="${gg.trangThai == true ? 'Tạm dừng mã' : 'Kích hoạt mã'}">
+                                            <i class="bi" th:classappend="${gg.trangThai == true ? 'bi-pause-circle' : 'bi-play-circle'}"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

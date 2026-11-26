@@ -33,4 +33,22 @@ public class DiaChi {
 
     @Column(name = "mac_dinh")
     private Boolean macDinh;
+
+    public String getDiaChiDayDu() {
+        StringBuilder sb = new StringBuilder();
+        if (duong != null && !duong.isBlank()) sb.append(duong.trim());
+        if (xaPhuong != null && !xaPhuong.isBlank()) {
+            if (sb.length() > 0) sb.append(", ");
+            sb.append(xaPhuong.trim());
+        }
+        if (quanHuyen != null && !quanHuyen.isBlank()) {
+            if (sb.length() > 0) sb.append(", ");
+            sb.append(quanHuyen.trim());
+        }
+        if (tinhThanhPho != null && !tinhThanhPho.isBlank()) {
+            if (sb.length() > 0) sb.append(", ");
+            sb.append(tinhThanhPho.trim());
+        }
+        return sb.toString();
+    }
 }

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head th:replace="~{admin/layout :: admin_head(${isEdit ? 'Chỉnh Sửa Nhân Viên' : 'Thêm Mới Nhân Viên'} + ' - Luôn Vui Tươi Shop')}">
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <aside th:replace="~{admin/layout :: admin_sidebar('staff')}"></aside>
+
+        <!-- Main Content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+            <div th:replace="~{admin/layout :: admin_topbar(${isEdit ? 'Chỉnh Sửa Nhân Viên' : 'Thêm Mới Nhân Viên'})"></div>
+
+            <div class="d-flex flex-wrap justify-content-between align-items-center pb-3 mb-4 border-bottom">
+                <div>
+                    <h3 class="fw-bold text-dark mb-1" th:text="${isEdit ? '✏️ Chỉnh Sửa Nhân Viên' : '➕ Thêm Nhân Viên Mới'}">Thêm Nhân Viên</h3>
+                    <p class="text-secondary mb-0 small">Thiết lập tài khoản đăng nhập, thông tin nhân sự và phân quyền vai trò</p>
+                </div>
+                <a href="/admin/nhan-vien" class="btn btn-outline-secondary fw-semibold btn-sm px-3">
+                    <i class="bi bi-arrow-left me-1"></i> Quay Lại Danh Sách
+                </a>
+            </div>
+
+            <!-- Flash Error -->
+            <div th:if="${errorMsg}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i> <span th:text="${errorMsg}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <div class="card card-custom p-4 shadow-sm" style="max-width: 800px;">
+                <form th:action="@{/admin/nhan-vien/luu}" method="POST">
+                    <input type="hidden" name="id" th:value="${nhanVien.id}">
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Mã Nhân Viên <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control fw-bold" name="maNhanVien" th:value="${nhanVien.maNhanVien}" placeholder="Ví dụ: NV01, NV02" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Họ và Tên Nhân Viên <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="hoVaTen" th:value="${nhanVien.hoVaTen}" placeholder="Ví dụ: Trần Văn Nam" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Tên Đăng Nhập <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="tenDangNhap" th:value="${nhanVien.tenDangNhap}" placeholder="Ví dụ: namtv, nhanvien1" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Mật Khẩu <span th:if="${!isEdit}" class="text-danger">*</span> <small class="text-muted" th:if="${isEdit}">(Để trống nếu không đổi)</small></label>
+                            <input type="password" class="form-control" name="matKhau" placeholder="Nhập mật khẩu" th:required="${!isEdit}">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Phân Quyền / Vai Trò <span class="text-danger">*</span></label>
+                            <select name="idVaiTro" class="form-select" required>
+                                <option value="">-- Chọn vai trò --</option>
+                                <option th:each="vt : ${listVaiTro}" 
+                                        th:value="${vt.id}" 
+                                        th:text="${vt.tenVaiTro + (vt.tenVaiTro == 'ADMIN' ? ' (Toàn quyền quản trị)' : ' (Bán hàng & thu ngân)')}"
+                                        th:selected="${nhanVien.vaiTro != null and nhanVien.vaiTro.id == vt.id}">
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Trạng Thái Làm Việc</label>
+                            <div class="mt-2">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" name="trangThai" value="true" id="checkTrangThai" th:checked="${nhanVien.trangThai == true}">
+                                    <label class="form-check-label fw-semibold" for="checkTrangThai">Đang làm việc (Cho phép đăng nhập)</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Số Điện Thoại</label>
+                            <input type="tel" class="form-control" name="soDienThoai" th:value="${nhanVien.soDienThoai}" placeholder="Ví dụ: 0912xxxxxx">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Email</label>
+                            <input type="email" class="form-control" name="email" th:value="${nhanVien.email}" placeholder="Ví dụ: nhanvien@shop.com">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Giới Tính</label>
+                            <div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="gioiTinh" id="gtNam" value="true" th:checked="${nhanVien.gioiTinh == true}">
+                                    <label class="form-check-label" for="gtNam">Nam</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="gioiTinh" id="gtNu" value="false" th:checked="${nhanVien.gioiTinh == false}">
+                                    <label class="form-check-label" for="gtNu">Nữ</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Ngày Sinh</label>
+                            <input type="date" class="form-control" name="ngaySinh" th:value="${nhanVien.ngaySinh}">
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label small fw-bold">Địa Chỉ Thường Trú</label>
+                            <input type="text" class="form-control" name="diaChi" th:value="${nhanVien.diaChi}" placeholder="Ví dụ: Cầu Giấy, Hà Nội">
+                        </div>
+
+                        <div class="col-12 mt-4 pt-3 border-top d-flex gap-2">
+                            <button type="submit" class="btn btn-danger fw-bold px-4">
+                                <i class="bi bi-save me-1"></i> Lưu Nhân Viên
+                            </button>
+                            <a href="/admin/nhan-vien" class="btn btn-outline-secondary fw-semibold px-3">Hủy Bỏ</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

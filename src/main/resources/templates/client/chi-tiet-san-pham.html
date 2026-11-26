@@ -582,9 +582,17 @@
                     </a>
                 </div>
 
-                <!-- 3. Khi đã đăng nhập là Khách hàng: Tên + Đăng Xuất -->
+                <!-- 3. Khi đã đăng nhập là Khách hàng: Tên + Menu Tài Khoản & Địa Chỉ + Đơn Hàng + Đăng Xuất -->
                 <div th:if="${currentUser != null and !currentUser.isNhanVien()}" class="d-flex align-items-center me-3">
-                    <span class="small fw-semibold me-2 text-secondary">Chào, <b class="text-dark" th:text="${currentUser.hoTen}">Khách</b></span>
+                    <a href="/tai-khoan" class="btn btn-sm btn-outline-danger me-2 fw-semibold d-none d-sm-inline-flex align-items-center gap-1" title="Quản lý tài khoản & địa chỉ">
+                        <i class="bi bi-geo-alt-fill"></i> Địa Chỉ Của Tôi
+                    </a>
+                    <a href="/don-hang-cua-toi" class="btn btn-sm btn-outline-dark me-2 fw-semibold d-none d-md-inline-flex align-items-center gap-1">
+                        <i class="bi bi-receipt"></i> Đơn Hàng
+                    </a>
+                    <a href="/tai-khoan" class="text-decoration-none small fw-semibold me-2 text-secondary" title="Xem hồ sơ">
+                        Chào, <b class="text-dark" th:text="${currentUser.hoTen}">Khách</b>
+                    </a>
                     <a href="/logout" class="action-icon m-0" title="Đăng Xuất">
                         <i class="bi bi-box-arrow-right"></i>
                     </a>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head th:replace="~{admin/layout :: admin_head(${isEdit ? 'Chỉnh Sửa Mã Giảm Giá' : 'Tạo Mã Giảm Giá Mới'} + ' - Luôn Vui Tươi Shop')}">
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <aside th:replace="~{admin/layout :: admin_sidebar('vouchers')}"></aside>
+
+        <!-- Main Content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+            <div th:replace="~{admin/layout :: admin_topbar(${isEdit ? 'Chỉnh Sửa Mã Giảm Giá' : 'Thêm Mới Mã Giảm Giá'})"></div>
+
+            <div class="d-flex flex-wrap justify-content-between align-items-center pb-3 mb-4 border-bottom">
+                <div>
+                    <h3 class="fw-bold text-dark mb-1" th:text="${isEdit ? '✏️ Chỉnh Sửa Mã Giảm Giá' : '➕ Tạo Mã Giảm Giá Mới'}">Tạo Mã Mới</h3>
+                    <p class="text-secondary mb-0 small">Thiết lập các thông số chiết khấu, hạn mức và thời gian hiệu lực</p>
+                </div>
+                <a href="/admin/giam-gia" class="btn btn-outline-secondary fw-semibold btn-sm px-3">
+                    <i class="bi bi-arrow-left me-1"></i> Quay Lại Danh Sách
+                </a>
+            </div>
+
+            <!-- Flash Error -->
+            <div th:if="${errorMsg}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i> <span th:text="${errorMsg}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <div class="card card-custom p-4 shadow-sm" style="max-width: 800px;">
+                <form th:action="@{/admin/giam-gia/luu}" method="POST">
+                    <input type="hidden" name="id" th:value="${giamGia.id}">
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Mã Voucher / Giảm Giá <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control text-uppercase fw-bold text-danger" name="maGiamGia" th:value="${giamGia.maGiamGia}" placeholder="Ví dụ: SALE50K, FREESHIP" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Tên Chương Trình Khuyến Mại <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="tenGiamGia" th:value="${giamGia.tenGiamGia}" placeholder="Ví dụ: Giảm 20% cho đơn đầu tiên" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Loại Giảm Giá <span class="text-danger">*</span></label>
+                            <select name="loaiGiamGia" class="form-select" id="selectLoaiGiamGia" onchange="doiLoaiGiamGia(this)">
+                                <option value="1" th:selected="${giamGia.loaiGiamGia == 1}">Giảm theo phần trăm (%)</option>
+                                <option value="2" th:selected="${giamGia.loaiGiamGia == 2}">Giảm số tiền cố định (VNĐ)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Giá Trị Giảm <span class="text-danger">*</span></label>
+                            <input type="number" step="any" class="form-control" name="giaTriGiam" th:value="${giamGia.giaTriGiam}" placeholder="Ví dụ: 15 (cho 15%) hoặc 50000" required>
+                        </div>
+
+                        <div class="col-md-6" id="boxToiDa">
+                            <label class="form-label small fw-bold">Giảm Tối Đa (VNĐ) <small class="text-muted">(Nếu giảm %)</small></label>
+                            <input type="number" step="any" class="form-control" name="toiDaGiamGia" th:value="${giamGia.toiDaGiamGia}" placeholder="Ví dụ: 100000 (0 nếu không giới hạn)">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Giá Trị Đơn Hàng Tối Thiểu (VNĐ)</label>
+                            <input type="number" step="any" class="form-control" name="giaTriToiThieu" th:value="${giamGia.giaTriToiThieu}" placeholder="Ví dụ: 200000">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Số Lượng Lượt Dùng <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" name="soLuong" th:value="${giamGia.soLuong}" min="1" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Trạng Thái Áp Dụng</label>
+                            <div class="mt-2">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" name="trangThai" value="true" id="checkTrangThai" th:checked="${giamGia.trangThai == true}">
+                                    <label class="form-check-label fw-semibold" for="checkTrangThai">Kích hoạt áp dụng ngay</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Thời Gian Bắt Đầu <span class="text-danger">*</span></label>
+                            <input type="datetime-local" class="form-control" name="ngayBatDau" th:value="${giamGia.ngayBatDau}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Thời Gian Kết Thúc <span class="text-danger">*</span></label>
+                            <input type="datetime-local" class="form-control" name="ngayKetThuc" th:value="${giamGia.ngayKetThuc}" required>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label small fw-bold">Mô Tả Chi Tiết</label>
+                            <textarea class="form-control" name="moTa" rows="3" placeholder="Điều kiện, lưu ý áp dụng của voucher..." th:text="${giamGia.moTa}"></textarea>
+                        </div>
+
+                        <div class="col-12 mt-4 pt-3 border-top d-flex gap-2">
+                            <button type="submit" class="btn btn-danger fw-bold px-4">
+                                <i class="bi bi-save me-1"></i> Lưu Mã Giảm Giá
+                            </button>
+                            <a href="/admin/giam-gia" class="btn btn-outline-secondary fw-semibold px-3">Hủy Bỏ</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+    function doiLoaiGiamGia(sel) {
+        const boxToiDa = document.getElementById('boxToiDa');
+        if (sel.value === '1') {
+            boxToiDa.style.display = 'block';
+        } else {
+            boxToiDa.style.display = 'none';
+        }
+    }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

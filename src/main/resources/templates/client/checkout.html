@@ -16,92 +16,107 @@
     <style>
         :root {
             --primary-black: #000000;
-            --primary-red: #c92921;
-            --text-main: #111111;
-            --text-muted: #777777;
-            --bg-light: #f8f9fa;
+            --primary-red: #ee4d2d;
+            --shopee-red: #ee4d2d;
+            --text-main: #222222;
+            --text-muted: #6b7280;
+            --bg-light: #f5f5f5;
             --border-color: #e5e7eb;
         }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             color: var(--text-main);
-            background-color: #f9fafb;
+            background-color: #f5f5f5;
             margin: 0;
             padding: 0;
         }
 
-        /* Header tối giản riêng cho trang thanh toán */
+        /* Header Shopee-style */
         .checkout-header {
             background: #ffffff;
             border-bottom: 1px solid var(--border-color);
-            padding: 15px 0;
+            padding: 16px 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
         }
 
         .brand-logo {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 800;
             letter-spacing: -0.5px;
-            color: var(--primary-black);
+            color: #000;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
         }
 
         .brand-logo span {
-            color: var(--primary-red);
+            color: var(--shopee-red);
+        }
+
+        .checkout-title-tag {
+            border-left: 2px solid var(--shopee-red);
+            padding-left: 14px;
+            font-size: 19px;
+            font-weight: 700;
+            color: var(--shopee-red);
+        }
+
+        /* Shopee Ribbon (Đường viền sọc đỏ xanh đặc trưng của Shopee) */
+        .shopee-ribbon {
+            height: 3px;
+            width: 100%;
+            background-position-x: -30px;
+            background-size: 116px 3px;
+            background-image: repeating-linear-gradient(45deg, #6fa6d6, #6fa6d6 33px, transparent 0, transparent 41px, #f18d9b 0, #f18d9b 74px, transparent 0, transparent 82px);
         }
 
         /* Card tùy chỉnh */
         .card-custom {
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
+            border: 1px solid rgba(0,0,0,0.06);
+            border-radius: 4px;
             background: #ffffff;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.03);
         }
 
         .section-title {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        /* Form Controls */
-        .form-label {
-            font-weight: 600;
-            font-size: 13px;
-            color: #374151;
-        }
-
-        .form-control, .form-select {
-            border-radius: 6px;
-            padding: 10px 14px;
-            font-size: 14px;
-            border: 1px solid var(--border-color);
-        }
-
-        .form-control:focus, .form-select:focus {
-            border-color: var(--primary-black);
-            box-shadow: none;
+        /* Shopee Default Address Badge */
+        .badge-shopee-default {
+            font-size: 10.5px;
+            font-weight: 700;
+            color: var(--shopee-red);
+            border: 1px solid var(--shopee-red);
+            background-color: #fff;
+            padding: 1px 5px;
+            border-radius: 2px;
+            margin-left: 8px;
+            text-transform: uppercase;
         }
 
         /* Payment Method Options */
         .payment-method-box {
             border: 1px solid var(--border-color);
             border-radius: 6px;
-            padding: 12px 16px;
-            margin-bottom: 10px;
+            padding: 14px 16px;
+            margin-bottom: 12px;
             cursor: pointer;
             transition: all 0.2s;
+            background-color: #ffffff;
         }
 
         .payment-method-box:hover {
-            border-color: #9ca3af;
+            border-color: var(--shopee-red);
+            background-color: #fff9f8;
         }
 
         /* Product mini item in summary */
@@ -137,39 +152,44 @@
             color: var(--text-muted);
         }
 
-        /* Nút Đặt hàng */
+        /* Nút Đặt hàng chuẩn Shopee */
         .btn-order {
             width: 100%;
-            background: var(--primary-black);
+            background: var(--shopee-red);
             color: white;
             font-weight: 700;
-            font-size: 14px;
+            font-size: 15px;
             text-transform: uppercase;
             border: none;
             padding: 14px 0;
-            border-radius: 6px;
-            transition: background 0.2s;
+            border-radius: 4px;
+            transition: opacity 0.2s;
+            box-shadow: 0 2px 6px rgba(238, 77, 45, 0.35);
         }
 
         .btn-order:hover {
-            background: var(--primary-red);
+            opacity: 0.92;
+            color: white;
         }
     </style>
 </head>
 <body>
 
-<!-- Header đơn giản -->
+<!-- Header chuẩn phong cách Shopee -->
 <header class="checkout-header">
     <div class="container d-flex justify-content-between align-items-center">
-        <a href="/" class="brand-logo">
-            LUÔN VUI TƯƠI <span>&nbsp;SHOP</span>
-        </a>
+        <div class="d-flex align-items-center gap-3">
+            <a href="/" class="brand-logo">
+                LUÔN VUI TƯƠI <span>&nbsp;SHOP</span>
+            </a>
+            <div class="checkout-title-tag d-none d-sm-block">Thanh Toán</div>
+        </div>
         <div class="d-flex align-items-center gap-3">
             <a href="/gio-hang" class="btn btn-sm btn-outline-secondary fw-semibold">
-                <i class="bi bi-arrow-left me-1"></i> Quay lại giỏ hàng
+                <i class="bi bi-arrow-left me-1"></i> Trở Lại Giỏ Hàng
             </a>
             <span class="text-muted fw-bold d-none d-md-inline" style="font-size: 13.5px;">
-                <i class="bi bi-shield-lock-fill text-success me-1"></i> Thanh toán an toàn
+                <i class="bi bi-shield-lock-fill text-success me-1"></i> Thanh toán bảo mật
             </span>
         </div>
     </div>
@@ -179,77 +199,91 @@
 <main class="container my-4">
 
     <!-- Thông báo lỗi nếu có -->
-    <div th:if="${thongBaoLoi}" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <div th:if="${thongBaoLoi}" class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
         <i class="bi bi-exclamation-triangle-fill me-2"></i> <span th:text="${thongBaoLoi}"></span>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 
+    <!-- Thông báo AJAX cập nhật thành công -->
+    <div id="ajaxSuccessAlert" class="alert alert-success alert-dismissible fade d-none shadow-sm" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i> <span id="ajaxSuccessMsg">Đã cập nhật địa chỉ nhận hàng thành công!</span>
+        <button type="button" class="btn-close" onclick="dongAlertAjax()"></button>
+    </div>
+
     <form th:action="@{/dat-hang/xac-nhan}" method="POST" id="checkoutForm">
-        <div class="row g-4">
 
-            <!-- CỘT TRÁI: Thông tin người nhận hàng & Phương thức thanh toán -->
-            <div class="col-lg-7">
+        <!-- ============================================================ -->
+        <!-- 1. KHỐI ĐỊA CHỈ NHẬN HÀNG PHONG CÁCH SHOPEE (GỌN GÀNG, 1 DÒNG) -->
+        <!-- ============================================================ -->
+        <div class="card-custom mb-4 overflow-hidden border-0 shadow-sm">
+            <div class="shopee-ribbon"></div>
+            <div class="p-4 bg-white">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="bi bi-geo-alt-fill text-danger fs-5 me-2"></i>
+                    <h6 class="mb-0 fw-bold text-danger text-uppercase" style="letter-spacing: 0.5px; font-size: 15px;">Địa Chỉ Nhận Hàng</h6>
+                </div>
 
-                <!-- 1. Thông tin người nhận -->
-                <div class="card-custom p-4 mb-4">
-                    <div class="section-title">
-                        <i class="bi bi-person-lines-fill text-danger"></i> 1. Thông tin người nhận hàng
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                    <div class="d-flex flex-wrap align-items-center" style="font-size: 14.5px;">
+                        <span class="fw-bold text-dark me-2" id="displayTenSdt">
+                            <span id="displayHoTen" th:text="${defaultHoTen}">Nguyễn Văn A</span>
+                            <span class="ms-1" id="displaySoDienThoai" th:text="${defaultSoDienThoai}">(+84) 0989xxxxxx</span>
+                        </span>
+                        <span class="text-secondary mx-2">•</span>
+                        <span class="text-dark me-2" id="displayDiaChi" th:text="${defaultDiaChi}">Số 123 Đường Cầu Giấy, Phường Quan Hoa, Quận Cầu Giấy, Hà Nội</span>
+                        <span class="badge-shopee-default">Mặc Định</span>
                     </div>
-
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Họ và tên người nhận <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="hoTen" id="inputHoTen" 
-                                   placeholder="Ví dụ: Nguyễn Văn A" 
-                                   th:value="${currentUser != null ? currentUser.hoTen : ''}" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Số điện thoại liên hệ <span class="text-danger">*</span></label>
-                            <input type="tel" class="form-control" id="inputSoDienThoai" name="soDienThoai" 
-                                   placeholder="Ví dụ: 0989xxxxxx" 
-                                   th:value="${currentUser != null ? currentUser.soDienThoai : ''}" required>
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">Email (để nhận mã xác nhận đơn hàng)</label>
-                            <input type="email" class="form-control" id="inputEmail" name="email" 
-                                   placeholder="Ví dụ: email@gmail.com" 
-                                   th:value="${currentUser != null ? currentUser.email : ''}">
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">Địa chỉ nhận hàng chi tiết <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="diaChi" id="inputDiaChi" 
-                                   placeholder="Ví dụ: Số 123 đường Cầu Giấy, phường Quan Hoa, quận Cầu Giấy, Hà Nội" required>
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">Ghi chú giao hàng (Tùy chọn)</label>
-                            <textarea class="form-control" name="ghiChu" rows="2" placeholder="Ví dụ: Giao giờ hành chính, gọi trước khi đến..."></textarea>
-                        </div>
+                    <div>
+                        <button type="button" class="btn btn-outline-danger btn-sm fw-bold px-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalThayDoiDiaChi">
+                            <i class="bi bi-pencil-square me-1"></i> Thay Đổi
+                        </button>
                     </div>
                 </div>
 
+                <!-- Input ẩn truyền dữ liệu vào request submit POST -->
+                <input type="hidden" name="hoTen" id="inputHoTen" th:value="${defaultHoTen}">
+                <input type="hidden" name="soDienThoai" id="inputSoDienThoai" th:value="${defaultSoDienThoai}">
+                <input type="hidden" name="email" id="inputEmail" th:value="${defaultEmail}">
+                <input type="hidden" name="diaChi" id="inputDiaChi" th:value="${defaultDiaChi}">
+            </div>
+        </div>
+
+        <div class="row g-4">
+
+            <!-- CỘT TRÁI: Phương thức thanh toán & Ghi chú -->
+            <div class="col-lg-7">
+
                 <!-- 2. Phương thức thanh toán -->
-                <div class="card-custom p-4">
+                <div class="card-custom p-4 mb-4">
                     <div class="section-title">
-                        <i class="bi bi-credit-card-2-front-fill text-danger"></i> 2. Phương thức thanh toán
+                        <i class="bi bi-credit-card-2-front-fill text-danger"></i> Phương thức thanh toán
                     </div>
 
                     <div class="payment-method-box d-flex align-items-center">
                         <input class="form-check-input me-3" type="radio" name="phuongThucThanhToan" id="cod" value="COD" checked>
                         <label class="payment-label flex-grow-1 mb-0" for="cod">
-                            <div class="fw-bold">Thanh toán khi nhận hàng (COD)</div>
-                            <div class="text-muted" style="font-size: 12px;">Nhận hàng tận nơi, kiểm tra hàng thoải mái trước khi thanh toán</div>
+                            <div class="fw-bold text-dark">Thanh toán khi nhận hàng (COD)</div>
+                            <div class="text-muted" style="font-size: 12px;">Nhận hàng tại nhà, kiểm tra hàng thoải mái trước khi thanh toán</div>
                         </label>
-                        <i class="bi bi-cash-coin fs-4 text-secondary"></i>
+                        <i class="bi bi-cash-coin fs-4 text-success"></i>
                     </div>
 
                     <div class="payment-method-box d-flex align-items-center">
                         <input class="form-check-input me-3" type="radio" name="phuongThucThanhToan" id="banking" value="BANKING">
                         <label class="payment-label flex-grow-1 mb-0" for="banking">
-                            <div class="fw-bold">Chuyển khoản ngân hàng (VietQR Code)</div>
-                            <div class="text-muted" style="font-size: 12px;">Quét mã QR chuyển khoản nhanh 24/7 từ mọi ứng dụng ngân hàng</div>
+                            <div class="fw-bold text-dark">Chuyển khoản trực tiếp (VietQR Code 24/7)</div>
+                            <div class="text-muted" style="font-size: 12px;">Quét mã QR qua mọi ứng dụng ngân hàng hoặc ví điện tử</div>
                         </label>
-                        <i class="bi bi-qr-code-scan fs-4 text-secondary"></i>
+                        <i class="bi bi-qr-code-scan fs-4 text-primary"></i>
                     </div>
+                </div>
+
+                <!-- 3. Lời nhắn / Ghi chú cho Shop -->
+                <div class="card-custom p-4">
+                    <div class="section-title">
+                        <i class="bi bi-chat-left-text text-danger"></i> Lời nhắn cho người bán
+                    </div>
+                    <textarea class="form-control" name="ghiChu" rows="2" placeholder="Lưu ý giao hàng (Ví dụ: Giao giờ hành chính, gọi điện trước khi đến, gửi bảo vệ...)"></textarea>
                 </div>
 
             </div>
@@ -258,12 +292,12 @@
             <div class="col-lg-5">
                 <div class="card-custom p-4 sticky-top" style="top: 20px;">
                     <div class="section-title justify-content-between">
-                        <span><i class="bi bi-bag-check-fill text-danger"></i> Đơn hàng (<span th:text="${cart.tongSoLuong}">0</span> món)</span>
+                        <span><i class="bi bi-bag-check-fill text-danger"></i> Đơn hàng (<span th:text="${cart.tongSoLuong}">0</span> sản phẩm)</span>
                         <a href="/gio-hang" class="text-decoration-none text-danger" style="font-size: 13px; font-weight: 600;">Sửa giỏ hàng</a>
                     </div>
 
                     <!-- Danh sách sản phẩm trong giỏ -->
-                    <div class="product-list mb-3" style="max-height: 280px; overflow-y: auto;">
+                    <div class="product-list mb-3" style="max-height: 260px; overflow-y: auto;">
                         <div class="summary-item" th:each="item : ${cart.items}">
                             <img th:src="${item.anhUrl != null ? item.anhUrl : 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=300'}" alt="Sản phẩm">
                             <div class="flex-grow-1">
@@ -277,9 +311,9 @@
 
                     <!-- Chọn Voucher Giảm Giá -->
                     <div class="mb-3">
-                        <label class="form-label small fw-semibold">Voucher / Mã giảm giá</label>
+                        <label class="form-label small fw-bold text-dark"><i class="bi bi-ticket-perforated-fill text-danger me-1"></i> Voucher Luôn Vui Tươi</label>
                         <select name="maVoucher" class="form-select form-select-sm" id="voucherSelect" onchange="capNhatVoucher(this)">
-                            <option value="">-- Không sử dụng voucher --</option>
+                            <option value="">-- Chọn hoặc nhập mã giảm giá --</option>
                             <th:block th:each="vc : ${voucherList}">
                                 <option th:value="${vc.maGiamGia}" 
                                         th:data-loai="${vc.loaiGiamGia}" 
@@ -296,7 +330,7 @@
 
                     <!-- Các khoản tính tiền -->
                     <div class="d-flex justify-content-between mb-2" style="font-size: 14px;">
-                        <span class="text-muted">Tạm tính:</span>
+                        <span class="text-muted">Tổng tiền hàng:</span>
                         <span class="fw-semibold" id="displayTamTinh" th:text="${#numbers.formatDecimal(cart.tamTinh, 0, 'COMMA', 0, 'POINT')} + 'đ'">338.000đ</span>
                     </div>
                     <div class="d-flex justify-content-between mb-2" style="font-size: 14px;">
@@ -313,16 +347,16 @@
 
                     <div class="d-flex justify-content-between mb-4 align-items-center">
                         <span class="fw-bold fs-6 text-uppercase">Tổng thanh toán:</span>
-                        <span class="fw-extrabold fs-4 text-danger" id="displayTongTien" th:text="${#numbers.formatDecimal(cart.tongTien, 0, 'COMMA', 0, 'POINT')} + 'đ'">338.000đ</span>
+                        <span class="fw-bold fs-4 text-danger" id="displayTongTien" th:text="${#numbers.formatDecimal(cart.tongTien, 0, 'COMMA', 0, 'POINT')} + 'đ'">338.000đ</span>
                     </div>
 
                     <!-- Nút bấm Đặt Hàng -->
-                    <button type="submit" class="btn-order shadow-sm">
-                        <i class="bi bi-shield-check me-1"></i> XÁC NHẬN ĐẶT HÀNG
+                    <button type="submit" class="btn-order">
+                        <i class="bi bi-shield-check me-1"></i> ĐẶT HÀNG NGAY
                     </button>
 
                     <p class="text-center text-muted mt-3 mb-0" style="font-size: 12px;">
-                        Bằng cách đặt hàng, bạn đồng ý với chính sách bán hàng và bảo mật của Luôn Vui Tươi Shop.
+                        Nhấn "Đặt hàng ngay" đồng nghĩa bạn đồng ý tuân theo Điều khoản sử dụng của Luôn Vui Tươi Shop.
                     </p>
 
                 </div>
@@ -331,6 +365,56 @@
         </div>
     </form>
 </main>
+
+<!-- ============================================================ -->
+<!-- MODAL THAY ĐỔI ĐỊA CHỈ NHẬN HÀNG (POPUP PHONG CÁCH SHOPEE) -->
+<!-- ============================================================ -->
+<div class="modal fade" id="modalThayDoiDiaChi" tabindex="-1" aria-labelledby="modalThayDoiDiaChiLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-bottom">
+                <h5 class="modal-title fw-bold text-danger d-flex align-items-center" id="modalThayDoiDiaChiLabel">
+                    <i class="bi bi-geo-alt-fill me-2"></i> Địa Chỉ Nhận Hàng Của Tôi
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <p class="small text-muted mb-3">
+                    <i class="bi bi-info-circle me-1"></i> Tùy chỉnh thông tin người nhận và địa chỉ giao hàng. Hệ thống sẽ tự động cập nhật vào tài khoản của bạn.
+                </p>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold text-dark">Họ và tên người nhận <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="modalInputHoTen" th:value="${defaultHoTen}" placeholder="Ví dụ: Nguyễn Văn A" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold text-dark">Số điện thoại liên hệ <span class="text-danger">*</span></label>
+                        <input type="tel" class="form-control" id="modalInputSoDienThoai" th:value="${defaultSoDienThoai}" placeholder="Ví dụ: 0989xxxxxx" required>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label small fw-bold text-dark">Email (nhận thông báo đơn hàng)</label>
+                        <input type="email" class="form-control" id="modalInputEmail" th:value="${defaultEmail}" placeholder="Ví dụ: email@gmail.com">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label small fw-bold text-dark">Địa chỉ nhận hàng chi tiết <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="modalInputDiaChi" th:value="${defaultDiaChi}" placeholder="Số nhà, tên tòa nhà, tên ngõ/đường, Phường/Xã, Quận/Huyện, Tỉnh/TP" required>
+                    </div>
+                </div>
+
+                <div class="mt-3 p-2 bg-light rounded text-muted small">
+                    <i class="bi bi-shield-check text-success me-1"></i> Địa chỉ này sẽ được đặt làm địa chỉ mặc định cho các đơn hàng tiếp theo.
+                </div>
+            </div>
+            <div class="modal-footer border-top bg-light">
+                <button type="button" class="btn btn-outline-secondary fw-semibold btn-sm px-3" data-bs-dismiss="modal">Trở Lại</button>
+                <button type="button" class="btn btn-danger fw-bold btn-sm px-4 shadow-sm" onclick="luuDiaChiNhanHang()">
+                    <i class="bi bi-check2-circle me-1"></i> Cập Nhật & Áp Dụng
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script th:inline="javascript">
     const rawTamTinh = /*[[${cart.tamTinh}]]*/ 0;
@@ -372,7 +456,83 @@
         document.getElementById('displayGiamGia').innerText = '-' + formatCurrency(giam);
         document.getElementById('displayTongTien').innerText = formatCurrency(rawTamTinh + rawShip - giam);
     }
+
+    // Xử lý Cập nhật địa chỉ nhận hàng phong cách Shopee qua AJAX
+    function luuDiaChiNhanHang() {
+        const hoTen = document.getElementById('modalInputHoTen').value.trim();
+        const sdt = document.getElementById('modalInputSoDienThoai').value.trim();
+        const email = document.getElementById('modalInputEmail').value.trim();
+        const diaChi = document.getElementById('modalInputDiaChi').value.trim();
+
+        if (!hoTen || !sdt || !diaChi) {
+            alert('Vui lòng nhập đầy đủ: Họ tên, Số điện thoại và Địa chỉ nhận hàng!');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('hoTen', hoTen);
+        formData.append('soDienThoai', sdt);
+        formData.append('email', email);
+        formData.append('diaChi', diaChi);
+
+        fetch('/api/tai-khoan/dia-chi/cap-nhat', {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                // Cập nhật giao diện khối địa chỉ Shopee
+                document.getElementById('displayHoTen').innerText = data.hoTen;
+                document.getElementById('displaySoDienThoai').innerText = '(+84) ' + data.soDienThoai;
+                document.getElementById('displayDiaChi').innerText = data.diaChi;
+
+                // Cập nhật các hidden inputs truyền lên khi Submit Đặt Hàng
+                document.getElementById('inputHoTen').value = data.hoTen;
+                document.getElementById('inputSoDienThoai').value = data.soDienThoai;
+                document.getElementById('inputEmail').value = email;
+                document.getElementById('inputDiaChi').value = data.diaChi;
+
+                // Đóng modal
+                const modalEl = document.getElementById('modalThayDoiDiaChi');
+                const modalInstance = bootstrap.Modal.getInstance(modalEl);
+                if (modalInstance) {
+                    modalInstance.hide();
+                }
+
+                // Hiển thị thông báo thành công
+                const alertEl = document.getElementById('ajaxSuccessAlert');
+                document.getElementById('ajaxSuccessMsg').innerText = data.message || 'Đã cập nhật địa chỉ nhận hàng thành công!';
+                alertEl.classList.remove('d-none');
+                alertEl.classList.add('show');
+            } else {
+                alert(data.message || 'Có lỗi xảy ra khi cập nhật địa chỉ!');
+            }
+        })
+        .catch(err => {
+            console.error('Lỗi cập nhật địa chỉ:', err);
+            // Dù có lỗi mạng vẫn cập nhật trên UI cho khách vãng lai
+            document.getElementById('displayHoTen').innerText = hoTen;
+            document.getElementById('displaySoDienThoai').innerText = '(+84) ' + sdt;
+            document.getElementById('displayDiaChi').innerText = diaChi;
+            document.getElementById('inputHoTen').value = hoTen;
+            document.getElementById('inputSoDienThoai').value = sdt;
+            document.getElementById('inputEmail').value = email;
+            document.getElementById('inputDiaChi').value = diaChi;
+
+            const modalEl = document.getElementById('modalThayDoiDiaChi');
+            const modalInstance = bootstrap.Modal.getInstance(modalEl);
+            if (modalInstance) modalInstance.hide();
+        });
+    }
+
+    function dongAlertAjax() {
+        const alertEl = document.getElementById('ajaxSuccessAlert');
+        alertEl.classList.add('d-none');
+        alertEl.classList.remove('show');
+    }
 </script>
+<!-- Bootstrap 5 Bundle JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

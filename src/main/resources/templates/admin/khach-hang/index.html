@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head th:replace="~{admin/layout :: admin_head('Quản Lý Khách Hàng - Luôn Vui Tươi Shop')}">
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <aside th:replace="~{admin/layout :: admin_sidebar('customers')}"></aside>
+
+        <!-- Main Content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+            <div th:replace="~{admin/layout :: admin_topbar('Quản Lý Khách Hàng')}"></div>
+
+            <div class="d-flex flex-wrap justify-content-between align-items-center pb-3 mb-4 border-bottom">
+                <div>
+                    <h3 class="fw-bold text-dark mb-1">👥 Quản Lý Khách Hàng</h3>
+                    <p class="text-secondary mb-0 small">Danh sách khách hàng đăng ký và mua sắm tại Luôn Vui Tươi Shop</p>
+                </div>
+            </div>
+
+            <!-- Flash messages -->
+            <div th:if="${successMsg}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i> <span th:text="${successMsg}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <div th:if="${errorMsg}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i> <span th:text="${errorMsg}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Thanh tìm kiếm -->
+            <div class="card card-custom p-3 mb-4">
+                <form th:action="@{/admin/khach-hang}" method="GET" class="row g-2 align-items-center">
+                    <div class="col-md-5">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                            <input type="text" name="keyword" class="form-control border-start-0" placeholder="Tìm theo tên, số điện thoại, email..." th:value="${keyword}">
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-dark fw-bold btn-sm px-3">Tìm Kiếm</button>
+                        <a href="/admin/khach-hang" class="btn btn-light border fw-semibold btn-sm ms-1" th:if="${keyword}">Xóa lọc</a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Bảng khách hàng -->
+            <div class="card card-custom overflow-hidden shadow-sm">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                        <tr>
+                            <th style="width: 50px;">STT</th>
+                            <th>Mã Khách Hàng</th>
+                            <th>Họ và Tên</th>
+                            <th>Số Điện Thoại</th>
+                            <th>Email</th>
+                            <th>Giới Tính</th>
+                            <th>Ngày Đăng Ký</th>
+                            <th class="text-center">Trạng Thái</th>
+                            <th class="text-center" style="width: 140px;">Hành Động</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:if="${#lists.isEmpty(listKhachHang)}">
+                            <td colspan="9" class="text-center py-5 text-muted">
+                                <i class="bi bi-people fs-1 d-block mb-2 text-secondary opacity-50"></i>
+                                Không tìm thấy khách hàng nào.
+                            </td>
+                        </tr>
+                        <tr th:each="kh, iter : ${listKhachHang}">
+                            <td class="text-muted fw-bold" th:text="${iter.count}">1</td>
+                            <td>
+                                <span class="badge bg-light text-dark border fw-bold px-2 py-1" th:text="${kh.maKhachHang}">KH001</span>
+                            </td>
+                            <td>
+                                <div class="fw-bold text-dark" th:text="${kh.hoTen}">Nguyễn Văn A</div>
+                            </td>
+                            <td class="fw-semibold text-secondary" th:text="${kh.soDienThoai}">0989xxxxxx</td>
+                            <td class="text-muted" th:text="${kh.email != null ? kh.email : '-'}">email@example.com</td>
+                            <td>
+                                <span th:if="${kh.gioiTinh == true}" class="badge bg-info-subtle text-info border border-info-subtle">Nam</span>
+                                <span th:if="${kh.gioiTinh == false}" class="badge bg-danger-subtle text-danger border border-danger-subtle">Nữ</span>
+                                <span th:if="${kh.gioiTinh == null}" class="text-muted">-</span>
+                            </td>
+                            <td class="text-muted" style="font-size: 13px;" th:text="${#temporals.format(kh.ngayTao, 'dd/MM/yyyy')}">11/10/2026</td>
+                            <td class="text-center">
+                                <span th:if="${kh.trangThai == true}" class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">Hoạt động</span>
+                                <span th:unless="${kh.trangThai == true}" class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">Bị khóa</span>
+                            </td>
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center gap-1">
+                                    <a th:href="@{'/admin/khach-hang/chi-tiet/' + ${kh.id}}" class="btn btn-sm btn-outline-primary" title="Xem chi tiết & lịch sử">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <form th:action="@{'/admin/khach-hang/doi-trang-thai/' + ${kh.id}}" method="POST" class="d-inline">
+                                        <button type="submit" class="btn btn-sm" th:classappend="${kh.trangThai == true ? 'btn-outline-danger' : 'btn-outline-success'}" th:title="${kh.trangThai == true ? 'Khóa tài khoản' : 'Mở khóa tài khoản'}">
+                                            <i class="bi" th:classappend="${kh.trangThai == true ? 'bi-lock' : 'bi-unlock'}"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

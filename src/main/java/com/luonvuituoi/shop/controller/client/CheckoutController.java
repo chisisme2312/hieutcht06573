@@ -3,11 +3,13 @@ package com.luonvuituoi.shop.controller.client;
 import com.luonvuituoi.shop.dto.AuthUser;
 import com.luonvuituoi.shop.dto.CartDto;
 import com.luonvuituoi.shop.dto.CartItemDto;
+import com.luonvuituoi.shop.entity.DiaChi;
 import com.luonvuituoi.shop.entity.GiamGia;
 import com.luonvuituoi.shop.entity.HoaDon;
 import com.luonvuituoi.shop.entity.HoaDonChiTiet;
 import com.luonvuituoi.shop.entity.KhachHang;
 import com.luonvuituoi.shop.entity.SanPhamChiTiet;
+import com.luonvuituoi.shop.repository.Dcrepository;
 import com.luonvuituoi.shop.repository.GiamGiaRepository;
 import com.luonvuituoi.shop.repository.HoaDonChiTietRepository;
 import com.luonvuituoi.shop.repository.HoaDonRepository;
@@ -18,6 +20,7 @@ import com.luonvuituoi.shop.service.impl.AuthServiceImpl;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -28,8 +31,10 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 
 @Controller
@@ -43,8 +48,9 @@ public class CheckoutController {
     private final HoaDonRepository hoaDonRepository;
     private final HoaDonChiTietRepository hoaDonChiTietRepository;
     private final SanPhamChiTietRepository sanPhamChiTietRepository;
+    private final Dcrepository dcrepository;
 
-    // 1. Giao diện Thanh toán & Chọn thông tin người nhận
+    // 1. Giao diện Thanh toán phong cách Shopee (1 khối Địa chỉ duy nhất, có nút Thay đổi)
     @GetMapping({"/dat-hang", "/checkout"})
     public String trangThanhToan(HttpSession session, Model model, RedirectAttributes ra) {
         CartDto cart = gioHangService.getGioHang(session);
@@ -57,7 +63,131 @@ public class CheckoutController {
         model.addAttribute("cart", cart);
         model.addAttribute("currentUser", currentUser);
         model.addAttribute("voucherList", giamGiaRepository.findByTrangThaiTrue());
+
+        // Lấy thông tin họ tên, SĐT và địa chỉ giao hàng chuẩn Shopee
+        String hoTen = "";
+        String soDienThoai = "";
+        String email = "";
+        String diaChi = "";
+        DiaChi currentDiaChi = null;
+
+        if (currentUser != null && currentUser.isCustomer()) {
+            hoTen = currentUser.getHoTen() != null ? currentUser.getHoTen() : "";
+            soDienThoai = currentUser.getSoDienThoai() != null ? currentUser.getSoDienThoai() : "";
+            email = currentUser.getEmail() != null ? currentUser.getEmail() : "";
+
+            // Tìm địa chỉ mặc định trong bảng dia_chi
+            currentDiaChi = dcrepository.findFirstByKhachHangIdAndMacDinhTrue(currentUser.getId())
+                    .or(() -> dcrepository.findFirstByKhachHangIdOrderByIdDesc(currentUser.getId()))
+                    .orElse(null);
+
+            if (currentDiaChi != null) {
+                diaChi = currentDiaChi.getDiaChiDayDu();
+            } else {
+                // Nếu chưa có địa chỉ, khởi tạo địa chỉ mặc định từ thông tin khách
+                diaChi = "Số 123 Đường Cầu Giấy, Phường Quan Hoa, Quận Cầu Giấy, Hà Nội";
+            }
+        } else {
+            // Khách chưa đăng nhập: Kiểm tra xem đã lưu tạm vào session chưa
+            String sessionHoTen = (String) session.getAttribute("GUEST_HOTEN");
+            String sessionSdt = (String) session.getAttribute("GUEST_SDT");
+            String sessionDc = (String) session.getAttribute("GUEST_DIACHI");
+
+            if (sessionHoTen != null && !sessionHoTen.isBlank()) {
+                hoTen = sessionHoTen;
+                soDienThoai = sessionSdt != null ? sessionSdt : "";
+                diaChi = sessionDc != null ? sessionDc : "";
+            } else {
+                hoTen = "Khách Hàng";
+                soDienThoai = "0989888888";
+                diaChi = "Số 123 Đường Cầu Giấy, Phường Quan Hoa, Quận Cầu Giấy, Hà Nội";
+            }
+        }
+
+        model.addAttribute("defaultHoTen", hoTen);
+        model.addAttribute("defaultSoDienThoai", soDienThoai);
+        model.addAttribute("defaultEmail", email);
+        model.addAttribute("defaultDiaChi", diaChi);
+        model.addAttribute("diaChiEntity", currentDiaChi);
+
         return "client/checkout";
+    }
+
+    // API Cập nhật nhanh địa chỉ nhận hàng phong cách Shopee qua AJAX
+    @PostMapping("/api/tai-khoan/dia-chi/cap-nhat")
+    @ResponseBody
+    public ResponseEntity<?> capNhatDiaChiNhanHang(
+            @RequestParam("hoTen") String hoTen,
+            @RequestParam("soDienThoai") String soDienThoai,
+            @RequestParam(value = "email", required = false) String email,
+            @RequestParam("diaChi") String diaChi,
+            @RequestParam(value = "xaPhuong", required = false) String xaPhuong,
+            @RequestParam(value = "quanHuyen", required = false) String quanHuyen,
+            @RequestParam(value = "tinhThanhPho", required = false) String tinhThanhPho,
+            HttpSession session) {
+
+        if (hoTen == null || hoTen.trim().isEmpty() || soDienThoai == null || soDienThoai.trim().isEmpty() || diaChi == null || diaChi.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Vui lòng nhập đầy đủ Họ tên, Số điện thoại và Địa chỉ!"));
+        }
+
+        String hoTenTrim = hoTen.trim();
+        String sdtTrim = soDienThoai.trim();
+        String diaChiTrim = diaChi.trim();
+
+        AuthUser currentUser = (AuthUser) session.getAttribute(AuthServiceImpl.SESSION_USER_KEY);
+        if (currentUser != null && currentUser.isCustomer()) {
+            KhachHang kh = khachHangRepository.findById(currentUser.getId()).orElse(null);
+            if (kh != null) {
+                kh.setHoTen(hoTenTrim);
+                kh.setSoDienThoai(sdtTrim);
+                if (email != null && !email.isBlank()) kh.setEmail(email.trim());
+                khachHangRepository.save(kh);
+
+                // Cập nhật lại session AuthUser
+                currentUser.setHoTen(hoTenTrim);
+                currentUser.setSoDienThoai(sdtTrim);
+                if (email != null && !email.isBlank()) currentUser.setEmail(email.trim());
+                session.setAttribute(AuthServiceImpl.SESSION_USER_KEY, currentUser);
+
+                // Cập nhật bảng dia_chi
+                DiaChi dc = dcrepository.findFirstByKhachHangIdAndMacDinhTrue(kh.getId())
+                        .or(() -> dcrepository.findFirstByKhachHangIdOrderByIdDesc(kh.getId()))
+                        .orElse(null);
+
+                if (dc == null) {
+                    dc = new DiaChi();
+                    dc.setKhachHang(kh);
+                    dc.setMacDinh(true);
+                }
+
+                dc.setDuong(diaChiTrim);
+                if (xaPhuong != null && !xaPhuong.isBlank()) dc.setXaPhuong(xaPhuong.trim());
+                if (quanHuyen != null && !quanHuyen.isBlank()) dc.setQuanHuyen(quanHuyen.trim());
+                if (tinhThanhPho != null && !tinhThanhPho.isBlank()) dc.setTinhThanhPho(tinhThanhPho.trim());
+                dcrepository.save(dc);
+
+                Map<String, Object> resp = new HashMap<>();
+                resp.put("success", true);
+                resp.put("hoTen", hoTenTrim);
+                resp.put("soDienThoai", sdtTrim);
+                resp.put("diaChi", dc.getDiaChiDayDu());
+                resp.put("message", "Đã cập nhật địa chỉ nhận hàng thành công!");
+                return ResponseEntity.ok(resp);
+            }
+        }
+
+        // Lưu tạm vào session đối với khách vãng lai
+        session.setAttribute("GUEST_HOTEN", hoTenTrim);
+        session.setAttribute("GUEST_SDT", sdtTrim);
+        session.setAttribute("GUEST_DIACHI", diaChiTrim);
+
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("success", true);
+        resp.put("hoTen", hoTenTrim);
+        resp.put("soDienThoai", sdtTrim);
+        resp.put("diaChi", diaChiTrim);
+        resp.put("message", "Đã cập nhật thông tin nhận hàng!");
+        return ResponseEntity.ok(resp);
     }
 
     // 2. Xử lý Đặt hàng Online (Trừ tồn kho nguyên tử, Chống bán trùng khi đông khách, Lưu hóa đơn & Chi tiết)
@@ -120,6 +250,18 @@ public class CheckoutController {
                 khachHang.setNgayTao(LocalDateTime.now());
                 khachHang = khachHangRepository.save(khachHang);
             }
+        }
+
+        // Lưu / Cập nhật địa chỉ nhận hàng vào sổ địa chỉ nếu chưa có
+        if (khachHang != null && khachHang.getId() != null) {
+            final KhachHang khRef = khachHang;
+            dcrepository.findFirstByKhachHangId(khRef.getId()).orElseGet(() -> {
+                DiaChi newDc = new DiaChi();
+                newDc.setKhachHang(khRef);
+                newDc.setDuong(diaChi.trim());
+                newDc.setMacDinh(true);
+                return dcrepository.save(newDc);
+            });
         }
 
         // BƯỚC 3: Tính toán Voucher giảm giá
