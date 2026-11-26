@@ -192,51 +192,45 @@
         <!-- CỘT PHẢI: Nội dung chi tiết từng Tab -->
         <div class="col-lg-9">
 
-            <!-- TAB 1: HỒ SƠ CỦA TÔI -->
+            <!-- TAB 1: HỒ SƠ CỦA TÔI (Chỉ tùy chỉnh Tên, SĐT, Email, Địa chỉ) -->
             <div id="tabHoSo" class="card-custom p-4">
                 <div class="border-bottom pb-3 mb-4">
-                    <h5 class="fw-bold mb-1">Hồ Sơ Của Tôi</h5>
-                    <p class="text-muted small mb-0">Quản lý thông tin cá nhân để bảo mật tài khoản</p>
+                    <h5 class="fw-bold mb-1">Thông Tin Tài Khoản</h5>
+                    <p class="text-muted small mb-0">Quản lý và tùy chỉnh thông tin cá nhân, số điện thoại, email và địa chỉ nhận hàng</p>
                 </div>
 
                 <form th:action="@{/tai-khoan/thong-tin/cap-nhat}" method="POST">
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="form-label small fw-bold">Mã Khách Hàng</label>
-                            <input type="text" class="form-control bg-light" th:value="${khachHang.maKhachHang}" readonly>
-                        </div>
-                        <div class="col-md-6">
                             <label class="form-label small fw-bold">Họ và Tên <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="hoTen" th:value="${khachHang.hoTen}" required>
+                            <input type="text" class="form-control" name="hoTen" th:value="${khachHang.hoTen}" placeholder="Nhập họ và tên" required>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold">Số Điện Thoại <span class="text-danger">*</span></label>
-                            <input type="tel" class="form-control" name="soDienThoai" th:value="${khachHang.soDienThoai}" required>
+                            <input type="tel" class="form-control" name="soDienThoai" th:value="${khachHang.soDienThoai}" placeholder="Nhập số điện thoại" required>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-12">
                             <label class="form-label small fw-bold">Email</label>
-                            <input type="email" class="form-control" name="email" th:value="${khachHang.email}">
+                            <input type="email" class="form-control" name="email" th:value="${khachHang.email}" placeholder="Nhập địa chỉ email của bạn">
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold">Giới Tính</label>
-                            <div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="gioiTinh" id="gtNam" value="true" th:checked="${khachHang.gioiTinh == true}">
-                                    <label class="form-check-label" for="gtNam">Nam</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="gioiTinh" id="gtNu" value="false" th:checked="${khachHang.gioiTinh == false}">
-                                    <label class="form-check-label" for="gtNu">Nữ</label>
-                                </div>
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label class="form-label small fw-bold mb-0">Địa Chỉ Nhận Hàng</label>
+                                <a href="javascript:void(0)" onclick="chuyenTab('dia-chi')" class="text-danger small fw-semibold text-decoration-none">
+                                    <i class="bi bi-gear-fill me-1"></i> Quản lý danh sách địa chỉ
+                                </a>
+                            </div>
+                            <input type="text" class="form-control" name="diaChi" 
+                                   th:value="${diaChiMacDinh != null ? diaChiMacDinh.getDiaChiDayDu() : ''}" 
+                                   placeholder="Số nhà, ngõ/đường, Phường/Xã, Quận/Huyện, Tỉnh/Thành Phố">
+                            <div class="text-muted small mt-1" style="font-size: 12px;">
+                                <i class="bi bi-info-circle me-1"></i> Địa chỉ này sẽ được dùng mặc định khi bạn đặt mua hàng.
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold">Ngày Sinh</label>
-                            <input type="date" class="form-control" name="ngaySinh" th:value="${khachHang.ngaySinh}">
-                        </div>
+
                         <div class="col-12 mt-4">
-                            <button type="submit" class="btn btn-danger fw-bold px-4">
-                                <i class="bi bi-save me-1"></i> Lưu Thay Đổi
+                            <button type="submit" class="btn btn-danger fw-bold px-4 shadow-sm">
+                                <i class="bi bi-check2-circle me-1"></i> Lưu Thay Đổi
                             </button>
                         </div>
                     </div>

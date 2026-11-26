@@ -202,10 +202,7 @@ public class AuthController {
                 .build();
         authService.setCurrentUser(session, authUser);
 
-        ra.addFlashAttribute("thongBao", "Đăng ký tài khoản thành công! Chào mừng " + kh.getHoTen() + ".");
-        if (redirect != null && !redirect.isBlank() && !redirect.startsWith("/admin")) {
-            return "redirect:" + redirect;
-        }
+        ra.addFlashAttribute("thongBaoThanhCong", "Đăng ký tài khoản thành công! Chào mừng " + kh.getHoTen() + " đến với Luôn Vui Tươi Shop.");
         return "redirect:/";
     }
 

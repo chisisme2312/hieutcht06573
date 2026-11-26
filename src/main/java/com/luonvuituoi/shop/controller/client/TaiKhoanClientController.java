@@ -57,15 +57,14 @@ public class TaiKhoanClientController {
         return "client/tai-khoan";
     }
 
-    // 2. Cập nhật Thông tin cá nhân (Họ tên, SĐT, Giới tính, Ngày sinh)
+    // 2. Cập nhật Thông tin cá nhân (Chỉ cho chỉnh: Họ tên, Số điện thoại, Email, Địa chỉ)
     @PostMapping("/thong-tin/cap-nhat")
     @Transactional
     public String capNhatThongTin(
             @RequestParam("hoTen") String hoTen,
             @RequestParam("soDienThoai") String soDienThoai,
             @RequestParam(value = "email", required = false) String email,
-            @RequestParam(value = "gioiTinh", required = false) Boolean gioiTinh,
-            @RequestParam(value = "ngaySinh", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate ngaySinh,
+            @RequestParam(value = "diaChi", required = false) String diaChi,
             HttpSession session,
             RedirectAttributes ra) {
 
@@ -82,10 +81,24 @@ public class TaiKhoanClientController {
 
         kh.setHoTen(hoTen.trim());
         kh.setSoDienThoai(soDienThoai.trim());
-        if (email != null && !email.isBlank()) kh.setEmail(email.trim());
-        kh.setGioiTinh(gioiTinh != null ? gioiTinh : true);
-        kh.setNgaySinh(ngaySinh);
+        kh.setEmail((email != null && !email.isBlank()) ? email.trim() : null);
         khachHangRepository.save(kh);
+
+        // Cập nhật địa chỉ nhận hàng mặc định nếu có nhập
+        if (diaChi != null && !diaChi.isBlank()) {
+            List<DiaChi> dsDiaChi = dcrepository.findByKhachHangId(kh.getId());
+            DiaChi dcMacDinh = dsDiaChi.stream()
+                    .filter(d -> Boolean.TRUE.equals(d.getMacDinh()))
+                    .findFirst()
+                    .orElse(dsDiaChi.isEmpty() ? null : dsDiaChi.get(0));
+            if (dcMacDinh == null) {
+                dcMacDinh = new DiaChi();
+                dcMacDinh.setKhachHang(kh);
+                dcMacDinh.setMacDinh(true);
+            }
+            dcMacDinh.setDuong(diaChi.trim());
+            dcrepository.save(dcMacDinh);
+        }
 
         // Cập nhật session
         currentUser.setHoTen(kh.getHoTen());
@@ -93,7 +106,7 @@ public class TaiKhoanClientController {
         currentUser.setEmail(kh.getEmail());
         session.setAttribute(AuthServiceImpl.SESSION_USER_KEY, currentUser);
 
-        ra.addFlashAttribute("thongBaoThanhCong", "Cập nhật hồ sơ tài khoản thành công!");
+        ra.addFlashAttribute("thongBaoThanhCong", "Cập nhật thông tin tài khoản thành công!");
         return "redirect:/tai-khoan";
     }
 

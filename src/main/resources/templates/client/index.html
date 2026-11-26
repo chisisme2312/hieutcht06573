@@ -475,6 +475,20 @@
     </div>
 </header>
 
+<!-- Thông báo Flash Messages (Đăng ký thành công, Đặt hàng thành công...) -->
+<div class="container mt-3" th:if="${thongBaoThanhCong != null or thongBao != null or thongBaoLoi != null}">
+    <div class="alert alert-success alert-dismissible fade show shadow-sm border-0 d-flex align-items-center gap-2" role="alert" th:if="${thongBaoThanhCong != null or thongBao != null}">
+        <i class="bi bi-check-circle-fill fs-5 text-success"></i>
+        <div class="fw-semibold" th:text="${thongBaoThanhCong != null ? thongBaoThanhCong : thongBao}">Đăng ký tài khoản thành công!</div>
+        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div class="alert alert-danger alert-dismissible fade show shadow-sm border-0 d-flex align-items-center gap-2" role="alert" th:if="${thongBaoLoi != null}">
+        <i class="bi bi-exclamation-triangle-fill fs-5 text-danger"></i>
+        <div class="fw-semibold" th:text="${thongBaoLoi}">Có lỗi xảy ra!</div>
+        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+</div>
+
 <!-- 3. Hero Banner (Chuẩn giao diện tối giản) -->
 <section class="hero-banner">
     <div class="container">
