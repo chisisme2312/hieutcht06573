@@ -149,13 +149,14 @@
                                 <th>Thương Hiệu</th>
                                 <th>Chất Liệu</th>
                                 <th>Biến Thể</th>
+                                <th>Tổng Tồn Kho</th>
                                 <th class="text-center">Trạng Thái</th>
                                 <th class="text-center" style="width: 180px;">Hành Động</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr th:if="${danhSach == null || danhSach.empty}">
-                                <td colspan="9" class="text-center py-4 text-muted">
+                                <td colspan="10" class="text-center py-4 text-muted">
                                     <i class="bi bi-inbox fs-2 d-block mb-2"></i>
                                     Không tìm thấy mẫu áo nào phù hợp với điều kiện lọc!
                                 </td>
@@ -172,6 +173,16 @@
                                         <span class="badge bg-info-subtle text-info border border-info-subtle" 
                                               th:text="${sp.danhSachChiTiet != null ? sp.danhSachChiTiet.size() : 0} + ' phân loại'"></span>
                                     </a>
+                                </td>
+                                <td>
+                                    <span th:if="${sp.tongSoLuongTon > 10}" 
+                                          class="badge bg-success-subtle text-success border border-success-subtle fw-bold" 
+                                          th:text="${sp.tongSoLuongTon} + ' cái'">50 cái</span>
+                                    <span th:if="${sp.tongSoLuongTon > 0 and sp.tongSoLuongTon <= 10}" 
+                                          class="badge bg-warning-subtle text-warning border border-warning-subtle fw-bold" 
+                                          th:text="'Sắp hết: ' + ${sp.tongSoLuongTon}">5 cái</span>
+                                    <span th:if="${sp.tongSoLuongTon == 0}" 
+                                          class="badge bg-danger-subtle text-danger border border-danger-subtle fw-bold">Hết hàng (0)</span>
                                 </td>
                                 <td class="text-center">
                                     <!-- Nút đổi trạng thái nhanh 1-click -->

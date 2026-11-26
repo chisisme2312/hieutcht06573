@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -15,12 +15,12 @@
 
     <style>
         :root {
-            --primary-black: #111827;
-            --primary-red: #dc2626;
-            --primary-red-hover: #b91c1c;
-            --text-main: #1f2937;
-            --text-muted: #6b7280;
-            --bg-light: #f9fafb;
+            --primary-black: #000000;
+            --primary-red: #c92921;
+            --primary-red-hover: #a8221b;
+            --text-main: #111111;
+            --text-muted: #777777;
+            --bg-light: #f8f9fa;
             --border-color: #e5e7eb;
         }
 
@@ -38,7 +38,7 @@
             color: #ffffff;
             font-size: 13px;
             font-weight: 500;
-            padding: 8px 0;
+            padding: 7px 0;
             letter-spacing: 0.5px;
         }
 
@@ -49,11 +49,10 @@
             z-index: 1000;
             background: #ffffff;
             border-bottom: 1px solid var(--border-color);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
         }
 
         .brand-logo {
-            font-size: 24px;
+            font-size: 26px;
             font-weight: 800;
             letter-spacing: -0.5px;
             color: var(--primary-black);
@@ -69,7 +68,7 @@
         /* Nav menu */
         .nav-link-custom {
             font-weight: 700;
-            font-size: 13.5px;
+            font-size: 14px;
             text-transform: uppercase;
             color: var(--primary-black) !important;
             padding: 16px 14px !important;
@@ -85,13 +84,14 @@
         /* Search Box */
         .header-search {
             position: relative;
+            max-width: 380px;
         }
 
         .header-search input {
             border-radius: 20px;
-            padding: 8px 16px 8px 38px;
+            padding: 7px 16px 7px 36px;
             font-size: 13px;
-            background: #f3f4f6;
+            background: #f4f4f5;
             border: 1px solid transparent;
         }
 
@@ -103,24 +103,23 @@
 
         .header-search .search-icon {
             position: absolute;
-            left: 14px;
+            left: 12px;
             top: 50%;
             transform: translateY(-50%);
-            color: #9ca3af;
+            color: #888;
             font-size: 14px;
         }
 
         /* Action icons */
         .action-icon {
-            font-size: 21px;
+            font-size: 20px;
             color: var(--primary-black);
             text-decoration: none;
             position: relative;
-            margin-left: 20px;
+            margin-left: 16px;
+            transition: transform 0.2s;
             display: inline-flex;
             align-items: center;
-            justify-content: center;
-            transition: transform 0.2s, color 0.2s;
         }
 
         .action-icon:hover {
@@ -134,11 +133,11 @@
             right: -10px;
             background-color: var(--primary-red);
             color: white;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 700;
             border-radius: 50%;
-            width: 19px;
-            height: 19px;
+            width: 18px;
+            height: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -548,9 +547,10 @@
     </div>
 </div>
 
-<!-- 2. Header & Menu Điều Hướng -->
+<!-- 2. Header & Thanh Menu Điều Hướng (Chuẩn phong cách Trang Chủ) -->
 <header class="main-header">
     <div class="container">
+        <!-- Hàng 1: Logo - Search - Actions -->
         <div class="d-flex align-items-center justify-content-between py-3">
             
             <!-- Logo -->
@@ -559,50 +559,47 @@
             </a>
 
             <!-- Search Bar in Header -->
-            <form action="/san-pham" method="GET" class="header-search d-none d-lg-block mx-4 flex-grow-1" style="max-width: 400px;">
+            <form action="/san-pham" method="GET" class="header-search d-none d-lg-block mx-4 flex-grow-1" style="max-width: 420px;">
                 <i class="bi bi-search search-icon"></i>
                 <input type="text" name="keyword" class="form-control" placeholder="Tìm kiếm áo thun, polo, sơ mi...">
             </form>
 
-                        <!-- Action Icons: User Auth, Admin (if staff), Catalog, Cart -->
-            <div class="d-flex align-items-center gap-2">
-                <!-- 1. Khi chua dang nhap: Nut Dang Nhap -->
-                <a th:if="${currentUser == null}" href="/login" class="btn btn-sm btn-outline-danger fw-bold">
+            <!-- Action Icons: Login, Admin (nếu là nhân viên), User, Cart -->
+            <div class="d-flex align-items-center">
+                <!-- 1. Khi chưa đăng nhập: Nút Đăng nhập -->
+                <a th:if="${currentUser == null}" href="/login" class="btn btn-sm btn-outline-dark fw-bold me-3">
                     <i class="bi bi-box-arrow-in-right me-1"></i> Đăng Nhập
                 </a>
 
-                <!-- 2. Khi da dang nhap la Nhan Vien hoac Admin: Nut vao Quan Tri + Ten + Dang Xuat -->
-                <div th:if="${currentUser != null and currentUser.isNhanVien()}" class="d-flex align-items-center gap-2">
-                    <a href="/admin" class="btn btn-sm btn-danger fw-bold">
-                        <i class="bi bi-speedometer2 me-1"></i> Quản Trị
+                <!-- 2. Khi đã đăng nhập là Nhân viên hoặc Admin: Nút vào Quản Trị + Tên + Đăng Xuất -->
+                <div th:if="${currentUser != null and currentUser.isNhanVien()}" class="d-flex align-items-center me-3">
+                    <a href="/admin" class="btn btn-sm btn-danger fw-bold me-2">
+                        <i class="bi bi-gear-fill me-1"></i> Trang Quản Trị
                     </a>
-                    <span class="small fw-bold text-dark d-none d-md-inline" th:text="${currentUser.hoTen}">Admin</span>
-                    <a href="/logout" class="btn btn-sm btn-outline-secondary" title="Đăng Xuất">
+                    <span class="small fw-bold me-2 text-dark" th:text="${currentUser.hoTen}">Admin</span>
+                    <a href="/logout" class="action-icon m-0" title="Đăng Xuất">
                         <i class="bi bi-box-arrow-right"></i>
                     </a>
                 </div>
 
-                <!-- 3. Khi da dang nhap la Khach Hang: Chi hien Ten + Dang Xuat (KHONG CO QUAN TRI) -->
-                <div th:if="${currentUser != null and !currentUser.isNhanVien()}" class="d-flex align-items-center gap-2">
-                    <span class="small fw-semibold text-secondary d-none d-md-inline">Xin chào, <strong class="text-dark" th:text="${currentUser.hoTen}">Khách</strong></span>
-                    <a href="/logout" class="btn btn-sm btn-outline-secondary" title="Đăng Xuất">
+                <!-- 3. Khi đã đăng nhập là Khách hàng: Tên + Đăng Xuất -->
+                <div th:if="${currentUser != null and !currentUser.isNhanVien()}" class="d-flex align-items-center me-3">
+                    <span class="small fw-semibold me-2 text-secondary">Chào, <b class="text-dark" th:text="${currentUser.hoTen}">Khách</b></span>
+                    <a href="/logout" class="action-icon m-0" title="Đăng Xuất">
                         <i class="bi bi-box-arrow-right"></i>
                     </a>
                 </div>
 
-                <a href="/san-pham" class="btn btn-sm btn-dark fw-bold d-none d-md-inline-block">
-                    <i class="bi bi-grid me-1"></i> Danh Mục
-                </a>
-
-                <a href="/gio-hang" class="action-icon position-relative ms-1" title="Giỏ hàng">
+                <a href="/gio-hang" class="action-icon" title="Giỏ hàng">
                     <i class="bi bi-bag"></i>
                     <span class="badge-cart" id="headerCartBadge" 
                           th:text="${session.SESSION_CART != null ? session.SESSION_CART.tongSoLuong : 0}">0</span>
                 </a>
             </div>
+        </div>
 
-        <!-- Navigation Categories -->
-        <nav class="d-flex align-items-center border-top overflow-auto">
+        <!-- Hàng 2: Menu điều hướng -->
+        <nav class="d-flex align-items-center border-top">
             <a href="/" class="nav-link-custom">Trang Chủ</a>
             <a href="/san-pham" class="nav-link-custom active">Tất Cả Sản Phẩm</a>
             <a href="/san-pham?sort=moi-nhat" class="nav-link-custom">Hàng Mới Về</a>
@@ -739,7 +736,7 @@
                     <span class="fw-bold small text-dark">Số lượng:</span>
                     <div class="qty-input-group">
                         <button type="button" class="qty-btn" onclick="decreaseQty()">-</button>
-                        <input type="number" name="soLuong" id="inputQuantity" class="qty-input" value="1" min="1" max="99" readonly>
+                        <input type="number" name="soLuong" id="inputQuantity" class="qty-input" value="1" min="1" max="99" onchange="validateQtyInput()">
                         <button type="button" class="qty-btn" onclick="increaseQty()">+</button>
                     </div>
                 </div>
@@ -889,9 +886,9 @@
 
         <div class="row g-4">
             <div class="col-6 col-md-3" th:each="related : ${sanPhamLienQuan}">
-                <div class="product-card">
+                <div class="product-card" th:onclick="|window.location.href='@{/san-pham/{id}(id=${related.id})}'|" style="cursor: pointer;">
                     <div class="product-thumb">
-                        <a th:href="@{'/san-pham/' + ${related.id}}">
+                        <a th:href="@{'/san-pham/' + ${related.id}}" class="d-block w-100 h-100">
                             <img th:if="${related.danhSachAnh != null and !related.danhSachAnh.empty}" 
                                  th:src="${related.danhSachAnh.iterator().next().anhUrl}" 
                                  th:alt="${related.tenSanPham}">
@@ -1128,13 +1125,30 @@
         }
     }
 
-    // Tăng giảm số lượng
+    // Tăng giảm và validate trực tiếp số lượng
+    function validateQtyInput() {
+        const input = document.getElementById('inputQuantity');
+        let val = parseInt(input.value);
+        const max = currentMatchedVariant ? (currentMatchedVariant.soLuongTon || 99) : 99;
+        if (isNaN(val) || val < 1) {
+            alert('Số lượng tối thiểu là 1!');
+            input.value = 1;
+            return;
+        }
+        if (val > max) {
+            alert('Số lượng bạn nhập (' + val + ') vượt quá số lượng tồn kho (tối đa ' + max + ' sản phẩm)!');
+            input.value = max;
+        }
+    }
+
     function increaseQty() {
         const input = document.getElementById('inputQuantity');
         let current = parseInt(input.value) || 1;
         const max = currentMatchedVariant ? (currentMatchedVariant.soLuongTon || 99) : 99;
         if (current < max) {
             input.value = current + 1;
+        } else {
+            alert('Số lượng đã đạt giới hạn tồn kho hiện có (' + max + ' sản phẩm)!');
         }
     }
 

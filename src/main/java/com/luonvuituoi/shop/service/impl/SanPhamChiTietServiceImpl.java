@@ -31,7 +31,11 @@ public class SanPhamChiTietServiceImpl implements SanPhamChiTietService {
 
     @Override
     public SanPhamChiTiet save(SanPhamChiTiet chiTiet) {
-        if (chiTiet.getTrangThai() == null) {
+        if (chiTiet.getSoLuongTon() != null && chiTiet.getSoLuongTon() <= 0) {
+            chiTiet.setTrangThai(false); // Hết hàng tự động chuyển sang ngừng kinh doanh
+        } else if (chiTiet.getSoLuongTon() != null && chiTiet.getSoLuongTon() > 0 && chiTiet.getTrangThai() == null) {
+            chiTiet.setTrangThai(true);
+        } else if (chiTiet.getTrangThai() == null) {
             chiTiet.setTrangThai(true);
         }
         return chiTietRepository.save(chiTiet);

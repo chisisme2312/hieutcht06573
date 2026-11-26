@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 
@@ -53,11 +52,15 @@
 
                         <a th:each="hd : ${hoaDonCho}"
                            th:href="@{/admin/ban-hang(hoaDonId=${hd.id})}"
-                           class="btn"
+                           class="btn position-relative d-flex align-items-center gap-1 shadow-sm"
                            th:classappend="${hoaDonDangChon != null and hoaDonDangChon.id == hd.id}
                                 ? ' btn-primary' : ' btn-outline-primary'">
 
-                            <span th:text="${hd.maHoaDon}"></span>
+                            <i class="bi bi-receipt"></i>
+                            <span class="fw-bold" th:text="${hd.maHoaDon}"></span>
+                            <span class="badge bg-light text-dark border ms-1 small" 
+                                  th:if="${hd.nhanVien != null}" 
+                                  th:text="${hd.nhanVien.hoVaTen}"></span>
                         </a>
                     </div>
                 </div>
@@ -106,128 +109,43 @@
                             </div>
                         </div>
 
-                        <!-- DANH SÁCH SẢN PHẨM -->
+                        <!-- 1. GIỎ HÀNG (CHUYỂN LÊN TRÊN ĐẦU) -->
                         <div class="card shadow-sm mb-4">
-                            <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                                <h5 class="fw-bold mb-0">Danh sách sản phẩm</h5>
-
-                                <input type="text"
-                                       id="searchProduct"
-                                       class="form-control"
-                                       style="max-width: 250px"
-                                       placeholder="Tìm sản phẩm..."
-                                       oninput="filterProducts()">
-                            </div>
-
-                            <div class="card-body">
-
-                                <div th:if="${#lists.isEmpty(sanPhamList)}"
-                                     class="text-center text-muted py-4">
-                                    Không có sản phẩm.
+                            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                                <div class="d-flex align-items-center gap-2">
+                                    <h5 class="fw-bold mb-0 text-primary">
+                                        <i class="bi bi-cart-check me-1"></i> Giỏ hàng của hóa đơn
+                                    </h5>
+                                    <span class="badge bg-primary rounded-pill px-2"
+                                          th:if="${!#lists.isEmpty(chiTietHoaDon)}"
+                                          th:text="${#lists.size(chiTietHoaDon)} + ' sản phẩm'">
+                                    </span>
                                 </div>
-
-                                <div class="row g-3"
-                                     th:unless="${#lists.isEmpty(sanPhamList)}">
-
-                                    <th:block th:each="sp : ${sanPhamList}">
-                                        <th:block th:each="ct : ${sp.danhSachChiTiet}">
-
-                                            <div class="col-md-4 product-card"
-                                                 th:if="${ct.trangThai == true
-                                                    and ct.soLuongTon != null
-                                                    and ct.soLuongTon > 0}">
-
-                                                <div class="border rounded p-3 h-100">
-
-                                                    <span class="badge bg-success mb-2">
-                                                        Còn hàng
-                                                    </span>
-
-                                                    <h6 class="fw-bold product-name"
-                                                        th:text="${sp.tenSanPham}">
-                                                    </h6>
-
-                                                    <p class="small mb-1">
-                                                        Mã:
-                                                        <span class="product-code"
-                                                              th:text="${sp.maSanPham}">
-                                                        </span>
-                                                    </p>
-
-                                                    <p class="small mb-1">
-                                                        Màu:
-                                                        <span th:text="${ct.mauSac != null
-                                                            ? ct.mauSac.tenMauSac : 'Không có'}">
-                                                        </span>
-                                                    </p>
-
-                                                    <p class="small mb-1">
-                                                        Kích thước:
-                                                        <span th:text="${ct.kichThuoc != null
-                                                            ? ct.kichThuoc.tenKichThuoc : 'Không có'}">
-                                                        </span>
-                                                    </p>
-
-                                                    <p class="small mb-2">
-                                                        Tồn kho:
-                                                        <strong th:text="${ct.soLuongTon}"></strong>
-                                                    </p>
-
-                                                    <h6 class="text-danger fw-bold mb-3"
-                                                        th:text="${#numbers.formatDecimal(ct.giaBan, 0, 'COMMA', 0, 'POINT')} + ' đ'">
-                                                    </h6>
-
-                                                    <!-- THÊM VÀO GIỎ -->
-                                                    <form th:action="@{/admin/ban-hang/{id}/them-san-pham(id=${hoaDonDangChon.id})}"
-                                                          method="post">
-
-                                                        <input type="hidden"
-                                                               name="sanPhamChiTietId"
-                                                               th:value="${ct.id}">
-
-                                                        <input type="hidden"
-                                                               name="soLuong"
-                                                               value="1">
-
-                                                        <button type="submit"
-                                                                class="btn btn-primary btn-sm w-100">
-                                                            + Thêm vào giỏ
-                                                        </button>
-                                                    </form>
-                                                </div>
-                                            </div>
-
-                                        </th:block>
-                                    </th:block>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- GIỎ HÀNG -->
-                        <div class="card shadow-sm">
-                            <div class="card-header bg-white">
-                                <h5 class="fw-bold mb-0">Giỏ hàng</h5>
+                                <span class="badge bg-warning text-dark px-2 py-1" th:if="${#lists.isEmpty(chiTietHoaDon)}">
+                                    Chưa có sản phẩm
+                                </span>
                             </div>
 
                             <div class="card-body">
 
                                 <div th:if="${#lists.isEmpty(chiTietHoaDon)}"
                                      class="text-center text-muted py-4">
-                                    Chưa có sản phẩm trong giỏ hàng.
+                                    <i class="bi bi-cart-x fs-2 d-block text-secondary mb-2"></i>
+                                    Chưa có sản phẩm trong giỏ hàng. Hãy chọn sản phẩm ở danh sách bên dưới để thêm vào hóa đơn.
                                 </div>
 
                                 <div th:unless="${#lists.isEmpty(chiTietHoaDon)}"
                                      class="table-responsive">
 
-                                    <table class="table table-bordered align-middle">
+                                    <table class="table table-bordered align-middle mb-0">
                                         <thead class="table-light">
                                         <tr>
                                             <th>Sản phẩm</th>
                                             <th>Phân loại</th>
                                             <th>Đơn giá</th>
-                                            <th>Số lượng</th>
+                                            <th style="width: 140px;">Số lượng</th>
                                             <th>Thành tiền</th>
-                                            <th>Thao tác</th>
+                                            <th class="text-center" style="width: 80px;">Thao tác</th>
                                         </tr>
                                         </thead>
 
@@ -237,31 +155,25 @@
 
                                             <td>
                                                 <strong th:text="${dong.sanPhamChiTiet.sanPham.tenSanPham}"></strong>
+                                                <div class="small text-muted" th:text="'Mã: ' + ${dong.sanPhamChiTiet.sanPham.maSanPham}"></div>
                                             </td>
 
                                             <td>
-                                                <div>
-                                                    Màu:
-                                                    <span th:text="${dong.sanPhamChiTiet.mauSac != null
-                                                        ? dong.sanPhamChiTiet.mauSac.tenMauSac : ''}">
-                                                    </span>
-                                                </div>
-
-                                                <div>
-                                                    Size:
-                                                    <span th:text="${dong.sanPhamChiTiet.kichThuoc != null
-                                                        ? dong.sanPhamChiTiet.kichThuoc.tenKichThuoc : ''}">
-                                                    </span>
-                                                </div>
+                                                <span class="badge bg-light text-dark border me-1"
+                                                      th:text="'Màu: ' + ${dong.sanPhamChiTiet.mauSac != null ? dong.sanPhamChiTiet.mauSac.tenMauSac : 'Không'}">
+                                                </span>
+                                                <span class="badge bg-light text-dark border"
+                                                      th:text="'Size: ' + ${dong.sanPhamChiTiet.kichThuoc != null ? dong.sanPhamChiTiet.kichThuoc.tenKichThuoc : 'Không'}">
+                                                </span>
                                             </td>
 
-                                            <td th:text="${#numbers.formatDecimal(dong.donGia, 0, 'COMMA', 0, 'POINT')} + ' đ'"></td>
+                                            <td class="fw-semibold" th:text="${#numbers.formatDecimal(dong.donGia, 0, 'COMMA', 0, 'POINT')} + ' đ'"></td>
 
                                             <!-- CẬP NHẬT SỐ LƯỢNG -->
                                             <td>
                                                 <form th:action="@{/admin/ban-hang/{id}/cap-nhat-so-luong(id=${hoaDonDangChon.id})}"
                                                       method="post"
-                                                      class="d-flex gap-1">
+                                                      class="d-flex gap-1 align-items-center">
 
                                                     <input type="hidden"
                                                            name="chiTietId"
@@ -272,20 +184,22 @@
                                                            min="1"
                                                            th:max="${dong.sanPhamChiTiet.soLuongTon}"
                                                            th:value="${dong.soLuong}"
-                                                           class="form-control form-control-sm"
-                                                           style="width: 75px">
+                                                           class="form-control form-control-sm text-center fw-bold"
+                                                           style="width: 70px"
+                                                           onchange="if(parseInt(this.value) > parseInt(this.max)){ alert('Số lượng vượt quá tồn kho hiện tại (tối đa ' + this.max + ' cái)!'); this.value = this.max; } if(parseInt(this.value) < 1 || isNaN(parseInt(this.value))){ this.value = 1; }">
 
                                                     <button type="submit"
-                                                            class="btn btn-warning btn-sm">
+                                                            class="btn btn-warning btn-sm"
+                                                            title="Cập nhật số lượng">
                                                         Lưu
                                                     </button>
                                                 </form>
                                             </td>
 
-                                            <td th:text="${#numbers.formatDecimal(dong.thanhTien, 0, 'COMMA', 0, 'POINT')} + ' đ'"></td>
+                                            <td class="text-danger fw-bold" th:text="${#numbers.formatDecimal(dong.thanhTien, 0, 'COMMA', 0, 'POINT')} + ' đ'"></td>
 
                                             <!-- XÓA SẢN PHẨM -->
-                                            <td>
+                                            <td class="text-center">
                                                 <form th:action="@{/admin/ban-hang/{id}/xoa-san-pham(id=${hoaDonDangChon.id})}"
                                                       method="post"
                                                       onsubmit="return confirm('Xóa sản phẩm này khỏi giỏ hàng?')">
@@ -295,8 +209,9 @@
                                                            th:value="${dong.id}">
 
                                                     <button type="submit"
-                                                            class="btn btn-danger btn-sm">
-                                                        Xóa
+                                                            class="btn btn-outline-danger btn-sm"
+                                                            title="Xóa khỏi giỏ">
+                                                        <i class="bi bi-trash"></i>
                                                     </button>
                                                 </form>
                                             </td>
@@ -305,6 +220,118 @@
                                         </tbody>
                                     </table>
                                 </div>
+                            </div>
+                        </div>
+
+                        <!-- 2. DANH SÁCH SẢN PHẨM (CÓ PHÂN TRANG VÀ TÌM KIẾM) -->
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-white d-flex justify-content-between align-items-center flex-wrap gap-2 py-3">
+                                <h5 class="fw-bold mb-0">
+                                    <i class="bi bi-grid-3x3-gap me-2"></i>Danh sách sản phẩm
+                                </h5>
+
+                                <input type="text"
+                                       id="searchProduct"
+                                       class="form-control form-control-sm"
+                                       style="max-width: 260px"
+                                       placeholder="Tìm tên, mã, màu, size..."
+                                       oninput="handleProductSearch()">
+                            </div>
+
+                            <div class="card-body">
+
+                                <div th:if="${#lists.isEmpty(sanPhamList)}"
+                                     class="text-center text-muted py-4">
+                                    Không có sản phẩm nào.
+                                </div>
+
+                                <div id="noProductMatch" class="text-center text-muted py-4 d-none">
+                                    <i class="bi bi-search fs-3 d-block mb-2 text-secondary"></i>
+                                    Không tìm thấy sản phẩm nào phù hợp với từ khóa.
+                                </div>
+
+                                <div class="row g-3"
+                                     id="productGrid"
+                                     th:unless="${#lists.isEmpty(sanPhamList)}">
+
+                                    <th:block th:each="sp : ${sanPhamList}">
+                                        <th:block th:each="ct : ${sp.danhSachChiTiet}">
+
+                                            <div class="col-md-4 product-card"
+                                                 th:if="${ct.trangThai == true
+                                                    and ct.soLuongTon != null
+                                                    and ct.soLuongTon > 0}">
+
+                                                <div class="border rounded p-3 h-100 shadow-sm bg-white d-flex flex-column justify-content-between">
+                                                    <div>
+                                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                                            <span class="badge bg-success">Còn hàng</span>
+                                                            <span class="badge bg-light text-secondary border"
+                                                                  th:text="'Tồn: ' + ${ct.soLuongTon}"></span>
+                                                        </div>
+
+                                                        <h6 class="fw-bold product-name mb-1"
+                                                            th:text="${sp.tenSanPham}">
+                                                        </h6>
+
+                                                        <p class="small text-muted mb-1">
+                                                            Mã: <span class="product-code fw-semibold text-dark" th:text="${sp.maSanPham}"></span>
+                                                        </p>
+
+                                                        <p class="small mb-1">
+                                                            Màu: <span class="fw-semibold" th:text="${ct.mauSac != null ? ct.mauSac.tenMauSac : 'Không có'}"></span>
+                                                            | Size: <span class="fw-semibold" th:text="${ct.kichThuoc != null ? ct.kichThuoc.tenKichThuoc : 'Không có'}"></span>
+                                                        </p>
+                                                    </div>
+
+                                                    <div class="pt-2 border-top mt-2">
+                                                        <h6 class="text-danger fw-bold mb-2"
+                                                            th:text="${#numbers.formatDecimal(ct.giaBan, 0, 'COMMA', 0, 'POINT')} + ' đ'">
+                                                        </h6>
+
+                                                        <!-- THÊM VÀO GIỎ (CHO PHÉP NHẬP SỐ LƯỢNG) -->
+                                                        <form th:action="@{/admin/ban-hang/{id}/them-san-pham(id=${hoaDonDangChon.id})}"
+                                                              method="post" class="d-flex gap-1 align-items-center">
+
+                                                            <input type="hidden"
+                                                                   name="sanPhamChiTietId"
+                                                                   th:value="${ct.id}">
+
+                                                            <input type="number"
+                                                                   name="soLuong"
+                                                                   value="1"
+                                                                   min="1"
+                                                                   th:max="${ct.soLuongTon}"
+                                                                   class="form-control form-control-sm text-center fw-bold"
+                                                                   style="width: 65px;"
+                                                                   title="Nhập số lượng muốn thêm"
+                                                                   onchange="if(parseInt(this.value) > parseInt(this.max)){ alert('Số lượng vượt quá tồn kho hiện có (' + this.max + ' cái)!'); this.value = this.max; } if(parseInt(this.value) < 1 || isNaN(parseInt(this.value))){ this.value = 1; }">
+
+                                                            <button type="submit"
+                                                                    class="btn btn-primary btn-sm flex-grow-1 fw-bold">
+                                                                <i class="bi bi-cart-plus me-1"></i> + Thêm
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </th:block>
+                                    </th:block>
+                                </div>
+                            </div>
+
+                            <!-- PHÂN TRANG SẢN PHẨM -->
+                            <div class="card-footer bg-white d-flex justify-content-between align-items-center py-2 flex-wrap gap-2" id="productPaginationContainer">
+                                <div class="text-muted small" id="productPageInfo">
+                                    Đang tải phân trang...
+                                </div>
+
+                                <nav aria-label="Product pagination">
+                                    <ul class="pagination pagination-sm mb-0" id="productPaginationList">
+                                        <!-- Rendered by JS -->
+                                    </ul>
+                                </nav>
                             </div>
                         </div>
                     </div>
@@ -517,17 +544,127 @@
 <!-- JAVASCRIPT -->
 <script th:inline="javascript">
 
-    // TÌM KIẾM SẢN PHẨM
-    function filterProducts() {
+    // PHÂN TRANG & TÌM KIẾM SẢN PHẨM BÁN HÀNG TẠI QUẦY
+    const PAGE_SIZE = 6; // 6 sản phẩm mỗi trang (2 hàng x 3 cột)
+    let currentPage = 1;
+    let matchingCards = [];
+
+    function initProductPagination() {
+        const allCards = Array.from(document.querySelectorAll(".product-card"));
+        matchingCards = allCards;
+        
+        // Khôi phục trang trước đó nếu vừa thao tác thêm sản phẩm
+        const savedPage = sessionStorage.getItem("pos_product_page");
+        if (savedPage) {
+            currentPage = parseInt(savedPage) || 1;
+        }
+        renderPage();
+    }
+
+    function handleProductSearch() {
         const input = document.getElementById("searchProduct");
-        if (!input) return;
+        const keyword = input ? input.value.toLowerCase().trim() : "";
+        const allCards = Array.from(document.querySelectorAll(".product-card"));
 
-        const keyword = input.value.toLowerCase().trim();
-
-        document.querySelectorAll(".product-card").forEach(card => {
-            const content = card.innerText.toLowerCase();
-            card.style.display = content.includes(keyword) ? "" : "none";
+        matchingCards = allCards.filter(card => {
+            const text = card.innerText.toLowerCase();
+            return text.includes(keyword);
         });
+
+        currentPage = 1;
+        sessionStorage.setItem("pos_product_page", "1");
+        renderPage();
+    }
+
+    function filterProducts() {
+        handleProductSearch();
+    }
+
+    function goToPage(page) {
+        const totalPages = Math.max(1, Math.ceil(matchingCards.length / PAGE_SIZE));
+        if (page < 1) page = 1;
+        if (page > totalPages) page = totalPages;
+        currentPage = page;
+        sessionStorage.setItem("pos_product_page", String(page));
+        renderPage();
+    }
+
+    function renderPage() {
+        const allCards = Array.from(document.querySelectorAll(".product-card"));
+        const noProductMatch = document.getElementById("noProductMatch");
+        const pageInfo = document.getElementById("productPageInfo");
+        const paginationList = document.getElementById("productPaginationList");
+        const paginationContainer = document.getElementById("productPaginationContainer");
+
+        if (allCards.length === 0) {
+            if (paginationContainer) paginationContainer.classList.add("d-none");
+            return;
+        }
+
+        const totalItems = matchingCards.length;
+        const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
+
+        if (currentPage > totalPages) currentPage = totalPages;
+
+        if (totalItems === 0) {
+            allCards.forEach(card => card.style.setProperty("display", "none", "important"));
+            if (noProductMatch) noProductMatch.classList.remove("d-none");
+            if (paginationContainer) paginationContainer.classList.add("d-none");
+            return;
+        }
+
+        if (noProductMatch) noProductMatch.classList.add("d-none");
+        if (paginationContainer) paginationContainer.classList.remove("d-none");
+
+        const startIndex = (currentPage - 1) * PAGE_SIZE;
+        const endIndex = Math.min(startIndex + PAGE_SIZE, totalItems);
+
+        // Ẩn tất cả card trước
+        allCards.forEach(card => card.style.setProperty("display", "none", "important"));
+
+        // Hiển thị các card thuộc trang hiện tại
+        for (let i = startIndex; i < endIndex; i++) {
+            matchingCards[i].style.removeProperty("display");
+        }
+
+        // Cập nhật thông tin phân trang
+        if (pageInfo) {
+            pageInfo.innerHTML = `Hiển thị <strong>${startIndex + 1} - ${endIndex}</strong> / <strong>${totalItems}</strong> sản phẩm`;
+        }
+
+        // Render các nút số trang
+        if (paginationList) {
+            let html = "";
+            
+            // Nút Trước
+            html += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                <button class="page-link" type="button" onclick="goToPage(${currentPage - 1})"><i class="bi bi-chevron-left"></i></button>
+            </li>`;
+
+            // Các nút số trang
+            for (let p = 1; p <= totalPages; p++) {
+                if (totalPages > 7) {
+                    if (p === 1 || p === totalPages || (p >= currentPage - 1 && p <= currentPage + 1)) {
+                        html += `<li class="page-item ${p === currentPage ? 'active' : ''}">
+                            <button class="page-link" type="button" onclick="goToPage(${p})">${p}</button>
+                        </li>`;
+                    } else if (p === currentPage - 2 || p === currentPage + 2) {
+                        html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+                    }
+                } else {
+                    html += `<li class="page-item ${p === currentPage ? 'active' : ''}">
+                        <button class="page-link" type="button" onclick="goToPage(${p})">${p}</button>
+                    </li>`;
+                }
+            }
+
+            // Nút Tiếp
+            html += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                <button class="page-link" type="button" onclick="goToPage(${currentPage + 1})"><i class="bi bi-chevron-right"></i></button>
+            </li>`;
+
+            paginationList.innerHTML = html;
+        }
     }
 
     // TÍNH TIỀN THỪA
@@ -550,8 +687,9 @@
     }
 
     document.addEventListener("DOMContentLoaded", function () {
-        const cashInput = document.getElementById("cashGiven");
+        initProductPagination();
 
+        const cashInput = document.getElementById("cashGiven");
         if (cashInput) {
             cashInput.addEventListener("input", calcChange);
         }

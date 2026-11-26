@@ -222,6 +222,26 @@
             const msId = ms.value;
             const msTen = ms.getAttribute('data-ten');
 
+            // Hàng tiêu đề phân loại theo Màu sắc
+            const trHeader = document.createElement('tr');
+            trHeader.className = 'table-light border-top border-bottom';
+            trHeader.innerHTML = `
+                <td colspan="8" class="py-2 bg-light">
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                        <span class="fw-bold text-dark">
+                            <i class="bi bi-palette-fill text-danger me-2"></i>MÀU SẮC: <span class="badge bg-dark px-2 py-1">${msTen}</span>
+                        </span>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="small text-muted d-none d-sm-inline">Điền nhanh cho màu ${msTen}:</span>
+                            <input type="text" class="form-control form-control-sm py-0 text-center" style="width: 105px;" placeholder="Giá bán" id="color_gia_${msId}" value="${quickGiaBan}">
+                            <input type="number" class="form-control form-control-sm py-0 text-center" style="width: 65px;" placeholder="Tồn kho" id="color_sl_${msId}" value="${quickSoLuong}">
+                            <button type="button" class="btn btn-sm btn-dark py-0 px-2 fw-semibold" onclick="apDungTheoMau('${msId}')">Áp dụng màu này</button>
+                        </div>
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(trHeader);
+
             checkKichThuoc.forEach(kt => {
                 const ktId = kt.value;
                 const ktTen = kt.getAttribute('data-ten');
@@ -290,6 +310,16 @@
         document.querySelectorAll('.input-giaban').forEach(input => input.value = qGiaBan);
         document.querySelectorAll('.input-giagoc').forEach(input => input.value = qGiaGoc);
         document.querySelectorAll('.input-soluong').forEach(input => input.value = qSoLuong);
+    }
+
+    function apDungTheoMau(msId) {
+        const gia = document.getElementById(`color_gia_${msId}`).value;
+        const sl = document.getElementById(`color_sl_${msId}`).value;
+        const rows = document.querySelectorAll(`tr[id^="row_bt_${msId}_"]`);
+        rows.forEach(r => {
+            if (gia) r.querySelector('.input-giaban').value = gia;
+            if (sl) r.querySelector('.input-soluong').value = sl;
+        });
     }
 
     function formatNumberInput(input) {

@@ -364,14 +364,14 @@ public class SanPhamAdminController {
         return "redirect:/admin/san-pham";
     }
 
-    // 5. Xóa mẫu áo
+    // 5. Ngừng kinh doanh / Xóa mềm mẫu áo
     @GetMapping("/xoa/{id}")
     public String xoaSanPham(@PathVariable("id") Integer id, RedirectAttributes ra) {
         try {
             sanPhamService.delete(id);
-            ra.addFlashAttribute("thongBao", "Xóa mẫu áo thành công!");
+            ra.addFlashAttribute("thongBao", "Đã chuyển mẫu áo sang trạng thái Ngừng kinh doanh an toàn (bảo toàn lịch sử đơn hàng)!");
         } catch (Exception e) {
-            ra.addFlashAttribute("loi", "Không thể xóa do mẫu áo này đã có đơn hàng hoặc giỏ hàng liên kết!");
+            ra.addFlashAttribute("loi", "Có lỗi xảy ra: " + e.getMessage());
         }
         return "redirect:/admin/san-pham";
     }

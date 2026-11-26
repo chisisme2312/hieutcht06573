@@ -24,7 +24,8 @@ public interface SanPhamRepository extends JpaRepository<SanPham, Integer> {
            "LEFT JOIN FETCH sp.danhSachChiTiet ct " +
            "LEFT JOIN FETCH ct.mauSac " +
            "LEFT JOIN FETCH ct.kichThuoc " +
-           "WHERE sp.trangThai = true")
+           "WHERE sp.trangThai = true " +
+           "ORDER BY sp.id DESC")
     List<SanPham> findAllActiveWithDetails();
 
     @Query("SELECT DISTINCT sp FROM SanPham sp " +
@@ -67,7 +68,7 @@ public interface SanPhamRepository extends JpaRepository<SanPham, Integer> {
             "   AND (:kichThuocId IS NULL OR ct.kichThuoc.id = :kichThuocId) " +
             "   AND (:minGia IS NULL OR ct.giaBan >= :minGia) " +
             "   AND (:maxGia IS NULL OR ct.giaBan <= :maxGia)" +
-            ")",
+            ") ORDER BY sp.id DESC",
            countQuery = "SELECT COUNT(sp) FROM SanPham sp WHERE sp.trangThai = true " +
             "AND (:keyword IS NULL OR LOWER(sp.tenSanPham) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(sp.maSanPham) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
             "AND (:loaiSanPhamId IS NULL OR sp.loaiSanPham.id = :loaiSanPhamId) " +

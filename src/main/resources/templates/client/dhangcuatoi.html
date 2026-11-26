@@ -302,12 +302,12 @@
             </div>
 
             <!-- DANH SÁCH ĐƠN HÀNG (Render động từ Database Spring Boot bằng th:each) -->
-            <div class="order-card" th:each="donHang : ${danhSachDonHang}">
+            <div class="order-card mb-4" th:each="donHang : ${danhSachDonHang}">
 
                 <!-- Header Đơn hàng: Mã đơn, Ngày đặt, Trạng thái -->
                 <div class="order-header d-flex flex-wrap justify-content-between align-items-center gap-2">
                     <div>
-                        <span class="fw-bold text-dark">Mã đơn: <span class="text-danger" th:text="${donHang.maDonHang}">#DH202689</span></span>
+                        <span class="fw-bold text-dark">Mã đơn: <span class="text-danger font-monospace" th:text="${donHang.maHoaDon}">#DH202689</span></span>
                         <span class="text-muted ms-3"><i class="bi bi-calendar3 me-1"></i> <span th:text="${#temporals.format(donHang.ngayTao, 'dd-MM-yyyy HH:mm')}">28-10-2026 14:30</span></span>
                     </div>
                     <div>
@@ -319,13 +319,15 @@
                 <!-- Body Đơn hàng: Danh sách sản phẩm bên trong -->
                 <div class="order-body">
 
-                    <!-- Lặp qua sản phẩm trong đơn (Ví dụ sản phẩm đơn hàng) -->
+                    <!-- Lặp qua sản phẩm trong đơn -->
                     <div class="order-item" th:each="chiTiet : ${donHang.danhSachChiTiet}">
-                        <img src="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=300" th:alt="${chiTiet.tenSanPham}">
+                        <img src="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=300" th:alt="${chiTiet.sanPhamChiTiet.sanPham.tenSanPham}">
                         <div class="flex-grow-1">
-                            <a href="#" class="item-title" th:text="${chiTiet.tenSanPham}">Áo Thun Cotton Basic Luôn Vui Tươi</a>
+                            <a th:href="@{'/san-pham/' + ${chiTiet.sanPhamChiTiet.sanPham.id}}" class="item-title" th:text="${chiTiet.sanPhamChiTiet.sanPham.tenSanPham}">Áo Thun Cotton Basic Luôn Vui Tươi</a>
                             <div class="text-muted" style="font-size: 12px; margin-top: 2px;">
-                                Phân loại: <span th:text="${chiTiet.kichCo}">L</span> / <span th:text="${chiTiet.mauSac}">Đen</span> x <span th:text="${chiTiet.soLuong}">2</span>
+                                Phân loại: <span th:text="${chiTiet.sanPhamChiTiet.kichThuoc != null ? chiTiet.sanPhamChiTiet.kichThuoc.tenKichThuoc : '-'}">L</span> 
+                                / <span th:text="${chiTiet.sanPhamChiTiet.mauSac != null ? chiTiet.sanPhamChiTiet.mauSac.tenMauSac : '-'}">Đen</span> 
+                                x <span th:text="${chiTiet.soLuong}">2</span>
                             </div>
                         </div>
                         <div class="text-end">
@@ -338,20 +340,24 @@
                 <!-- Footer Đơn hàng: Tổng tiền & Nút thao tác -->
                 <div class="order-footer d-flex flex-wrap justify-content-between align-items-center gap-3">
                     <div>
-                        <span class="text-muted" style="font-size: 13px;">Thành tiền: </span>
+                        <span class="text-muted" style="font-size: 13px;">Tổng thanh toán: </span>
                         <span class="fw-extrabold text-danger fs-5" style="font-weight: 800;" th:text="${#numbers.formatDecimal(donHang.tongTien, 0, 'COMMA', 0, 'POINT') + 'đ'}">338.000đ</span>
                     </div>
                     <div class="d-flex gap-2">
-                        <a th:href="@{'/don-hang/chi-tiet/' + ${donHang.id}}" class="btn-custom-outline">Xem Chi Tiết</a>
-                        <button class="btn-custom-dark" th:if="${donHang.trangThai == 'Đang giao hàng'}">Theo Dõi Vận Chuyển</button>
-                        <button class="btn-custom-dark" th:if="${donHang.trangThai == 'Đã hoàn thành'}">Mua Lại</button>
+                        <a th:href="@{'/dat-hang/thanh-cong/' + ${donHang.id}}" class="btn-custom-outline">Xem Chi Tiết</a>
+                        <a href="/" class="btn-custom-dark">Mua Lại</a>
                     </div>
                 </div>
 
             </div>
 
-            <!-- Nếu không có đơn hàng nào (Ví dụ mẫu minh họa tĩnh nếu chưa có data) -->
-            <div class="order-card p-4">
+            <!-- Nếu không có đơn hàng nào -->
+            <div class="order-card p-5 text-center text-muted" th:if="${#lists.isEmpty(danhSachDonHang)}">
+                <i class="bi bi-box-seam fs-1 d-block mb-3 text-secondary"></i>
+                <h5>Bạn chưa có đơn hàng nào!</h5>
+                <p class="small text-secondary mb-3">Hãy dạo quanh cửa hàng và chọn cho mình những mẫu áo ưng ý nhất.</p>
+                <a href="/" class="btn btn-danger fw-bold px-4 py-2">Khám Phá Sản Phẩm Ngay</a>
+            </div>
                 <div class="order-header border-0 bg-transparent px-0 pt-0 d-flex justify-content-between align-items-center">
                     <div>
                         <span class="fw-bold text-dark">Mã đơn: <span class="text-danger">#DH202688</span></span>

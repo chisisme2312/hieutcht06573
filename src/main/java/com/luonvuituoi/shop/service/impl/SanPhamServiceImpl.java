@@ -53,7 +53,18 @@ public class SanPhamServiceImpl implements SanPhamService {
 
     @Override
     public void delete(Integer id) {
-        sanPhamRepository.deleteById(id);
+        var spOpt = sanPhamRepository.findById(id);
+        if (spOpt.isPresent()) {
+            SanPham sp = spOpt.get();
+            sp.setTrangThai(false);
+            if (sp.getDanhSachChiTiet() != null) {
+                for (SanPhamChiTiet ct : sp.getDanhSachChiTiet()) {
+                    ct.setTrangThai(false);
+                    sanPhamChiTietRepository.save(ct);
+                }
+            }
+            sanPhamRepository.save(sp);
+        }
     }
 
     @Override

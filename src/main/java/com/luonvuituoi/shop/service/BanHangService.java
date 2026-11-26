@@ -163,6 +163,10 @@ public class BanHangService {
         kiemTraCoSanPham(hd);
         tinhLaiTien(hd);
         if (tienKhachDua == null || tienKhachDua.compareTo(hd.getTongTien()) < 0) throw new IllegalArgumentException("Tiền khách đưa chưa đủ.");
+        
+        // Trừ tồn kho nguyên tử trước khi thanh toán hoàn tất
+        truTonKhoCacSanPham(hd);
+
         BigDecimal tienThua = tienKhachDua.subtract(hd.getTongTien());
         hd.setPhuongThucThanhToan(false);
         hd.setTrangThai(DA_HOAN_THANH);
@@ -178,6 +182,10 @@ public class BanHangService {
         HoaDon hd = layHoaDonDangCho(hoaDonId);
         kiemTraCoSanPham(hd);
         tinhLaiTien(hd);
+        
+        // Trừ tồn kho nguyên tử trước khi thanh toán hoàn tất
+        truTonKhoCacSanPham(hd);
+
         hd.setPhuongThucThanhToan(true);
         hd.setTrangThai(DA_HOAN_THANH);
         hd.setGhiChu(ghiChuThanhToan(hd.getGhiChu(), "Chuyển khoản QR - nhân viên đã xác nhận nhận tiền"));
@@ -185,6 +193,24 @@ public class BanHangService {
         HoaDon saved = hoaDonRepository.save(hd);
         eventPublisher.publishEvent(new PosHoaDonThanhToanEvent(saved.getId()));
         return saved;
+    }
+
+    private void truTonKhoCacSanPham(HoaDon hd) {
+        List<HoaDonChiTiet> items = chiTietRepository.findByHoaDonId(hd.getId());
+        for (HoaDonChiTiet item : items) {
+            SanPhamChiTiet spct = item.getSanPhamChiTiet();
+            int updated = sanPhamChiTietRepository.truTonKhoAtomic(spct.getId(), item.getSoLuong());
+            if (updated == 0) {
+                SanPhamChiTiet current = sanPhamChiTietRepository.findById(spct.getId()).orElse(spct);
+                int tonHienTai = current.getSoLuongTon() != null ? current.getSoLuongTon() : 0;
+                String tenSp = (spct.getSanPham() != null) ? spct.getSanPham().getTenSanPham() : "Sản phẩm";
+                String tenMau = (spct.getMauSac() != null) ? spct.getMauSac().getTenMauSac() : "";
+                String tenSize = (spct.getKichThuoc() != null) ? spct.getKichThuoc().getTenKichThuoc() : "";
+                throw new IllegalArgumentException("Sản phẩm [" + tenSp + " - " + tenMau + " " + tenSize 
+                        + "] không đủ tồn kho (chỉ còn " + tonHienTai + " cái). Vui lòng điều chỉnh lại số lượng!");
+            }
+            sanPhamChiTietRepository.capNhatHetHang(spct.getId());
+        }
     }
 
     @Transactional

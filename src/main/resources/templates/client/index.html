@@ -185,10 +185,19 @@
 
         /* Product Card */
         .product-card {
-            border: none;
+            border: 1px solid #f0f0f0;
+            border-radius: 8px;
+            padding: 10px;
             background: #ffffff;
             transition: all 0.3s ease;
             position: relative;
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 24px rgba(0,0,0,0.08);
+            border-color: #e5e7eb;
         }
 
         .product-thumb {
@@ -401,10 +410,10 @@
             </a>
 
             <!-- Search Bar -->
-            <div class="header-search d-none d-lg-block mx-4 flex-grow-1" style="max-width: 420px;">
+            <form action="/san-pham" method="GET" class="header-search d-none d-lg-block mx-4 flex-grow-1" style="max-width: 420px;">
                 <i class="bi bi-search search-icon"></i>
-                <input type="text" class="form-control" placeholder="Tìm kiếm áo thun, polo, sơ mi...">
-            </div>
+                <input type="text" name="keyword" class="form-control" placeholder="Tìm kiếm áo thun, polo, sơ mi...">
+            </form>
 
             <!-- Action Icons: Login, Admin (nếu là nhân viên), User, Cart -->
             <div class="d-flex align-items-center">
@@ -442,12 +451,13 @@
         <!-- Hàng 2: Menu điều hướng -->
         <nav class="d-flex align-items-center border-top">
             <a href="/" class="nav-link-custom">Trang Chủ</a>
-            <a href="#new-arrivals" class="nav-link-custom">Hàng Mới Về</a>
-            <a href="#ao-thun" class="nav-link-custom">Áo Thun T-Shirt</a>
-            <a href="#ao-polo" class="nav-link-custom">Áo Polo</a>
-            <a href="#ao-so-mi" class="nav-link-custom">Áo Sơ Mi</a>
-            <a href="#khuyen-mai" class="nav-link-custom sale-link">🔥 Khuyến Mãi Hot (-15%)</a>
-            <a href="#chinh-sach" class="nav-link-custom ms-auto text-secondary text-capitalize" style="font-weight: 500; font-size: 13px;">Hệ thống 15+ Cửa Hàng</a>
+            <a href="/san-pham" class="nav-link-custom">Tất Cả Sản Phẩm</a>
+            <a href="/san-pham?sort=moi-nhat" class="nav-link-custom">Hàng Mới Về</a>
+            <a href="/san-pham?loaiSanPhamId=1" class="nav-link-custom">Áo Thun T-Shirt</a>
+            <a href="/san-pham?loaiSanPhamId=2" class="nav-link-custom">Áo Polo</a>
+            <a href="/san-pham?loaiSanPhamId=3" class="nav-link-custom">Áo Sơ Mi</a>
+            <a href="/san-pham?mucGia=duoi-200k" class="nav-link-custom sale-link">🔥 Dưới 200K</a>
+            <a href="#chinh-sach" class="nav-link-custom ms-auto text-secondary text-capitalize d-none d-lg-block" style="font-weight: 500; font-size: 13px;">Hệ thống 15+ Cửa Hàng</a>
         </nav>
     </div>
 </header>
@@ -491,17 +501,21 @@
         
         <!-- Render động từ Database Spring Boot JPA -->
         <div class="col-6 col-md-4 col-lg-3" th:each="sp : ${danhSachSanPham}">
-            <div class="product-card h-100 d-flex flex-column">
+            <div class="product-card h-100 d-flex flex-column" 
+                 th:onclick="|window.location.href='@{/san-pham/{id}(id=${sp.id})}'|" 
+                 style="cursor: pointer;">
                 
                 <!-- Ảnh sản phẩm -->
                 <div class="product-thumb">
                     <!-- Lấy ảnh đầu tiên nếu có -->
-                    <img th:if="${sp.danhSachAnh != null and !sp.danhSachAnh.empty}" 
-                         th:src="${sp.danhSachAnh.iterator().next().anhUrl}" 
-                         th:alt="${sp.tenSanPham}">
-                    <img th:unless="${sp.danhSachAnh != null and !sp.danhSachAnh.empty}" 
-                         src="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600" 
-                         th:alt="${sp.tenSanPham}">
+                    <a th:href="@{'/san-pham/' + ${sp.id}}" class="d-block w-100 h-100">
+                        <img th:if="${sp.danhSachAnh != null and !sp.danhSachAnh.empty}" 
+                             th:src="${sp.danhSachAnh.iterator().next().anhUrl}" 
+                             th:alt="${sp.tenSanPham}">
+                        <img th:unless="${sp.danhSachAnh != null and !sp.danhSachAnh.empty}" 
+                             src="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600" 
+                             th:alt="${sp.tenSanPham}">
+                    </a>
                     
                     <span class="tag-discount" th:if="${sp.danhSachChiTiet != null and !sp.danhSachChiTiet.empty and sp.danhSachChiTiet.iterator().next().khuyenMai != null}">
                         -<span th:text="${sp.danhSachChiTiet.iterator().next().khuyenMai.phanTramGiam}">15</span>%

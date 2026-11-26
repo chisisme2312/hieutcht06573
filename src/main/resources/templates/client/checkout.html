@@ -104,10 +104,6 @@
             border-color: #9ca3af;
         }
 
-        .payment-method-box input[type="radio"]:checked ~ .payment-label {
-            font-weight: 700;
-        }
-
         /* Product mini item in summary */
         .summary-item {
             display: flex;
@@ -168,16 +164,30 @@
         <a href="/" class="brand-logo">
             LUÔN VUI TƯƠI <span>&nbsp;SHOP</span>
         </a>
-        <span class="text-muted fw-bold" style="font-size: 14px;"><i class="bi bi-shield-lock-fill text-success me-1"></i> Thanh toán bảo mật 100%</span>
+        <div class="d-flex align-items-center gap-3">
+            <a href="/gio-hang" class="btn btn-sm btn-outline-secondary fw-semibold">
+                <i class="bi bi-arrow-left me-1"></i> Quay lại giỏ hàng
+            </a>
+            <span class="text-muted fw-bold d-none d-md-inline" style="font-size: 13.5px;">
+                <i class="bi bi-shield-lock-fill text-success me-1"></i> Thanh toán an toàn
+            </span>
+        </div>
     </div>
 </header>
 
 <!-- Main Checkout Content -->
 <main class="container my-4">
-    <form th:action="@{/dat-hang/succeed}" method="POST">
+
+    <!-- Thông báo lỗi nếu có -->
+    <div th:if="${thongBaoLoi}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i> <span th:text="${thongBaoLoi}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <form th:action="@{/dat-hang/xac-nhan}" method="POST" id="checkoutForm">
         <div class="row g-4">
 
-            <!-- CỘT TRÁI: Thông tin khách hàng & Vận chuyển -->
+            <!-- CỘT TRÁI: Thông tin người nhận hàng & Phương thức thanh toán -->
             <div class="col-lg-7">
 
                 <!-- 1. Thông tin người nhận -->
@@ -188,32 +198,27 @@
 
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="form-label">Họ và tên người nhận</label>
-                     <select name="hoTen" class="form-control" onchange="dienThongTinKhachHang(this)">
-                         <option value="" selected>-- Chọn khách hàng --</option>
-                         <th:block th:each="kh : ${khachHang}">
-                         <option th:value="${kh.id}" th:text="${kh.hoTen}" th:data-hoTen="${kh.hoTen}" th:data-soDienThoai="${kh.soDienThoai}" th:data-email="${kh.email}"></option>
-                         </th:block>
-                     </select>
-                            <!--                            <input type="text" class="form-control" name="hoTen" placeholder="Ví dụ: Nguyễn Văn A" required>-->
+                            <label class="form-label">Họ và tên người nhận <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="hoTen" id="inputHoTen" 
+                                   placeholder="Ví dụ: Nguyễn Văn A" 
+                                   th:value="${currentUser != null ? currentUser.hoTen : ''}" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Số điện thoại liên hệ</label>
-                            <input type="tel" class="form-control" id="inputSoDienThoai" name="soDienThoai" placeholder="Ví dụ: 0989xxxxxx" required>
+                            <label class="form-label">Số điện thoại liên hệ <span class="text-danger">*</span></label>
+                            <input type="tel" class="form-control" id="inputSoDienThoai" name="soDienThoai" 
+                                   placeholder="Ví dụ: 0989xxxxxx" 
+                                   th:value="${currentUser != null ? currentUser.soDienThoai : ''}" required>
                         </div>
                         <div class="col-12">
-                            <label class="form-label">Email (để nhận xác nhận đơn hàng)</label>
-                            <input type="email" class="form-control" id="inputEmail" name="email" placeholder="Ví dụ: email@gmail.com">
+                            <label class="form-label">Email (để nhận mã xác nhận đơn hàng)</label>
+                            <input type="email" class="form-control" id="inputEmail" name="email" 
+                                   placeholder="Ví dụ: email@gmail.com" 
+                                   th:value="${currentUser != null ? currentUser.email : ''}">
                         </div>
                         <div class="col-12">
-                            <label class="form-label">Địa chỉ nhận hàng chi tiết (Số nhà, đường, phường/xã, quận/huyện)</label>
-                            <select name="tinhThanhPho" class="form-control">
-                                <option value="" selected>-- Chọn địa chỉ --</option>
-                                <th:block th:each="dc : ${dclp}">
-                                    <option th:value="${dc.id}" th:text="${dc.tinhThanhPho}"></option>
-                                </th:block>
-                            </select>
-<!--                            <input type="text" class="form-control" name="diaChi" placeholder="Ví dụ: Số 123, Đường Cầu Giấy, Phường Quan Hoa" required>-->
+                            <label class="form-label">Địa chỉ nhận hàng chi tiết <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="diaChi" id="inputDiaChi" 
+                                   placeholder="Ví dụ: Số 123 đường Cầu Giấy, phường Quan Hoa, quận Cầu Giấy, Hà Nội" required>
                         </div>
                         <div class="col-12">
                             <label class="form-label">Ghi chú giao hàng (Tùy chọn)</label>
@@ -231,8 +236,8 @@
                     <div class="payment-method-box d-flex align-items-center">
                         <input class="form-check-input me-3" type="radio" name="phuongThucThanhToan" id="cod" value="COD" checked>
                         <label class="payment-label flex-grow-1 mb-0" for="cod">
-                            <div class="fw-bold">Thanh toán khi giao hàng (COD)</div>
-                            <div class="text-muted" style="font-size: 12px;">Bạn chỉ phải trả tiền khi nhận được sản phẩm</div>
+                            <div class="fw-bold">Thanh toán khi nhận hàng (COD)</div>
+                            <div class="text-muted" style="font-size: 12px;">Nhận hàng tận nơi, kiểm tra hàng thoải mái trước khi thanh toán</div>
                         </label>
                         <i class="bi bi-cash-coin fs-4 text-secondary"></i>
                     </div>
@@ -240,8 +245,8 @@
                     <div class="payment-method-box d-flex align-items-center">
                         <input class="form-check-input me-3" type="radio" name="phuongThucThanhToan" id="banking" value="BANKING">
                         <label class="payment-label flex-grow-1 mb-0" for="banking">
-                            <div class="fw-bold">Chuyển khoản ngân hàng trước (QR Code)</div>
-                            <div class="text-muted" style="font-size: 12px;">Nhanh chóng, miễn phí vận chuyển thêm cho đơn từ 200k</div>
+                            <div class="fw-bold">Chuyển khoản ngân hàng (VietQR Code)</div>
+                            <div class="text-muted" style="font-size: 12px;">Quét mã QR chuyển khoản nhanh 24/7 từ mọi ứng dụng ngân hàng</div>
                         </label>
                         <i class="bi bi-qr-code-scan fs-4 text-secondary"></i>
                     </div>
@@ -253,68 +258,71 @@
             <div class="col-lg-5">
                 <div class="card-custom p-4 sticky-top" style="top: 20px;">
                     <div class="section-title justify-content-between">
-                        <span><i class="bi bi-bag-check-fill text-danger"></i> Đơn hàng của bạn</span>
+                        <span><i class="bi bi-bag-check-fill text-danger"></i> Đơn hàng (<span th:text="${cart.tongSoLuong}">0</span> món)</span>
                         <a href="/gio-hang" class="text-decoration-none text-danger" style="font-size: 13px; font-weight: 600;">Sửa giỏ hàng</a>
                     </div>
 
-                    <!-- Danh sách sản phẩm rút gọn -->
+                    <!-- Danh sách sản phẩm trong giỏ -->
                     <div class="product-list mb-3" style="max-height: 280px; overflow-y: auto;">
-
-                        <!-- Lặp qua các sản phẩm trong giỏ hàng (Ví dụ Thymeleaf) -->
-                        <div class="summary-item" th:each="item : ${danhSachGioHang}">
-                            <img src="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=300" alt="Sản phẩm">
+                        <div class="summary-item" th:each="item : ${cart.items}">
+                            <img th:src="${item.anhUrl != null ? item.anhUrl : 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=300'}" alt="Sản phẩm">
                             <div class="flex-grow-1">
                                 <div class="item-name" th:text="${item.tenSanPham}">Áo Thun Cotton Basic</div>
-                                <div class="item-meta">Size: <span th:text="${item.kichCo}">L</span> | Màu: <span th:text="${item.mauSac}">Đen</span></div>
-                                <div class="item-meta">SL: <span th:text="${item.soLuong}">1</span> x <span th:text="${#numbers.formatDecimal(item.gia, 0, 'COMMA', 0, 'POINT')}">169.000</span>đ</div>
+                                <div class="item-meta">Màu: <strong th:text="${item.tenMauSac}">Đen</strong> | Size: <strong th:text="${item.tenKichThuoc}">L</strong></div>
+                                <div class="item-meta">SL: <strong th:text="${item.soLuong}">1</strong> x <span th:text="${#numbers.formatDecimal(item.giaBan, 0, 'COMMA', 0, 'POINT')} + 'đ'">169.000đ</span></div>
                             </div>
-                            <div class="fw-bold text-end" style="font-size: 14px;" th:text="${#numbers.formatDecimal(item.gia * item.soLuong, 0, 'COMMA', 0, 'POINT') + 'đ'}">169.000đ</div>
+                            <div class="fw-bold text-end" style="font-size: 14px;" th:text="${#numbers.formatDecimal(item.thanhTien, 0, 'COMMA', 0, 'POINT') + 'đ'}">169.000đ</div>
                         </div>
-
                     </div>
 
-                    <!-- Mã giảm giá -->
-                    <div class="input-group mb-3">
-<!--                        <input type="text" class="form-control" placeholder="Nhập mã giảm giá...">-->
-                        <select name="maGiamGia" class="form-control">
-                            <option value="" selected>-- Chọn mã giảm giá --</option>
-                            <th:block th:each="gg : ${giamgia}">
-                                <option th:value="${gg.id}" th:text="${gg.maGiamGia}"></option>
+                    <!-- Chọn Voucher Giảm Giá -->
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Voucher / Mã giảm giá</label>
+                        <select name="maVoucher" class="form-select form-select-sm" id="voucherSelect" onchange="capNhatVoucher(this)">
+                            <option value="">-- Không sử dụng voucher --</option>
+                            <th:block th:each="vc : ${voucherList}">
+                                <option th:value="${vc.maGiamGia}" 
+                                        th:data-loai="${vc.loaiGiamGia}" 
+                                        th:data-giatri="${vc.giaTriGiam}" 
+                                        th:data-toida="${vc.toiDaGiamGia}" 
+                                        th:data-toithieu="${vc.giaTriToiThieu}" 
+                                        th:text="${vc.maGiamGia + ' - Giảm ' + (vc.loaiGiamGia == 1 ? vc.giaTriGiam + '%' : #numbers.formatDecimal(vc.giaTriGiam, 0, 'COMMA', 0, 'POINT') + 'đ')}">
+                                </option>
                             </th:block>
                         </select>
-                        <button class="btn btn-outline-dark fw-bold" type="button" style="font-size: 13px;">Áp Dụng</button>
                     </div>
 
                     <hr class="text-muted">
 
                     <!-- Các khoản tính tiền -->
                     <div class="d-flex justify-content-between mb-2" style="font-size: 14px;">
-                        <span class="text-muted">Tạm tính</span>
-                        <span class="fw-semibold">338.000đ</span>
+                        <span class="text-muted">Tạm tính:</span>
+                        <span class="fw-semibold" id="displayTamTinh" th:text="${#numbers.formatDecimal(cart.tamTinh, 0, 'COMMA', 0, 'POINT')} + 'đ'">338.000đ</span>
                     </div>
                     <div class="d-flex justify-content-between mb-2" style="font-size: 14px;">
-                        <span class="text-muted">Phí vận chuyển</span>
-                        <span class="fw-semibold text-success">Miễn phí (Đơn từ 399k)</span>
+                        <span class="text-muted">Phí vận chuyển:</span>
+                        <span th:if="${cart.phiVanChuyen.compareTo(T(java.math.BigDecimal).ZERO) == 0}" class="text-success fw-bold" id="displayShip">Miễn phí (Đơn >= 399k)</span>
+                        <span th:unless="${cart.phiVanChuyen.compareTo(T(java.math.BigDecimal).ZERO) == 0}" class="fw-semibold" id="displayShip" th:text="${#numbers.formatDecimal(cart.phiVanChuyen, 0, 'COMMA', 0, 'POINT')} + 'đ'">30.000đ</span>
                     </div>
                     <div class="d-flex justify-content-between mb-3" style="font-size: 14px;">
-                        <span class="text-muted">Giảm giá voucher</span>
-                        <span class="fw-semibold text-danger">-0đ</span>
+                        <span class="text-muted">Giảm giá voucher:</span>
+                        <span class="fw-semibold text-danger" id="displayGiamGia">-0đ</span>
                     </div>
 
                     <hr class="text-muted">
 
                     <div class="d-flex justify-content-between mb-4 align-items-center">
-                        <span class="fw-bold fs-6 text-uppercase">Tổng thanh toán</span>
-                        <span class="fw-extrabold fs-4 text-danger" style="font-weight: 800;">338.000đ</span>
+                        <span class="fw-bold fs-6 text-uppercase">Tổng thanh toán:</span>
+                        <span class="fw-extrabold fs-4 text-danger" id="displayTongTien" th:text="${#numbers.formatDecimal(cart.tongTien, 0, 'COMMA', 0, 'POINT')} + 'đ'">338.000đ</span>
                     </div>
 
                     <!-- Nút bấm Đặt Hàng -->
-                    <button type="submit" class="btn-order">
-                        <i class="bi bi-shield-check me-1"></i> HOÀN TẤT ĐẶT HÀNG
+                    <button type="submit" class="btn-order shadow-sm">
+                        <i class="bi bi-shield-check me-1"></i> XÁC NHẬN ĐẶT HÀNG
                     </button>
 
                     <p class="text-center text-muted mt-3 mb-0" style="font-size: 12px;">
-                        Bằng cách đặt hàng, bạn đồng ý với <a href="#" class="text-decoration-none">Điều khoản dịch vụ</a> của Luôn Vui Tươi Shop.
+                        Bằng cách đặt hàng, bạn đồng ý với chính sách bán hàng và bảo mật của Luôn Vui Tươi Shop.
                     </p>
 
                 </div>
@@ -324,19 +332,45 @@
     </form>
 </main>
 
-<!-- Bootstrap JS Bundle -->
-<script>
-    function dienThongTinKhachHang(selectElement) {
-        // Lấy option đang được chọn
-        var selectedOption = selectElement.options[selectElement.selectedIndex];
+<script th:inline="javascript">
+    const rawTamTinh = /*[[${cart.tamTinh}]]*/ 0;
+    const rawShip = /*[[${cart.phiVanChuyen}]]*/ 0;
 
-        // Lấy dữ liệu từ các thuộc tính th:data-* đã gán ở thẻ option
-        var sdt = selectedOption.getAttribute('data-soDienThoai');
-        var email = selectedOption.getAttribute('data-email');
+    function formatCurrency(val) {
+        return new Intl.NumberFormat('vi-VN').format(Math.max(0, Math.round(val))) + 'đ';
+    }
 
-        // Tự động in/điền dữ liệu vào các ô input tương ứng
-        document.getElementById('inputSoDienThoai').value = sdt ? sdt : '';
-        document.getElementById('inputEmail').value = email ? email : '';
+    function capNhatVoucher(sel) {
+        const opt = sel.options[sel.selectedIndex];
+        if (!opt || !opt.value) {
+            document.getElementById('displayGiamGia').innerText = '-0đ';
+            document.getElementById('displayTongTien').innerText = formatCurrency(rawTamTinh + rawShip);
+            return;
+        }
+
+        const loai = parseInt(opt.getAttribute('data-loai')) || 0;
+        const giaTri = parseFloat(opt.getAttribute('data-giatri')) || 0;
+        const toiDa = parseFloat(opt.getAttribute('data-toida')) || 0;
+        const toiThieu = parseFloat(opt.getAttribute('data-toithieu')) || 0;
+
+        if (rawTamTinh < toiThieu) {
+            alert('Đơn hàng chưa đạt giá trị tối thiểu của mã này (' + formatCurrency(toiThieu) + ')!');
+            sel.value = '';
+            capNhatVoucher(sel);
+            return;
+        }
+
+        let giam = 0;
+        if (loai === 1) { // Giảm theo %
+            giam = (rawTamTinh * giaTri) / 100;
+        } else {
+            giam = giaTri;
+        }
+        if (toiDa > 0 && giam > toiDa) giam = toiDa;
+        if (giam > rawTamTinh) giam = rawTamTinh;
+
+        document.getElementById('displayGiamGia').innerText = '-' + formatCurrency(giam);
+        document.getElementById('displayTongTien').innerText = formatCurrency(rawTamTinh + rawShip - giam);
     }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

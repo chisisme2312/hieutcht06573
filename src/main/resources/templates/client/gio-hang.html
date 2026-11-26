@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -15,12 +15,12 @@
 
     <style>
         :root {
-            --primary-black: #111827;
-            --primary-red: #dc2626;
-            --primary-red-hover: #b91c1c;
-            --text-main: #1f2937;
-            --text-muted: #6b7280;
-            --bg-light: #f9fafb;
+            --primary-black: #000000;
+            --primary-red: #c92921;
+            --primary-red-hover: #a8221b;
+            --text-main: #111111;
+            --text-muted: #777777;
+            --bg-light: #f8f9fa;
             --border-color: #e5e7eb;
         }
 
@@ -38,7 +38,7 @@
             color: #ffffff;
             font-size: 13px;
             font-weight: 500;
-            padding: 8px 0;
+            padding: 7px 0;
             letter-spacing: 0.5px;
         }
 
@@ -49,11 +49,10 @@
             z-index: 1000;
             background: #ffffff;
             border-bottom: 1px solid var(--border-color);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
         }
 
         .brand-logo {
-            font-size: 24px;
+            font-size: 26px;
             font-weight: 800;
             letter-spacing: -0.5px;
             color: var(--primary-black);
@@ -69,7 +68,7 @@
         /* Nav menu */
         .nav-link-custom {
             font-weight: 700;
-            font-size: 13.5px;
+            font-size: 14px;
             text-transform: uppercase;
             color: var(--primary-black) !important;
             padding: 16px 14px !important;
@@ -82,17 +81,45 @@
             color: var(--primary-red) !important;
         }
 
+        /* Search Box */
+        .header-search {
+            position: relative;
+            max-width: 380px;
+        }
+
+        .header-search input {
+            border-radius: 20px;
+            padding: 7px 16px 7px 36px;
+            font-size: 13px;
+            background: #f4f4f5;
+            border: 1px solid transparent;
+        }
+
+        .header-search input:focus {
+            background: #ffffff;
+            border-color: var(--primary-black);
+            box-shadow: none;
+        }
+
+        .header-search .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #888;
+            font-size: 14px;
+        }
+
         /* Action icons */
         .action-icon {
-            font-size: 21px;
+            font-size: 20px;
             color: var(--primary-black);
             text-decoration: none;
             position: relative;
-            margin-left: 20px;
+            margin-left: 16px;
+            transition: transform 0.2s;
             display: inline-flex;
             align-items: center;
-            justify-content: center;
-            transition: transform 0.2s, color 0.2s;
         }
 
         .action-icon:hover {
@@ -106,11 +133,11 @@
             right: -10px;
             background-color: var(--primary-red);
             color: white;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 700;
             border-radius: 50%;
-            width: 19px;
-            height: 19px;
+            width: 18px;
+            height: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -365,9 +392,10 @@
     </div>
 </div>
 
-<!-- 2. Header & Menu Điều Hướng -->
+<!-- 2. Header & Thanh Menu Điều Hướng (Chuẩn phong cách Trang Chủ) -->
 <header class="main-header">
     <div class="container">
+        <!-- Hàng 1: Logo - Search - Actions -->
         <div class="d-flex align-items-center justify-content-between py-3">
             
             <!-- Logo -->
@@ -376,50 +404,47 @@
             </a>
 
             <!-- Search Bar in Header -->
-            <form action="/san-pham" method="GET" class="header-search d-none d-lg-block mx-4 flex-grow-1" style="max-width: 400px;">
+            <form action="/san-pham" method="GET" class="header-search d-none d-lg-block mx-4 flex-grow-1" style="max-width: 420px;">
                 <i class="bi bi-search search-icon"></i>
                 <input type="text" name="keyword" class="form-control" placeholder="Tìm kiếm áo thun, polo, sơ mi...">
             </form>
 
-                        <!-- Action Icons: User Auth, Admin (if staff), Catalog, Cart -->
-            <div class="d-flex align-items-center gap-2">
-                <!-- 1. Khi chua dang nhap: Nut Dang Nhap -->
-                <a th:if="${currentUser == null}" href="/login" class="btn btn-sm btn-outline-danger fw-bold">
+            <!-- Action Icons: Login, Admin (nếu là nhân viên), User, Cart -->
+            <div class="d-flex align-items-center">
+                <!-- 1. Khi chưa đăng nhập: Nút Đăng nhập -->
+                <a th:if="${currentUser == null}" href="/login" class="btn btn-sm btn-outline-dark fw-bold me-3">
                     <i class="bi bi-box-arrow-in-right me-1"></i> Đăng Nhập
                 </a>
 
-                <!-- 2. Khi da dang nhap la Nhan Vien hoac Admin: Nut vao Quan Tri + Ten + Dang Xuat -->
-                <div th:if="${currentUser != null and currentUser.isNhanVien()}" class="d-flex align-items-center gap-2">
-                    <a href="/admin" class="btn btn-sm btn-danger fw-bold">
-                        <i class="bi bi-speedometer2 me-1"></i> Quản Trị
+                <!-- 2. Khi đã đăng nhập là Nhân viên hoặc Admin: Nút vào Quản Trị + Tên + Đăng Xuất -->
+                <div th:if="${currentUser != null and currentUser.isNhanVien()}" class="d-flex align-items-center me-3">
+                    <a href="/admin" class="btn btn-sm btn-danger fw-bold me-2">
+                        <i class="bi bi-gear-fill me-1"></i> Trang Quản Trị
                     </a>
-                    <span class="small fw-bold text-dark d-none d-md-inline" th:text="${currentUser.hoTen}">Admin</span>
-                    <a href="/logout" class="btn btn-sm btn-outline-secondary" title="Đăng Xuất">
+                    <span class="small fw-bold me-2 text-dark" th:text="${currentUser.hoTen}">Admin</span>
+                    <a href="/logout" class="action-icon m-0" title="Đăng Xuất">
                         <i class="bi bi-box-arrow-right"></i>
                     </a>
                 </div>
 
-                <!-- 3. Khi da dang nhap la Khach Hang: Chi hien Ten + Dang Xuat (KHONG CO QUAN TRI) -->
-                <div th:if="${currentUser != null and !currentUser.isNhanVien()}" class="d-flex align-items-center gap-2">
-                    <span class="small fw-semibold text-secondary d-none d-md-inline">Xin chào, <strong class="text-dark" th:text="${currentUser.hoTen}">Khách</strong></span>
-                    <a href="/logout" class="btn btn-sm btn-outline-secondary" title="Đăng Xuất">
+                <!-- 3. Khi đã đăng nhập là Khách hàng: Tên + Đăng Xuất -->
+                <div th:if="${currentUser != null and !currentUser.isNhanVien()}" class="d-flex align-items-center me-3">
+                    <span class="small fw-semibold me-2 text-secondary">Chào, <b class="text-dark" th:text="${currentUser.hoTen}">Khách</b></span>
+                    <a href="/logout" class="action-icon m-0" title="Đăng Xuất">
                         <i class="bi bi-box-arrow-right"></i>
                     </a>
                 </div>
 
-                <a href="/san-pham" class="btn btn-sm btn-dark fw-bold d-none d-md-inline-block">
-                    <i class="bi bi-grid me-1"></i> Danh Mục
-                </a>
-
-                <a href="/gio-hang" class="action-icon position-relative ms-1" title="Giỏ hàng">
+                <a href="/gio-hang" class="action-icon" title="Giỏ hàng">
                     <i class="bi bi-bag"></i>
                     <span class="badge-cart" id="headerCartBadge" 
                           th:text="${session.SESSION_CART != null ? session.SESSION_CART.tongSoLuong : 0}">0</span>
                 </a>
             </div>
+        </div>
 
-        <!-- Navigation Categories -->
-        <nav class="d-flex align-items-center border-top overflow-auto">
+        <!-- Hàng 2: Menu điều hướng -->
+        <nav class="d-flex align-items-center border-top">
             <a href="/" class="nav-link-custom">Trang Chủ</a>
             <a href="/san-pham" class="nav-link-custom">Tất Cả Sản Phẩm</a>
             <a href="/san-pham?sort=moi-nhat" class="nav-link-custom">Hàng Mới Về</a>
@@ -537,8 +562,9 @@
                                     <div class="qty-group mx-auto">
                                         <button type="button" class="qty-btn" 
                                                 th:onclick="'updateCartItemQty(' + ${item.sanPhamChiTietId} + ', ' + (${item.soLuong} - 1) + ')'">-</button>
-                                        <input type="text" class="qty-display" th:id="'qty-input-' + ${item.sanPhamChiTietId}" 
-                                               th:value="${item.soLuong}" readonly>
+                                        <input type="number" class="qty-display" th:id="'qty-input-' + ${item.sanPhamChiTietId}" 
+                                               th:value="${item.soLuong}" min="1" th:max="${item.soLuongTon}"
+                                               th:onchange="'onManualCartQtyChange(' + ${item.sanPhamChiTietId} + ', ' + ${item.soLuongTon} + ', this)'">
                                         <button type="button" class="qty-btn" 
                                                 th:onclick="'updateCartItemQty(' + ${item.sanPhamChiTietId} + ', ' + (${item.soLuong} + 1) + ')'"
                                                 th:disabled="${item.soLuong >= item.soLuongTon}">+</button>
@@ -611,13 +637,49 @@
                     <strong class="text-dark" id="displayPhiShip" th:text="${cart.phiVanChuyen > 0 ? #numbers.formatDecimal(cart.phiVanChuyen, 0, 'COMMA', 0, 'POINT') + 'đ' : 'Miễn phí'}">30.000đ</strong>
                 </div>
 
-                <!-- Mã Giảm Giá -->
+                <!-- Mã Giảm Giá (Chọn Voucher, không cho nhập tay) -->
                 <div class="my-3 py-2 border-top border-bottom">
-                    <label class="small fw-bold text-muted mb-2">Mã Khuyến Mãi / Voucher:</label>
-                    <div class="input-group">
-                        <input type="text" class="form-control form-control-sm" placeholder="Nhập mã voucher...">
-                        <button class="btn btn-sm btn-dark fw-bold px-3" type="button" onclick="alert('Đã áp dụng mã voucher thành công!')">ÁP DỤNG</button>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label class="small fw-bold text-dark mb-0">
+                            <i class="bi bi-ticket-perforated-fill text-danger me-1"></i> Mã Khuyến Mãi / Voucher:
+                        </label>
+                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle" id="voucherBadge">Chưa chọn</span>
                     </div>
+
+                    <div class="mb-2">
+                        <select id="selectVoucher" class="form-select form-select-sm fw-semibold" onchange="applyVoucherOnline(this)">
+                            <option value="" data-type="0" data-val="0" data-min="0" data-max="0">-- Chọn voucher giảm giá --</option>
+                            <option th:each="vc : ${@giamGiaRepository.findByTrangThaiTrue()}"
+                                    th:value="${vc.maGiamGia}"
+                                    th:data-type="${vc.loaiGiamGia}"
+                                    th:data-val="${vc.giaTriGiam}"
+                                    th:data-max="${vc.toiDaGiamGia != null ? vc.toiDaGiamGia : 0}"
+                                    th:data-min="${vc.giaTriToiThieu != null ? vc.giaTriToiThieu : 0}"
+                                    th:data-name="${vc.tenGiamGia}"
+                                    th:text="${vc.maGiamGia + ' - ' + vc.tenGiamGia + (vc.loaiGiamGia == 1 ? ' (Giảm ' + vc.giaTriGiam + '%)' : ' (Giảm ' + #numbers.formatDecimal(vc.giaTriGiam, 0, 'COMMA', 0, 'POINT') + 'đ)')}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <!-- Hộp thông báo chi tiết voucher sau khi chọn -->
+                    <div id="voucherDetailBox" class="alert alert-success py-2 px-3 small mb-0 d-none">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <i class="bi bi-check-circle-fill text-success me-1"></i>
+                                <span>Đã chọn: <strong id="appliedVoucherCode"></strong></span>
+                                <div class="text-muted" style="font-size: 11px;" id="appliedVoucherDesc"></div>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-link text-danger p-0 text-decoration-none fw-bold" onclick="removeVoucherOnline()">
+                                <i class="bi bi-x-circle me-1"></i> Bỏ chọn
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dòng hiển thị số tiền giảm giá -->
+                <div class="d-flex justify-content-between mb-3 small d-none" id="rowGiamGiaVoucher">
+                    <span class="text-success fw-semibold"><i class="bi bi-tag-fill me-1"></i> Giảm giá voucher:</span>
+                    <strong class="text-success fw-bold" id="displayGiamGiaVoucher">-0đ</strong>
                 </div>
 
                 <!-- Tổng Thanh Toán -->
@@ -630,9 +692,9 @@
                 </div>
 
                 <!-- Nút Tiến hành đặt hàng -->
-                <button type="button" class="btn-checkout" onclick="thongBaoDatHang()">
+                <a th:href="@{/dat-hang}" class="btn-checkout text-decoration-none d-block text-center">
                     <i class="bi bi-shield-check me-1"></i> TIẾN HÀNH ĐẶT HÀNG
-                </button>
+                </a>
 
                 <!-- Cam kết mua sắm -->
                 <div class="mt-4 pt-3 border-top text-muted small">
@@ -710,6 +772,20 @@
         return new Intl.NumberFormat('vi-VN').format(amount) + 'đ';
     }
 
+    function onManualCartQtyChange(variantId, maxStock, inputEl) {
+        let val = parseInt(inputEl.value);
+        if (isNaN(val) || val < 1) {
+            alert('Số lượng tối thiểu là 1!');
+            inputEl.value = 1;
+            val = 1;
+        } else if (val > maxStock) {
+            alert('Số lượng bạn nhập (' + val + ') vượt quá tồn kho (tối đa ' + maxStock + ' sản phẩm)!');
+            inputEl.value = maxStock;
+            val = maxStock;
+        }
+        updateCartItemQty(variantId, val);
+    }
+
     function updateCartItemQty(variantId, newQty) {
         if (newQty <= 0) {
             if (!confirm('Bạn có muốn xóa sản phẩm này khỏi giỏ hàng?')) {
@@ -743,9 +819,121 @@
         });
     }
 
-    function thongBaoDatHang() {
-        alert('🎉 Chúc mừng bạn đã hoàn tất đặt hàng thử nghiệm!\nNhân viên Luôn Vui Tươi Shop sẽ liên hệ với bạn để xác nhận đơn hàng.');
+    // XỬ LÝ CHỌN VOUCHER TRỰC TIẾP (KHÔNG NHẬP TAY)
+    const rawTamTinh = Number(/*[[${cart.tamTinh != null ? cart.tamTinh : 0}]]*/ 0);
+    const rawPhiShip = Number(/*[[${cart.phiVanChuyen != null ? cart.phiVanChuyen : 0}]]*/ 0);
+
+    function applyVoucherOnline(sel) {
+        if (!sel) return;
+        const opt = sel.options[sel.selectedIndex];
+        const val = Number(opt.getAttribute('data-val') || 0);
+        const type = Number(opt.getAttribute('data-type') || 0);
+        const max = Number(opt.getAttribute('data-max') || 0);
+        const min = Number(opt.getAttribute('data-min') || 0);
+        const code = opt.value;
+
+        if (!code || val <= 0) {
+            removeVoucherOnline();
+            return;
+        }
+
+        // Kiểm tra điều kiện đơn hàng tối thiểu
+        if (min > 0 && rawTamTinh < min) {
+            alert(`⚠️ Voucher ${code} chỉ áp dụng cho đơn hàng từ ${formatVND(min)} trở lên!\nTổng tiền hàng hiện tại của bạn là ${formatVND(rawTamTinh)} chưa đủ điều kiện.`);
+            sel.value = "";
+            removeVoucherOnline();
+            return;
+        }
+
+        // Tính số tiền giảm
+        let discount = 0;
+        let desc = "";
+        if (type === 1) { // Giảm theo %
+            discount = Math.round((rawTamTinh * val) / 100);
+            if (max > 0 && discount > max) {
+                discount = max;
+                desc = `Giảm ${val}% (Tối đa ${formatVND(max)})`;
+            } else {
+                desc = `Giảm ${val}%`;
+            }
+        } else { // Giảm theo tiền cố định (type === 2)
+            discount = val;
+            desc = `Giảm trực tiếp ${formatVND(val)}`;
+        }
+
+        if (discount > rawTamTinh) {
+            discount = rawTamTinh;
+        }
+
+        const newTotal = Math.max(0, rawTamTinh + rawPhiShip - discount);
+
+        // Hiển thị dòng giảm giá
+        const rowGiamGia = document.getElementById('rowGiamGiaVoucher');
+        if (rowGiamGia) rowGiamGia.classList.remove('d-none');
+
+        const displayGiam = document.getElementById('displayGiamGiaVoucher');
+        if (displayGiam) displayGiam.innerText = '-' + formatVND(discount);
+
+        const displayTotal = document.getElementById('displayTongTien');
+        if (displayTotal) displayTotal.innerText = formatVND(newTotal);
+
+        // Hiển thị chi tiết voucher
+        const appliedCode = document.getElementById('appliedVoucherCode');
+        if (appliedCode) appliedCode.innerText = code;
+
+        const appliedDesc = document.getElementById('appliedVoucherDesc');
+        if (appliedDesc) appliedDesc.innerText = desc + ` (Tiết kiệm ${formatVND(discount)})`;
+
+        const detailBox = document.getElementById('voucherDetailBox');
+        if (detailBox) detailBox.classList.remove('d-none');
+
+        const badge = document.getElementById('voucherBadge');
+        if (badge) {
+            badge.innerText = code;
+            badge.className = "badge bg-success-subtle text-success border border-success-subtle";
+        }
+
+        sessionStorage.setItem("applied_voucher_code", code);
     }
+
+    function removeVoucherOnline() {
+        const sel = document.getElementById('selectVoucher');
+        if (sel) sel.value = "";
+
+        const normalTotal = rawTamTinh + rawPhiShip;
+        const rowGiamGia = document.getElementById('rowGiamGiaVoucher');
+        if (rowGiamGia) rowGiamGia.classList.add('d-none');
+
+        const displayGiam = document.getElementById('displayGiamGiaVoucher');
+        if (displayGiam) displayGiam.innerText = '-0đ';
+
+        const displayTotal = document.getElementById('displayTongTien');
+        if (displayTotal) displayTotal.innerText = formatVND(normalTotal);
+
+        const detailBox = document.getElementById('voucherDetailBox');
+        if (detailBox) detailBox.classList.add('d-none');
+
+        const badge = document.getElementById('voucherBadge');
+        if (badge) {
+            badge.innerText = "Chưa chọn";
+            badge.className = "badge bg-danger-subtle text-danger border border-danger-subtle";
+        }
+
+        sessionStorage.removeItem("applied_voucher_code");
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const savedCode = sessionStorage.getItem("applied_voucher_code");
+        if (savedCode) {
+            const sel = document.getElementById('selectVoucher');
+            if (sel) {
+                sel.value = savedCode;
+                if (sel.value === savedCode) {
+                    applyVoucherOnline(sel);
+                }
+            }
+        }
+    });
 </script>
 </body>
 </html>

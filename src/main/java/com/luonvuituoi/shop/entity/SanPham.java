@@ -53,4 +53,13 @@ public class SanPham {
 
     @OneToMany(mappedBy = "sanPham", cascade = CascadeType.ALL)
     private java.util.Set<SanPhamChiTiet> danhSachChiTiet;
+
+    @Transient
+    public int getTongSoLuongTon() {
+        if (danhSachChiTiet == null || danhSachChiTiet.isEmpty()) return 0;
+        return danhSachChiTiet.stream()
+                .filter(ct -> ct.getSoLuongTon() != null)
+                .mapToInt(SanPhamChiTiet::getSoLuongTon)
+                .sum();
+    }
 }

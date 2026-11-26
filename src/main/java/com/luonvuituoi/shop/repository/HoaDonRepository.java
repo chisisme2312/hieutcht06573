@@ -12,7 +12,9 @@ import java.util.List;
 public interface HoaDonRepository extends JpaRepository<HoaDon, Integer> {
     List<HoaDon> findByTrangThai(String trangThai);
     List<HoaDon> findByKhachHangId(Integer khachHangId);
+    List<HoaDon> findByKhachHangIdOrderByNgayTaoDesc(Integer khachHangId);
     List<HoaDon> findByHinhThucMuaHangTrueOrderByNgayTaoDesc();
+    List<HoaDon> findByHinhThucMuaHangFalseOrderByNgayTaoDesc();
 
     @Override
     @EntityGraph(attributePaths = {"khachHang", "nhanVien"})

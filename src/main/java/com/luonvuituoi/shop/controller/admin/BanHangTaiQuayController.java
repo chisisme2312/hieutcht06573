@@ -35,11 +35,32 @@ public class BanHangTaiQuayController {
     @Value("${pos.qr.account-name:}") private String accountName;
 
     @GetMapping
-    public String index(@RequestParam(required = false) Integer hoaDonId, Model model) {
-        List<HoaDon> hoaDonCho = hoaDonRepository.findByHinhThucMuaHangTrueOrderByNgayTaoDesc().stream()
-                .filter(h -> BanHangService.CHO_THANH_TOAN.equals(h.getTrangThai())).toList();
+    public String index(@RequestParam(required = false) Integer hoaDonId, HttpSession session, Model model) {
+        AuthUser auth = (AuthUser) session.getAttribute(AuthServiceImpl.SESSION_USER_KEY);
+
+        // Phân quyền hóa đơn chờ: Nhân viên chỉ xem hóa đơn của mình, Admin xem tất cả
+        List<HoaDon> hoaDonCho;
+        if (auth != null && auth.isStaff() && !auth.isAdmin()) {
+            hoaDonCho = hoaDonRepository.findByHinhThucMuaHangTrueOrderByNgayTaoDesc().stream()
+                    .filter(h -> BanHangService.CHO_THANH_TOAN.equals(h.getTrangThai()))
+                    .filter(h -> h.getNhanVien() != null && h.getNhanVien().getId().equals(auth.getId()))
+                    .toList();
+        } else {
+            hoaDonCho = hoaDonRepository.findByHinhThucMuaHangTrueOrderByNgayTaoDesc().stream()
+                    .filter(h -> BanHangService.CHO_THANH_TOAN.equals(h.getTrangThai()))
+                    .toList();
+        }
+
         HoaDon selected = null;
-        if (hoaDonId != null) selected = hoaDonRepository.findById(hoaDonId).orElse(null);
+        if (hoaDonId != null) {
+            selected = hoaDonRepository.findById(hoaDonId).orElse(null);
+            // Nhân viên thường không được xem hóa đơn chờ của nhân viên khác
+            if (selected != null && auth != null && auth.isStaff() && !auth.isAdmin()) {
+                if (selected.getNhanVien() != null && !selected.getNhanVien().getId().equals(auth.getId())) {
+                    selected = null;
+                }
+            }
+        }
         if (selected != null && (!Boolean.TRUE.equals(selected.getHinhThucMuaHang()) || !BanHangService.CHO_THANH_TOAN.equals(selected.getTrangThai()))) selected = null;
         if (selected == null && !hoaDonCho.isEmpty()) selected = hoaDonCho.get(0);
         model.addAttribute("hoaDonCho", hoaDonCho);
@@ -75,45 +96,62 @@ public class BanHangTaiQuayController {
     }
 
     @PostMapping("/{id}/them-san-pham")
-    public String themSanPham(@PathVariable Integer id, @RequestParam Integer sanPhamChiTietId, @RequestParam(defaultValue = "1") Integer soLuong, RedirectAttributes ra) {
-        return xuLy(id, ra, () -> banHangService.themSanPham(id, sanPhamChiTietId, soLuong));
+    public String themSanPham(@PathVariable Integer id, @RequestParam Integer sanPhamChiTietId, @RequestParam(defaultValue = "1") Integer soLuong, HttpSession session, RedirectAttributes ra) {
+        return xuLy(id, session, ra, () -> banHangService.themSanPham(id, sanPhamChiTietId, soLuong));
     }
 
     @PostMapping("/{id}/cap-nhat-so-luong")
-    public String capNhatSoLuong(@PathVariable Integer id, @RequestParam Integer chiTietId, @RequestParam Integer soLuong, RedirectAttributes ra) {
-        return xuLy(id, ra, () -> banHangService.capNhatSoLuong(id, chiTietId, soLuong));
+    public String capNhatSoLuong(@PathVariable Integer id, @RequestParam Integer chiTietId, @RequestParam Integer soLuong, HttpSession session, RedirectAttributes ra) {
+        return xuLy(id, session, ra, () -> banHangService.capNhatSoLuong(id, chiTietId, soLuong));
     }
 
     @PostMapping("/{id}/xoa-san-pham")
-    public String xoaSanPham(@PathVariable Integer id, @RequestParam Integer chiTietId, RedirectAttributes ra) {
-        return xuLy(id, ra, () -> banHangService.xoaSanPham(id, chiTietId));
+    public String xoaSanPham(@PathVariable Integer id, @RequestParam Integer chiTietId, HttpSession session, RedirectAttributes ra) {
+        return xuLy(id, session, ra, () -> banHangService.xoaSanPham(id, chiTietId));
     }
 
     @PostMapping("/{id}/gan-khach-hang")
-    public String ganKhachHang(@PathVariable Integer id, @RequestParam(required = false) Integer khachHangId, RedirectAttributes ra) {
-        return xuLy(id, ra, () -> banHangService.ganKhachHang(id, khachHangId));
+    public String ganKhachHang(@PathVariable Integer id, @RequestParam(required = false) Integer khachHangId, HttpSession session, RedirectAttributes ra) {
+        return xuLy(id, session, ra, () -> banHangService.ganKhachHang(id, khachHangId));
     }
 
     @PostMapping("/{id}/them-khach-hang")
-    public String themKhachHang(@PathVariable Integer id, @RequestParam String hoTen, @RequestParam(required = false) String soDienThoai, @RequestParam(required = false) String email, RedirectAttributes ra) {
-        try { KhachHang kh = banHangService.themKhachHangNhanh(hoTen, soDienThoai, email); banHangService.ganKhachHang(id, kh.getId()); ra.addFlashAttribute("success", "Đã thêm và chọn khách hàng."); }
-        catch (RuntimeException e) { ra.addFlashAttribute("error", e.getMessage()); }
-        return "redirect:/admin/ban-hang?hoaDonId=" + id;
+    public String themKhachHang(@PathVariable Integer id, @RequestParam String hoTen, @RequestParam(required = false) String soDienThoai, @RequestParam(required = false) String email, HttpSession session, RedirectAttributes ra) {
+        return xuLy(id, session, ra, () -> {
+            KhachHang kh = banHangService.themKhachHangNhanh(hoTen, soDienThoai, email);
+            banHangService.ganKhachHang(id, kh.getId());
+        });
     }
 
     @PostMapping("/{id}/voucher")
-    public String apDungVoucher(@PathVariable Integer id, @RequestParam(required = false) String maVoucher, RedirectAttributes ra) {
-        return xuLy(id, ra, () -> banHangService.apDungVoucher(id, maVoucher));
+    public String apDungVoucher(@PathVariable Integer id, @RequestParam(required = false) String maVoucher, HttpSession session, RedirectAttributes ra) {
+        return xuLy(id, session, ra, () -> banHangService.apDungVoucher(id, maVoucher));
     }
 
     @PostMapping("/{id}/thanh-toan-tien-mat")
-    public String thanhToanTienMat(@PathVariable Integer id, @RequestParam BigDecimal tienKhachDua, RedirectAttributes ra) {
-        try { banHangService.thanhToanTienMat(id, tienKhachDua); ra.addFlashAttribute("success", "Thanh toán tiền mặt thành công."); return "redirect:/admin/hoa-don/" + id; }
-        catch (RuntimeException e) { ra.addFlashAttribute("error", e.getMessage()); return "redirect:/admin/ban-hang?hoaDonId=" + id; }
+    public String thanhToanTienMat(@PathVariable Integer id, @RequestParam BigDecimal tienKhachDua, HttpSession session, RedirectAttributes ra) {
+        AuthUser auth = (AuthUser) session.getAttribute(AuthServiceImpl.SESSION_USER_KEY);
+        if (!kiemTraQuyenHoaDon(id, auth)) {
+            ra.addFlashAttribute("error", "Bạn không có quyền thanh toán hóa đơn của nhân viên khác!");
+            return "redirect:/admin/ban-hang";
+        }
+        try { 
+            banHangService.thanhToanTienMat(id, tienKhachDua); 
+            ra.addFlashAttribute("success", "Thanh toán tiền mặt thành công."); 
+            return "redirect:/admin/hoa-don/" + id; 
+        } catch (RuntimeException e) { 
+            ra.addFlashAttribute("error", e.getMessage()); 
+            return "redirect:/admin/ban-hang?hoaDonId=" + id; 
+        }
     }
 
     @GetMapping("/{id}/qr")
-    public String hienThiQR(@PathVariable Integer id, Model model, RedirectAttributes ra) {
+    public String hienThiQR(@PathVariable Integer id, HttpSession session, Model model, RedirectAttributes ra) {
+        AuthUser auth = (AuthUser) session.getAttribute(AuthServiceImpl.SESSION_USER_KEY);
+        if (!kiemTraQuyenHoaDon(id, auth)) {
+            ra.addFlashAttribute("error", "Bạn không có quyền xem QR hóa đơn của nhân viên khác!");
+            return "redirect:/admin/ban-hang";
+        }
         HoaDon hd = hoaDonRepository.findById(id).orElse(null);
         if (hd == null || !BanHangService.CHO_THANH_TOAN.equals(hd.getTrangThai()) || !Boolean.TRUE.equals(hd.getHinhThucMuaHang())) {
             ra.addFlashAttribute("error", "Hóa đơn không hợp lệ hoặc đã thanh toán."); return "redirect:/admin/ban-hang";
@@ -138,19 +176,48 @@ public class BanHangTaiQuayController {
     }
 
     @PostMapping("/{id}/xac-nhan-qr")
-    public String xacNhanQR(@PathVariable Integer id, RedirectAttributes ra) {
-        try { banHangService.xacNhanDaNhanChuyenKhoan(id); ra.addFlashAttribute("success", "Đã xác nhận thanh toán chuyển khoản."); return "redirect:/admin/hoa-don/" + id; }
-        catch (RuntimeException e) { ra.addFlashAttribute("error", e.getMessage()); return "redirect:/admin/ban-hang?hoaDonId=" + id; }
+    public String xacNhanQR(@PathVariable Integer id, HttpSession session, RedirectAttributes ra) {
+        AuthUser auth = (AuthUser) session.getAttribute(AuthServiceImpl.SESSION_USER_KEY);
+        if (!kiemTraQuyenHoaDon(id, auth)) {
+            ra.addFlashAttribute("error", "Bạn không có quyền xác nhận hóa đơn của nhân viên khác!");
+            return "redirect:/admin/ban-hang";
+        }
+        try { 
+            banHangService.xacNhanDaNhanChuyenKhoan(id); 
+            ra.addFlashAttribute("success", "Đã xác nhận thanh toán chuyển khoản."); 
+            return "redirect:/admin/hoa-don/" + id; 
+        } catch (RuntimeException e) { 
+            ra.addFlashAttribute("error", e.getMessage()); 
+            return "redirect:/admin/ban-hang?hoaDonId=" + id; 
+        }
     }
 
     @PostMapping("/{id}/huy")
-    public String huy(@PathVariable Integer id, RedirectAttributes ra) {
-        return xuLy(id, ra, () -> banHangService.huyHoaDon(id));
+    public String huy(@PathVariable Integer id, HttpSession session, RedirectAttributes ra) {
+        return xuLy(id, session, ra, () -> banHangService.huyHoaDon(id));
     }
 
-    private String xuLy(Integer id, RedirectAttributes ra, Runnable action) {
-        try { action.run(); ra.addFlashAttribute("success", "Đã cập nhật hóa đơn."); }
-        catch (RuntimeException e) { ra.addFlashAttribute("error", e.getMessage()); }
+    private boolean kiemTraQuyenHoaDon(Integer hoaDonId, AuthUser auth) {
+        if (auth == null) return false;
+        if (auth.isAdmin()) return true;
+        var hdOpt = hoaDonRepository.findById(hoaDonId);
+        if (hdOpt.isEmpty()) return false;
+        HoaDon hd = hdOpt.get();
+        return hd.getNhanVien() == null || hd.getNhanVien().getId().equals(auth.getId());
+    }
+
+    private String xuLy(Integer id, HttpSession session, RedirectAttributes ra, Runnable action) {
+        AuthUser auth = (AuthUser) session.getAttribute(AuthServiceImpl.SESSION_USER_KEY);
+        if (!kiemTraQuyenHoaDon(id, auth)) {
+            ra.addFlashAttribute("error", "Bạn không có quyền thao tác trên hóa đơn chờ của nhân viên khác!");
+            return "redirect:/admin/ban-hang";
+        }
+        try { 
+            action.run(); 
+            ra.addFlashAttribute("success", "Đã cập nhật hóa đơn."); 
+        } catch (RuntimeException e) { 
+            ra.addFlashAttribute("error", e.getMessage()); 
+        }
         return "redirect:/admin/ban-hang?hoaDonId=" + id;
     }
 }
