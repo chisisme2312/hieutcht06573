@@ -566,10 +566,15 @@
 
             <!-- Action Icons: Login, Admin (nếu là nhân viên), User, Cart -->
             <div class="d-flex align-items-center">
-                <!-- 1. Khi chưa đăng nhập: Nút Đăng nhập -->
-                <a th:if="${currentUser == null}" href="/login" class="btn btn-sm btn-outline-dark fw-bold me-3">
-                    <i class="bi bi-box-arrow-in-right me-1"></i> Đăng Nhập
-                </a>
+                <!-- 1. Khi chưa đăng nhập: Nút Đăng nhập & Đăng ký -->
+                <div th:if="${currentUser == null}" class="d-flex align-items-center me-3 gap-2">
+                    <a href="/login" class="btn btn-sm btn-outline-dark fw-bold">
+                        <i class="bi bi-box-arrow-in-right me-1"></i> Đăng Nhập
+                    </a>
+                    <a href="/dang-ky" class="btn btn-sm btn-danger fw-bold">
+                        <i class="bi bi-person-plus me-1"></i> Đăng Ký
+                    </a>
+                </div>
 
                 <!-- 2. Khi đã đăng nhập là Nhân viên hoặc Admin: Nút vào Quản Trị + Tên + Đăng Xuất -->
                 <div th:if="${currentUser != null and currentUser.isNhanVien()}" class="d-flex align-items-center me-3">

@@ -194,6 +194,14 @@
             </button>
         </form>
 
+        <!-- Chưa có tài khoản? Đăng ký ngay -->
+        <div class="text-center pt-3 mb-2">
+            <span class="text-muted small">Chưa có tài khoản?</span>
+            <a th:href="@{/dang-ky(redirect=${redirect})}" class="text-danger fw-bold text-decoration-none ms-1 small">
+                Đăng ký tài khoản mới <i class="bi bi-arrow-right-short"></i>
+            </a>
+        </div>
+
         <!-- Nút chọn nhanh tài khoản mẫu phục vụ kiểm thử & bảo vệ đồ án -->
         <div class="divider">Tài khoản demo kiểm thử</div>
         <div class="d-flex flex-column gap-2 mb-3">
