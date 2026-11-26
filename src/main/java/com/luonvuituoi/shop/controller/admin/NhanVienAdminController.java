@@ -66,9 +66,13 @@ public class NhanVienAdminController {
             return "redirect:/admin/nhan-vien";
         }
 
-        model.addAttribute("nhanVien", opt.get());
+        NhanVien nv = opt.get();
+        boolean isAdminAccount = "admin".equalsIgnoreCase(nv.getTenDangNhap());
+
+        model.addAttribute("nhanVien", nv);
         model.addAttribute("listVaiTro", vaiTroRepository.findAll());
         model.addAttribute("isEdit", true);
+        model.addAttribute("isAdminAccount", isAdminAccount);
         return "admin/nhan-vien/form";
     }
 
@@ -102,6 +106,19 @@ public class NhanVienAdminController {
         NhanVien nv;
         if (id != null) {
             nv = nhanVienRepository.findById(id).orElse(new NhanVien());
+
+            // BẢO VỆ TÀI KHOẢN ADMIN: Nếu là tài khoản 'admin' gốc
+            if ("admin".equalsIgnoreCase(nv.getTenDangNhap())) {
+                usernameTrim = "admin"; // Không cho đổi username
+                trangThai = true; // Luôn luôn hoạt động, không cho khóa
+
+                // Luôn giữ vai trò ADMIN
+                var adminRoleOpt = vaiTroRepository.findByTenVaiTro("ADMIN");
+                if (adminRoleOpt.isPresent()) {
+                    vaiTro = adminRoleOpt.get();
+                }
+            }
+
             if (matKhau != null && !matKhau.isBlank()) {
                 nv.setMatKhau(matKhau.trim());
             }
@@ -141,13 +158,20 @@ public class NhanVienAdminController {
         return "redirect:/admin/nhan-vien";
     }
 
-    // 5. Khóa / Mở khóa tài khoản nhân viên
+    // 5. Khóa / Mở khóa tài khoản nhân viên (BẢO VỆ TÀI KHOẢN ADMIN GỐC)
     @PostMapping("/doi-trang-thai/{id}")
     @Transactional
     public String doiTrangThai(@PathVariable("id") Integer id, RedirectAttributes ra) {
         var opt = nhanVienRepository.findById(id);
         if (opt.isPresent()) {
             NhanVien nv = opt.get();
+
+            // CHẶN TUYỆT ĐỐI: Không cho phép khóa tài khoản admin
+            if ("admin".equalsIgnoreCase(nv.getTenDangNhap())) {
+                ra.addFlashAttribute("errorMsg", "Không thể khóa tài khoản Quản Trị Viên (Admin) gốc! Phải luôn duy trì tài khoản Admin để quản trị hệ thống.");
+                return "redirect:/admin/nhan-vien";
+            }
+
             boolean newStatus = !Boolean.TRUE.equals(nv.getTrangThai());
             nv.setTrangThai(newStatus);
             nhanVienRepository.save(nv);

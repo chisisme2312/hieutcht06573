@@ -29,6 +29,15 @@
             </div>
 
             <div class="card card-custom p-4 shadow-sm" style="max-width: 800px;">
+
+                <!-- Cảnh báo bảo vệ tài khoản Admin gốc -->
+                <div th:if="${isAdminAccount}" class="alert alert-warning d-flex align-items-center gap-2 py-2 px-3 rounded-3 mb-3 small" role="alert">
+                    <i class="bi bi-shield-lock-fill text-danger fs-5 flex-shrink-0"></i>
+                    <div>
+                        <strong>Tài khoản Quản Trị Viên (Admin) gốc được bảo vệ:</strong> Tên đăng nhập, vai trò ADMIN và trạng thái hoạt động được cố định an toàn để luôn đảm bảo quyền quản trị hệ thống.
+                    </div>
+                </div>
+
                 <form th:action="@{/admin/nhan-vien/luu}" method="POST">
                     <input type="hidden" name="id" th:value="${nhanVien.id}">
 
@@ -44,7 +53,7 @@
 
                         <div class="col-md-6">
                             <label class="form-label small fw-bold">Tên Đăng Nhập <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="tenDangNhap" th:value="${nhanVien.tenDangNhap}" placeholder="Ví dụ: namtv, nhanvien1" required>
+                            <input type="text" class="form-control" name="tenDangNhap" th:value="${nhanVien.tenDangNhap}" th:readonly="${isAdminAccount}" placeholder="Ví dụ: namtv, nhanvien1" required>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold">Mật Khẩu <span th:if="${!isEdit}" class="text-danger">*</span> <small class="text-muted" th:if="${isEdit}">(Để trống nếu không đổi)</small></label>
@@ -53,7 +62,7 @@
 
                         <div class="col-md-6">
                             <label class="form-label small fw-bold">Phân Quyền / Vai Trò <span class="text-danger">*</span></label>
-                            <select name="idVaiTro" class="form-select" required>
+                            <select name="idVaiTro" class="form-select" th:disabled="${isAdminAccount}" required>
                                 <option value="">-- Chọn vai trò --</option>
                                 <option th:each="vt : ${listVaiTro}" 
                                         th:value="${vt.id}" 
@@ -61,14 +70,16 @@
                                         th:selected="${nhanVien.vaiTro != null and nhanVien.vaiTro.id == vt.id}">
                                 </option>
                             </select>
+                            <input type="hidden" name="idVaiTro" th:value="${nhanVien.vaiTro != null ? nhanVien.vaiTro.id : ''}" th:if="${isAdminAccount}" />
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold">Trạng Thái Làm Việc</label>
                             <div class="mt-2">
                                 <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" name="trangThai" value="true" id="checkTrangThai" th:checked="${nhanVien.trangThai == true}">
+                                    <input class="form-check-input" type="checkbox" name="trangThai" value="true" id="checkTrangThai" th:checked="${nhanVien.trangThai == true or isAdminAccount}" th:disabled="${isAdminAccount}">
                                     <label class="form-check-label fw-semibold" for="checkTrangThai">Đang làm việc (Cho phép đăng nhập)</label>
                                 </div>
+                                <input type="hidden" name="trangThai" value="true" th:if="${isAdminAccount}" />
                             </div>
                         </div>
 
