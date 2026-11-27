@@ -170,14 +170,18 @@ public class BanHangTaiQuayController {
         }
         model.addAttribute("hoaDon", hd);
         model.addAttribute("chiTietHoaDon", chiTiet);
-        boolean configured = bankId != null && !bankId.isBlank() && accountNumber != null && !accountNumber.isBlank();
-        model.addAttribute("qrConfigured", configured);
-        String qrUrl = "";
-        if (configured) {
-            String info = URLEncoder.encode("Thanh toan " + hd.getMaHoaDon(), StandardCharsets.UTF_8);
-            String name = URLEncoder.encode(accountName == null ? "" : accountName, StandardCharsets.UTF_8);
-            qrUrl = "https://img.vietqr.io/image/" + bankId + "-" + accountNumber + "-compact2.png?amount=" + hd.getTongTien().longValue() + "&addInfo=" + info + "&accountName=" + name;
-        }
+
+        String bId = (bankId != null && !bankId.isBlank()) ? bankId.trim() : "MB";
+        String accNum = (accountNumber != null && !accountNumber.isBlank()) ? accountNumber.trim() : "0987654321";
+        String accName = (accountName != null && !accountName.isBlank()) ? accountName.trim() : "LUON VUI TUOI SHOP";
+
+        String info = URLEncoder.encode("Thanh toan " + hd.getMaHoaDon(), StandardCharsets.UTF_8);
+        String name = URLEncoder.encode(accName, StandardCharsets.UTF_8);
+        long amount = (hd.getTongTien() != null) ? hd.getTongTien().longValue() : 0L;
+
+        String qrUrl = "https://img.vietqr.io/image/" + bId + "-" + accNum + "-compact2.png?amount=" + amount + "&addInfo=" + info + "&accountName=" + name;
+
+        model.addAttribute("qrConfigured", true);
         model.addAttribute("qrUrl", qrUrl);
         return "admin/ban-hang/qr";
     }
