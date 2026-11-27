@@ -163,13 +163,16 @@
             <input type="hidden" name="redirect" th:value="${redirect}" />
 
             <div class="mb-3">
-                <label class="form-label fw-semibold text-secondary small mb-1">Tên đăng nhập / Email / Số điện thoại</label>
+                <label class="form-label fw-semibold text-secondary small mb-1">Số điện thoại / Email / Tên đăng nhập</label>
                 <div class="input-group">
                     <span class="input-group-text bg-light border-end-0 text-muted" style="border-radius: 10px 0 0 10px;">
                         <i class="bi bi-person"></i>
                     </span>
                     <input type="text" id="usernameInput" name="usernameOrAccount" class="form-control border-start-0 ps-1"
-                           th:value="${usernameOrAccount}" placeholder="Nhập tài khoản hoặc email..." required autofocus />
+                           th:value="${usernameOrAccount}" placeholder="Nhập Số điện thoại hoặc Email bạn đã đăng ký..." required autofocus />
+                </div>
+                <div class="form-text text-muted" style="font-size: 11.5px;">
+                    <i class="bi bi-info-circle me-1"></i> Dùng chính <b>Số điện thoại</b> hoặc <b>Email</b> bạn đã tạo tài khoản để đăng nhập.
                 </div>
             </div>
 
