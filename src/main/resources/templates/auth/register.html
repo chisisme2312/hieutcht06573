@@ -140,19 +140,35 @@
 
                 <div class="col-md-6 mb-2">
                     <label class="form-label fw-semibold text-secondary small mb-1">Mật Khẩu <span class="text-danger">*</span></label>
-                    <input type="password" name="password" class="form-control" placeholder="Tối thiểu 4 ký tự" minlength="4" required />
+                    <input type="password" id="regPassword" name="password" class="form-control" placeholder="Tối thiểu 4 ký tự" minlength="4" required />
                 </div>
 
                 <div class="col-md-6 mb-3">
                     <label class="form-label fw-semibold text-secondary small mb-1">Xác Nhận Mật Khẩu <span class="text-danger">*</span></label>
-                    <input type="password" name="confirmPassword" class="form-control" placeholder="Nhập lại mật khẩu" minlength="4" required />
+                    <input type="password" id="regConfirmPassword" name="confirmPassword" class="form-control" placeholder="Nhập lại mật khẩu" minlength="4" required />
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-brand w-100 mt-2">
+            <button type="submit" id="btnSubmitRegister" class="btn btn-brand w-100 mt-2">
                 <i class="bi bi-person-check-fill me-1"></i> Đăng Ký Tài Khoản
             </button>
         </form>
+
+        <script>
+            const pw = document.getElementById('regPassword');
+            const cpw = document.getElementById('regConfirmPassword');
+            function validatePw() {
+                if (pw.value !== cpw.value) {
+                    cpw.setCustomValidity('Mật khẩu xác nhận không khớp!');
+                } else {
+                    cpw.setCustomValidity('');
+                }
+            }
+            if (pw && cpw) {
+                pw.onchange = validatePw;
+                cpw.onkeyup = validatePw;
+            }
+        </script>
 
         <!-- Đã có tài khoản? Đăng nhập ngay -->
         <div class="text-center pt-3 mt-3 border-top">

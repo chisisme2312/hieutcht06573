@@ -130,23 +130,68 @@ public class AuthController {
         }
 
         String sdtTrim = soDienThoai.trim();
-        if (khachHangRepository.findBySoDienThoai(sdtTrim).isPresent()) {
-            model.addAttribute("errorMsg", "Số điện thoại [" + sdtTrim + "] đã được đăng ký! Vui lòng đăng nhập hoặc dùng số khác.");
-            model.addAttribute("hoTen", hoTen);
-            model.addAttribute("email", email);
-            model.addAttribute("diaChi", diaChi);
-            model.addAttribute("redirect", redirect);
-            return "auth/register";
+        String emailTrim = (email != null && !email.isBlank()) ? email.trim() : null;
+
+        var khTonTaiOpt = khachHangRepository.findBySoDienThoai(sdtTrim);
+        if (khTonTaiOpt.isPresent()) {
+            // Số điện thoại đã có sẵn: Cập nhật thông tin mới nhất và tự động đăng nhập, chuyển ngay về giao diện chính
+            KhachHang kh = khTonTaiOpt.get();
+            if (hoTen != null && !hoTen.isBlank()) kh.setHoTen(hoTen.trim());
+            if (emailTrim != null) kh.setEmail(emailTrim);
+            if (password != null && !password.isBlank() && password.equals(confirmPassword)) {
+                kh.setMatKhau(password.trim());
+            }
+            khachHangRepository.save(kh);
+
+            if (diaChi != null && !diaChi.isBlank()) {
+                var dsDc = dcrepository.findByKhachHangId(kh.getId());
+                DiaChi dc = dsDc.isEmpty() ? new DiaChi() : dsDc.get(0);
+                dc.setKhachHang(kh);
+                dc.setDuong(diaChi.trim());
+                dc.setMacDinh(true);
+                dcrepository.save(dc);
+            }
+
+            AuthUser authUser = AuthUser.builder()
+                    .id(kh.getId())
+                    .maNguoiDung(kh.getMaKhachHang())
+                    .hoTen(kh.getHoTen())
+                    .tenDangNhap(kh.getEmail() != null ? kh.getEmail() : kh.getSoDienThoai())
+                    .email(kh.getEmail())
+                    .soDienThoai(kh.getSoDienThoai())
+                    .vaiTro("CUSTOMER")
+                    .build();
+            authService.setCurrentUser(session, authUser);
+
+            ra.addFlashAttribute("thongBaoThanhCong", "Tài khoản [" + sdtTrim + "] đã sẵn sàng! Chào mừng " + kh.getHoTen() + " quay trở lại mua sắm.");
+            return "redirect:/";
         }
 
-        String emailTrim = (email != null && !email.isBlank()) ? email.trim() : null;
-        if (emailTrim != null && khachHangRepository.findByEmail(emailTrim).isPresent()) {
-            model.addAttribute("errorMsg", "Email [" + emailTrim + "] đã được sử dụng! Vui lòng dùng email khác.");
-            model.addAttribute("hoTen", hoTen);
-            model.addAttribute("soDienThoai", soDienThoai);
-            model.addAttribute("diaChi", diaChi);
-            model.addAttribute("redirect", redirect);
-            return "auth/register";
+        if (emailTrim != null) {
+            var khEmailOpt = khachHangRepository.findByEmail(emailTrim);
+            if (khEmailOpt.isPresent()) {
+                // Email đã có sẵn: Tự động đăng nhập vào tài khoản đó luôn và về trang chủ
+                KhachHang kh = khEmailOpt.get();
+                if (hoTen != null && !hoTen.isBlank()) kh.setHoTen(hoTen.trim());
+                if (password != null && !password.isBlank() && password.equals(confirmPassword)) {
+                    kh.setMatKhau(password.trim());
+                }
+                khachHangRepository.save(kh);
+
+                AuthUser authUser = AuthUser.builder()
+                        .id(kh.getId())
+                        .maNguoiDung(kh.getMaKhachHang())
+                        .hoTen(kh.getHoTen())
+                        .tenDangNhap(kh.getEmail())
+                        .email(kh.getEmail())
+                        .soDienThoai(kh.getSoDienThoai())
+                        .vaiTro("CUSTOMER")
+                        .build();
+                authService.setCurrentUser(session, authUser);
+
+                ra.addFlashAttribute("thongBaoThanhCong", "Tài khoản [" + emailTrim + "] đã sẵn sàng! Chào mừng " + kh.getHoTen() + " quay trở lại.");
+                return "redirect:/";
+            }
         }
 
         if (password == null || password.trim().length() < 4) {
