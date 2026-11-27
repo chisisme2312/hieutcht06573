@@ -221,7 +221,9 @@ public class BanHangService {
     }
 
     @Transactional(readOnly = true)
-    public List<HoaDonChiTiet> layChiTiet(Integer hoaDonId) { return chiTietRepository.findByHoaDonId(hoaDonId); }
+    public List<HoaDonChiTiet> layChiTiet(Integer hoaDonId) { 
+        return chiTietRepository.findByHoaDonIdWithDetails(hoaDonId); 
+    }
 
     private HoaDon layHoaDonDangCho(Integer id) {
         HoaDon hd = hoaDonRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Không tìm thấy hóa đơn."));

@@ -35,6 +35,7 @@ public class BanHangTaiQuayController {
     @Value("${pos.qr.account-name:}") private String accountName;
 
     @GetMapping
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public String index(@RequestParam(required = false) Integer hoaDonId, HttpSession session, Model model, RedirectAttributes ra) {
         AuthUser auth = (AuthUser) session.getAttribute(AuthServiceImpl.SESSION_USER_KEY);
         if (auth == null || !auth.isNhanVien()) {

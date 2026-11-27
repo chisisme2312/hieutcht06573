@@ -181,8 +181,8 @@ public class TaiKhoanClientController {
         return "redirect:/tai-khoan?tab=dia-chi";
     }
 
-    // 5. Đổi Mật Khẩu
-    @PostMapping("/doi-mat-khau")
+    // 5. Đổi Mật Khẩu (Hỗ trợ cả POST /tai-khoan/doi-mat-khau và /doi-mat-khau)
+    @PostMapping({"/doi-mat-khau", "/tai-khoan/doi-mat-khau"})
     @Transactional
     public String doiMatKhau(
             @RequestParam("matKhauHienTai") String matKhauHienTai,
@@ -215,6 +215,11 @@ public class TaiKhoanClientController {
         kh.setMatKhau(matKhauMoi);
         khachHangRepository.save(kh);
         ra.addFlashAttribute("thongBaoThanhCong", "Đổi mật khẩu thành công!");
+        return "redirect:/tai-khoan?tab=mat-khau";
+    }
+
+    @GetMapping("/doi-mat-khau")
+    public String getDoiMatKhau() {
         return "redirect:/tai-khoan?tab=mat-khau";
     }
 }

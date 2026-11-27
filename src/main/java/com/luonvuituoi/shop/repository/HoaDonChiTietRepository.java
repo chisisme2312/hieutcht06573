@@ -11,6 +11,14 @@ import java.util.List;
 public interface HoaDonChiTietRepository extends JpaRepository<HoaDonChiTiet, Integer> {
     List<HoaDonChiTiet> findByHoaDonId(Integer hoaDonId);
 
+    @Query("SELECT ct FROM HoaDonChiTiet ct " +
+           "LEFT JOIN FETCH ct.sanPhamChiTiet spct " +
+           "LEFT JOIN FETCH spct.sanPham sp " +
+           "LEFT JOIN FETCH spct.mauSac ms " +
+           "LEFT JOIN FETCH spct.kichThuoc kt " +
+           "WHERE ct.hoaDon.id = :hoaDonId")
+    List<HoaDonChiTiet> findByHoaDonIdWithDetails(@org.springframework.data.repository.query.Param("hoaDonId") Integer hoaDonId);
+
     @Query("SELECT hdct.sanPhamChiTiet.sanPham.id, SUM(hdct.soLuong) " +
            "FROM HoaDonChiTiet hdct " +
            "WHERE hdct.sanPhamChiTiet.sanPham.trangThai = true " +

@@ -33,10 +33,15 @@ public class AuthServiceImpl implements AuthService {
         String input = usernameOrAccount.trim();
         String pass = password.trim();
 
-        // 1. Kiểm tra tài khoản Nhân viên / Quản trị viên
+        // 1. Kiểm tra tài khoản Nhân viên / Quản trị viên (theo Username, Email, SĐT, Mã NV)
         Optional<NhanVien> nvOpt = nhanVienRepository.findByTenDangNhap(input);
         if (nvOpt.isEmpty()) {
             nvOpt = nhanVienRepository.findByEmail(input);
+        }
+        if (nvOpt.isEmpty()) {
+            nvOpt = nhanVienRepository.findAll().stream()
+                    .filter(nv -> input.equalsIgnoreCase(nv.getMaNhanVien()) || input.equalsIgnoreCase(nv.getSoDienThoai()))
+                    .findFirst();
         }
 
         if (nvOpt.isPresent()) {
@@ -45,7 +50,7 @@ public class AuthServiceImpl implements AuthService {
                 throw new IllegalArgumentException("Tài khoản nhân viên này đang bị tạm khóa!");
             }
             if (!pass.equals(nv.getMatKhau())) {
-                throw new IllegalArgumentException("Mật khẩu không chính xác!");
+                throw new IllegalArgumentException("Mật khẩu không chính xác! Vui lòng kiểm tra lại.");
             }
 
             String roleName = (nv.getVaiTro() != null && nv.getVaiTro().getTenVaiTro() != null)
@@ -63,10 +68,21 @@ public class AuthServiceImpl implements AuthService {
                     .build();
         }
 
-        // 2. Kiểm tra tài khoản Khách hàng mua online
-        Optional<KhachHang> khOpt = khachHangRepository.findByEmail(input);
+        // 2. Kiểm tra tài khoản Khách hàng mua online (theo SĐT, Email, Mã KH)
+        String sdtDigits = input.replaceAll("[^0-9]", "");
+        Optional<KhachHang> khOpt = khachHangRepository.findBySoDienThoai(input);
+        if (khOpt.isEmpty() && !sdtDigits.isBlank()) {
+            khOpt = khachHangRepository.findBySoDienThoai(sdtDigits);
+        }
         if (khOpt.isEmpty()) {
-            khOpt = khachHangRepository.findBySoDienThoai(input);
+            khOpt = khachHangRepository.findByEmail(input);
+        }
+        if (khOpt.isEmpty()) {
+            khOpt = khachHangRepository.findAll().stream()
+                    .filter(kh -> input.equalsIgnoreCase(kh.getMaKhachHang()) 
+                               || (kh.getEmail() != null && kh.getEmail().equalsIgnoreCase(input))
+                               || (kh.getSoDienThoai() != null && kh.getSoDienThoai().equalsIgnoreCase(input)))
+                    .findFirst();
         }
 
         if (khOpt.isPresent()) {
@@ -75,7 +91,7 @@ public class AuthServiceImpl implements AuthService {
                 throw new IllegalArgumentException("Tài khoản khách hàng này đang bị khóa!");
             }
             if (!pass.equals(kh.getMatKhau())) {
-                throw new IllegalArgumentException("Mật khẩu không chính xác!");
+                throw new IllegalArgumentException("Mật khẩu không chính xác! Vui lòng kiểm tra lại.");
             }
 
             return AuthUser.builder()
@@ -89,7 +105,7 @@ public class AuthServiceImpl implements AuthService {
                     .build();
         }
 
-        throw new IllegalArgumentException("Tài khoản không tồn tại trên hệ thống!");
+        throw new IllegalArgumentException("Tài khoản [" + input + "] chưa tồn tại trên hệ thống! Vui lòng kiểm tra lại thông tin hoặc bấm Đăng Ký bên dưới.");
     }
 
     @Override
