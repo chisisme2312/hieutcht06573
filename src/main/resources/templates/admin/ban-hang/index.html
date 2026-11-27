@@ -23,14 +23,9 @@
                 </div>
 
                 <form th:action="@{/admin/ban-hang/tao-hoa-don}"
-                      method="post"
-                      class="d-flex align-items-center gap-2">
-                    <span th:if="${!#lists.isEmpty(hoaDonCho)}" class="badge bg-warning-subtle text-dark border border-warning-subtle py-2 px-3 fw-semibold">
-                        <i class="bi bi-info-circle me-1"></i> Đang mở 1 hóa đơn (Mỗi tài khoản chỉ 1 hóa đơn)
-                    </span>
+                      method="post">
                     <button type="submit" class="btn btn-danger text-nowrap fw-bold shadow-sm px-3"
-                            th:disabled="${!#lists.isEmpty(hoaDonCho)}"
-                            th:title="${!#lists.isEmpty(hoaDonCho) ? 'Bạn đang có 1 hóa đơn chờ! Vui lòng hoàn tất hoặc hủy trước khi tạo mới.' : 'Tạo hóa đơn chờ mới'}">
+                            th:disabled="${!#lists.isEmpty(hoaDonCho)}">
                         <i class="bi bi-plus-circle me-1"></i> + Tạo Hóa Đơn Mới
                     </button>
                 </form>
@@ -46,19 +41,18 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
 
-            <!-- DANH SÁCH HÓA ĐƠN RIÊNG BIỆT CỦA TÀI KHOẢN -->
+            <!-- DANH SÁCH HÓA ĐƠN CỦA TÀI KHOẢN -->
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-white d-flex justify-content-between align-items-center">
                     <h5 class="fw-bold mb-0">
-                        <i class="bi bi-person-badge text-danger me-2"></i> Hóa đơn chờ của bạn (<span th:text="${currentUser != null ? currentUser.hoTen : 'Nhân viên'}"></span>)
+                        <i class="bi bi-receipt-cutoff text-danger me-2"></i> Hóa đơn chờ
                     </h5>
-                    <span class="badge bg-danger text-white">Độc lập - Không chung đụng</span>
                 </div>
 
                 <div class="card-body">
                     <div th:if="${#lists.isEmpty(hoaDonCho)}"
                          class="text-center text-muted py-3">
-                        Chưa có hóa đơn nào. Hãy tạo hóa đơn mới.
+                        Chưa có hóa đơn chờ.
                     </div>
 
                     <div th:unless="${#lists.isEmpty(hoaDonCho)}"
@@ -83,10 +77,7 @@
             <!-- CHƯA CHỌN HÓA ĐƠN -->
             <div th:if="${hoaDonDangChon == null}" class="card shadow-sm">
                 <div class="card-body text-center py-5">
-                    <h5>Chưa có hóa đơn được chọn</h5>
-                    <p class="text-muted mb-0">
-                        Tạo hóa đơn mới hoặc chọn hóa đơn đang chờ.
-                    </p>
+                    <h5 class="text-muted mb-0">Chưa có hóa đơn được chọn</h5>
                 </div>
             </div>
 
@@ -145,7 +136,7 @@
                                 <div th:if="${#lists.isEmpty(chiTietHoaDon)}"
                                      class="text-center text-muted py-4">
                                     <i class="bi bi-cart-x fs-2 d-block text-secondary mb-2"></i>
-                                    Chưa có sản phẩm trong giỏ hàng. Hãy chọn sản phẩm ở danh sách bên dưới để thêm vào hóa đơn.
+                                    Chưa có sản phẩm trong giỏ hàng.
                                 </div>
 
                                 <div th:unless="${#lists.isEmpty(chiTietHoaDon)}"
@@ -318,7 +309,6 @@
                                                                    th:max="${ct.soLuongTon}"
                                                                    class="form-control form-control-sm text-center fw-bold"
                                                                    style="width: 65px;"
-                                                                   title="Nhập số lượng muốn thêm"
                                                                    onchange="if(parseInt(this.value) > parseInt(this.max)){ alert('Số lượng vượt quá tồn kho hiện có (' + this.max + ' cái)!'); this.value = this.max; } if(parseInt(this.value) < 1 || isNaN(parseInt(this.value))){ this.value = 1; }">
 
                                                             <button type="submit"
